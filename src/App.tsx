@@ -14,6 +14,8 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminBookings from "./pages/admin/Bookings";
 import AdminInquiries from "./pages/admin/Inquiries";
 import AdminTours from "./pages/admin/Tours";
+import AdminAddTour from "./pages/admin/AddTour";
+import AdminEditTour from "./pages/admin/EditTour";
 import AdminReviews from "./pages/admin/Reviews";
 import AdminGallery from "./pages/admin/Gallery";
 import AdminSettings from "./pages/admin/Settings";
@@ -40,6 +42,8 @@ const App = () => (
           <Route path="/admin/bookings" element={<AdminBookings />} />
           <Route path="/admin/inquiries" element={<AdminInquiries />} />
           <Route path="/admin/tours" element={<AdminTours />} />
+          <Route path="/admin/tours/add" element={<AdminAddTour />} />
+          <Route path="/admin/tours/edit/:slug" element={<AdminEditTour />} />
           <Route path="/admin/reviews" element={<AdminReviews />} />
           <Route path="/admin/gallery" element={<AdminGallery />} />
           <Route path="/admin/settings/*" element={<AdminSettings />} />
