@@ -98,34 +98,6 @@ const Home = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/80 to-primary/40" />
         </div>
 
-        {/* Floating Elements */}
-        <div className="absolute top-1/4 right-[15%] hidden lg:block">
-          <div className="bg-card/95 backdrop-blur-sm rounded-2xl p-4 shadow-2xl animate-fade-in" style={{ animationDelay: "0.5s" }}>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center">
-                <Star className="w-6 h-6 text-secondary fill-secondary" />
-              </div>
-              <div>
-                <p className="font-bold text-foreground">4.9/5</p>
-                <p className="text-xs text-muted-foreground">3,245+ Reviews</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="absolute bottom-1/3 right-[10%] hidden lg:block">
-          <div className="bg-card/95 backdrop-blur-sm rounded-2xl p-4 shadow-2xl animate-fade-in" style={{ animationDelay: "0.8s" }}>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-green-500" />
-              </div>
-              <div>
-                <p className="font-bold text-foreground">Instant Booking</p>
-                <p className="text-xs text-muted-foreground">Confirm in seconds</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Content */}
         <div className="container relative z-10 py-20">
