@@ -25,16 +25,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Plus, Search, MoreHorizontal, Edit, Trash2, Eye } from "lucide-react";
-import { tours as localTours, Tour } from "@/data/tours";
+import { Plus, Search, MoreHorizontal, Edit, Trash2, Eye, Loader2 } from "lucide-react";
+import type { Tables } from "@/integrations/supabase/types";
+
+type Tour = Tables<"tours">;
 
 const AdminTours = () => {
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [tourToDelete, setTourToDelete] = useState<Tour | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchTours();
@@ -42,14 +57,47 @@ const AdminTours = () => {
 
   const fetchTours = async () => {
     try {
-      // For now, use local tours data since we just created the DB table
-      // In production, this would fetch from Supabase
-      setTours(localTours);
+      const { data, error } = await supabase
+        .from("tours")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setTours(data || []);
     } catch (error) {
       console.error("Error fetching tours:", error);
       toast.error("Failed to load tours");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (tour: Tour) => {
+    setTourToDelete(tour);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!tourToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("tours")
+        .delete()
+        .eq("id", tourToDelete.id);
+
+      if (error) throw error;
+
+      setTours((prev) => prev.filter((t) => t.id !== tourToDelete.id));
+      toast.success("Tour deleted successfully");
+    } catch (error: any) {
+      console.error("Error deleting tour:", error);
+      toast.error(error.message || "Failed to delete tour");
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+      setTourToDelete(null);
     }
   };
 
@@ -150,11 +198,17 @@ const AdminTours = () => {
                   <TableRow key={tour.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <img
-                          src={tour.image}
-                          alt={tour.title}
-                          className="w-14 h-14 rounded-lg object-cover"
-                        />
+                        {tour.image_url ? (
+                          <img
+                            src={tour.image_url}
+                            alt={tour.title}
+                            className="w-14 h-14 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="w-14 h-14 rounded-lg bg-muted flex items-center justify-center">
+                            <span className="text-xs text-muted-foreground">No img</span>
+                          </div>
+                        )}
                         <div>
                           <p className="font-medium">{tour.title}</p>
                           <p className="text-sm text-muted-foreground truncate max-w-[250px]">
@@ -169,9 +223,9 @@ const AdminTours = () => {
                       </Badge>
                     </TableCell>
                     <TableCell className="font-medium">
-                      AED {tour.price.toLocaleString()}
+                      AED {Number(tour.price).toLocaleString()}
                     </TableCell>
-                    <TableCell>{tour.duration}</TableCell>
+                    <TableCell>{tour.duration || "-"}</TableCell>
                     <TableCell>
                       <Badge
                         className={
@@ -204,7 +258,10 @@ const AdminTours = () => {
                               Edit
                             </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
+                          <DropdownMenuItem 
+                            className="text-destructive"
+                            onClick={() => handleDeleteClick(tour)}
+                          >
                             <Trash2 className="w-4 h-4 mr-2" />
                             Delete
                           </DropdownMenuItem>
@@ -217,6 +274,35 @@ const AdminTours = () => {
             </TableBody>
           </Table>
         </div>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Tour</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete "{tourToDelete?.title}"? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete"
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AdminLayout>
   );
