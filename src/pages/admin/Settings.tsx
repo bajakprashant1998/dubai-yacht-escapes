@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,28 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Save, Globe, Home, Mail, FileText } from "lucide-react";
 
+type SettingsTab = "site" | "homepage" | "footer" | "email";
+
+const VALID_TABS: SettingsTab[] = ["site", "homepage", "footer", "email"];
+
+function getTabFromPath(pathname: string): SettingsTab {
+  // Supports deep links like:
+  // /admin/settings/email
+  // /admin/settings/homepage
+  const parts = pathname.split("/").filter(Boolean);
+  const settingsIndex = parts.indexOf("settings");
+  const candidate = settingsIndex >= 0 ? parts[settingsIndex + 1] : undefined;
+
+  if (candidate && (VALID_TABS as string[]).includes(candidate)) {
+    return candidate as SettingsTab;
+  }
+  return "site";
+}
+
 const AdminSettings = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [siteSettings, setSiteSettings] = useState({
     siteName: "BetterView Tourism",
@@ -32,6 +53,13 @@ const AdminSettings = () => {
     instagramUrl: "https://instagram.com/betterviewtourism",
     twitterUrl: "https://twitter.com/betterviewtour",
   });
+
+  const tabFromUrl = useMemo(() => getTabFromPath(location.pathname), [location.pathname]);
+  const [activeTab, setActiveTab] = useState<SettingsTab>(tabFromUrl);
+
+  useEffect(() => {
+    setActiveTab(tabFromUrl);
+  }, [tabFromUrl]);
 
   const handleSaveSiteSettings = async () => {
     setLoading(true);
@@ -81,7 +109,15 @@ const AdminSettings = () => {
         </div>
 
         {/* Settings Tabs */}
-        <Tabs defaultValue="site" className="w-full">
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => {
+            const next = (VALID_TABS as string[]).includes(value) ? (value as SettingsTab) : "site";
+            setActiveTab(next);
+            navigate(`/admin/settings/${next}`);
+          }}
+          className="w-full"
+        >
           <TabsList className="grid w-full max-w-md grid-cols-4">
             <TabsTrigger value="site" className="gap-2">
               <Globe className="w-4 h-4" />
