@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { withTimeout } from "@/lib/withTimeout";
+import { Button } from "@/components/ui/button";
 import AdminSidebar from "./AdminSidebar";
 import AdminTopBar from "./AdminTopBar";
 
@@ -17,6 +18,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [adminGateError, setAdminGateError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -29,6 +31,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         if (event === "SIGNED_OUT") {
           setUser(null);
           setIsAdmin(false);
+          setAdminGateError(null);
           setLoading(false);
           navigate("/auth");
           return;
@@ -55,6 +58,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         const session = data.session;
         if (!session) {
           setIsAdmin(false);
+          setAdminGateError(null);
           setLoading(false);
           navigate("/auth");
           return;
@@ -66,6 +70,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         console.error("Error checking auth:", err);
         if (!cancelled) {
           setIsAdmin(false);
+          setAdminGateError("Couldn't verify your session. Please sign in again.");
           setLoading(false);
           navigate("/auth");
         }
@@ -82,6 +87,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
 
   const checkAdminRole = async (userId: string) => {
     setLoading(true);
+    setAdminGateError(null);
     try {
       const { data, error } = await withTimeout(
         supabase
@@ -89,16 +95,20 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
           .select("role")
           .eq("user_id", userId)
           .eq("role", "admin")
-          .maybeSingle(),
-        8000,
+          .limit(1),
+        15000,
         "Role check timed out",
       );
 
       if (error) throw error;
 
-      if (data) {
+      const hasAdminRole = Array.isArray(data) ? data.length > 0 : !!data;
+
+      if (hasAdminRole) {
         setIsAdmin(true);
       } else {
+        setIsAdmin(false);
+        setAdminGateError("You don't have admin privileges.");
         toast({
           title: "Access Denied",
           description: "You don't have admin privileges.",
@@ -108,12 +118,15 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       }
     } catch (error) {
       console.error("Error checking admin role:", error);
+      setIsAdmin(false);
+      setAdminGateError(
+        "We couldn't verify admin access right now. Please retry (or sign out/in).",
+      );
       toast({
         title: "Admin check failed",
         description: "Couldn't verify admin access. Please refresh and try again.",
         variant: "destructive",
       });
-      navigate("/");
     } finally {
       setLoading(false);
     }
@@ -128,7 +141,30 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   }
 
   if (!isAdmin) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-6">
+        <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 space-y-4">
+          <div className="space-y-1">
+            <h1 className="font-display text-xl font-bold text-foreground">
+              Admin access
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {adminGateError ?? "Admin access is required to view this page."}
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => window.location.reload()}>
+              Retry
+            </Button>
+            <Button variant="secondary" onClick={() => navigate("/auth")}>
+              Sign in
+            </Button>
+            <Button onClick={() => navigate("/")}>Go home</Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
