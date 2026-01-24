@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Filter, Ship, Anchor, Crown, Users, Loader2 } from "lucide-react";
+import { ArrowRight, Filter, Ship, Anchor, Crown, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import Layout from "@/components/layout/Layout";
 import TourCard from "@/components/TourCard";
-import { useTours, categories } from "@/hooks/useTours";
+import { useTours } from "@/hooks/useTours";
+import { useActiveCategories } from "@/hooks/useCategories";
 
 const categoryIcons: Record<string, React.ReactNode> = {
   "all": <Filter className="w-4 h-4" />,
@@ -19,7 +20,19 @@ const Tours = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState<"popular" | "price-low" | "price-high">("popular");
   
-  const { data: tours = [], isLoading, error } = useTours();
+  const { data: tours = [], isLoading: toursLoading, error: toursError } = useTours();
+  const { data: dbCategories = [], isLoading: categoriesLoading } = useActiveCategories();
+
+  // Build categories array with "All Tours" option
+  const categories: Array<{ id: string; label: string; slug: string; description?: string | null }> = [
+    { id: "all", label: "All Tours", slug: "all" },
+    ...dbCategories.map((cat) => ({
+      id: cat.slug,
+      label: cat.name,
+      slug: cat.slug,
+      description: cat.description,
+    })),
+  ];
 
   const filteredTours = selectedCategory === "all" 
     ? tours 
@@ -36,6 +49,11 @@ const Tours = () => {
         return b.reviewCount - a.reviewCount;
     }
   });
+
+  // Get selected category description
+  const selectedCategoryData = categories.find((c) => c.id === selectedCategory);
+
+  const isLoading = toursLoading || categoriesLoading;
 
   return (
     <Layout>
@@ -69,20 +87,28 @@ const Tours = () => {
       <section className="py-8 bg-cream border-b border-border">
         <div className="container">
           <div className="flex flex-wrap justify-center gap-3">
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all ${
-                  selectedCategory === category.id
-                    ? "bg-primary text-primary-foreground shadow-lg"
-                    : "bg-card text-foreground hover:bg-muted border border-border"
-                }`}
-              >
-                {categoryIcons[category.id]}
-                {category.label}
-              </button>
-            ))}
+            {categoriesLoading ? (
+              <>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Skeleton key={i} className="h-10 w-32 rounded-full" />
+                ))}
+              </>
+            ) : (
+              categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all ${
+                    selectedCategory === category.id
+                      ? "bg-primary text-primary-foreground shadow-lg"
+                      : "bg-card text-foreground hover:bg-muted border border-border"
+                  }`}
+                >
+                  {categoryIcons[category.id] || <Filter className="w-4 h-4" />}
+                  {category.label}
+                </button>
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -110,28 +136,11 @@ const Tours = () => {
           </div>
 
           {/* Category Description */}
-          {selectedCategory !== "all" && (
+          {selectedCategory !== "all" && selectedCategoryData?.description && (
             <div className="mb-8 p-6 bg-cream rounded-xl">
-              {selectedCategory === "dhow-cruise" && (
-                <p className="text-muted-foreground">
-                  <span className="font-semibold text-foreground">Traditional Dhow Cruises</span> — Experience the timeless charm of Arabian wooden vessels as you cruise through Dubai Marina with dinner, entertainment, and stunning skyline views.
-                </p>
-              )}
-              {selectedCategory === "yacht-shared" && (
-                <p className="text-muted-foreground">
-                  <span className="font-semibold text-foreground">Shared Yacht Experiences</span> — Join fellow travelers aboard luxury yachts for affordable yet premium experiences with live BBQ, swimming, and spectacular views.
-                </p>
-              )}
-              {selectedCategory === "yacht-private" && (
-                <p className="text-muted-foreground">
-                  <span className="font-semibold text-foreground">Private Yacht Charters</span> — Exclusive use of the entire yacht for your group. Perfect for celebrations, corporate events, or intimate gatherings.
-                </p>
-              )}
-              {selectedCategory === "megayacht" && (
-                <p className="text-muted-foreground">
-                  <span className="font-semibold text-foreground">Megayacht Dining</span> — The ultimate luxury experience aboard magnificent multi-deck vessels with lavish buffets and world-class service.
-                </p>
-              )}
+              <p className="text-muted-foreground">
+                <span className="font-semibold text-foreground">{selectedCategoryData.label}</span> — {selectedCategoryData.description}
+              </p>
             </div>
           )}
 
@@ -160,7 +169,7 @@ const Tours = () => {
           )}
 
           {/* Error State */}
-          {error && (
+          {toursError && (
             <div className="text-center py-12">
               <p className="text-destructive mb-4">Failed to load tours. Please try again.</p>
               <Button onClick={() => window.location.reload()}>Retry</Button>
@@ -168,7 +177,7 @@ const Tours = () => {
           )}
 
           {/* Tours Grid */}
-          {!isLoading && !error && (
+          {!isLoading && !toursError && (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {sortedTours.map((tour) => (
                 <TourCard key={tour.id} tour={tour} />
@@ -176,7 +185,7 @@ const Tours = () => {
             </div>
           )}
 
-          {!isLoading && !error && sortedTours.length === 0 && (
+          {!isLoading && !toursError && sortedTours.length === 0 && (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No tours found in this category.</p>
             </div>

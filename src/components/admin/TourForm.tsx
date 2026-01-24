@@ -14,9 +14,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { Upload, X, Plus, Loader2, ImageIcon } from "lucide-react";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
+import { useActiveCategories } from "@/hooks/useCategories";
 
 type Tour = Tables<"tours">;
 
@@ -32,6 +34,9 @@ const TourForm = ({ tour, mode }: TourFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+
+  // Fetch categories from database
+  const { data: categories = [], isLoading: categoriesLoading } = useActiveCategories();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -326,20 +331,25 @@ const TourForm = ({ tour, mode }: TourFormProps) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Category *</Label>
-                  <Select
-                    value={formData.category}
-                    onValueChange={(value) => setFormData((prev) => ({ ...prev, category: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="dhow">Dhow Cruise</SelectItem>
-                      <SelectItem value="megayacht">Megayacht</SelectItem>
-                      <SelectItem value="shared">Shared Yacht</SelectItem>
-                      <SelectItem value="private">Private Yacht</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {categoriesLoading ? (
+                    <Skeleton className="h-10 w-full" />
+                  ) : (
+                    <Select
+                      value={formData.category}
+                      onValueChange={(value) => setFormData((prev) => ({ ...prev, category: value }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.slug}>
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label>Status</Label>
