@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Phone, Mail, ChevronDown, Ship, Anchor, Crown, Users } from "lucide-react";
+import rentalYachtLogo from "@/assets/rental-yacht-logo.png";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -75,9 +76,9 @@ const Header = () => {
               <Phone className="w-4 h-4" />
               +971 50 123 4567
             </a>
-            <a href="mailto:info@betterviewtourism.com" className="flex items-center gap-2 hover:text-secondary transition-colors">
+            <a href="mailto:info@rentalyachtdubai.com" className="flex items-center gap-2 hover:text-secondary transition-colors">
               <Mail className="w-4 h-4" />
-              info@betterviewtourism.com
+              info@rentalyachtdubai.com
             </a>
           </div>
           <div className="flex items-center gap-4 text-secondary font-medium">
@@ -96,12 +97,14 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
-              <span className="text-secondary font-display font-bold text-2xl">B</span>
-            </div>
+            <img 
+              src={rentalYachtLogo} 
+              alt="Rental Yacht Dubai" 
+              className="w-11 h-11 object-contain rounded-lg"
+            />
             <div className="flex flex-col">
-              <span className="font-display font-bold text-xl text-primary leading-tight tracking-tight">BetterView</span>
-              <span className="text-[10px] text-muted-foreground tracking-[0.2em] uppercase font-medium">Tourism</span>
+              <span className="font-display font-bold text-xl text-primary leading-tight tracking-tight">Rental Yacht</span>
+              <span className="text-[10px] text-muted-foreground tracking-[0.2em] uppercase font-medium">Dubai</span>
             </div>
           </Link>
 

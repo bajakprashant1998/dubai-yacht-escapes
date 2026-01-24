@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 interface ImageGalleryProps {
@@ -11,6 +12,11 @@ interface ImageGalleryProps {
 const ImageGallery = ({ images, title }: ImageGalleryProps) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
+
+  const handleImageLoad = (index: number) => {
+    setLoadedImages(prev => ({ ...prev, [index]: true }));
+  };
 
   const openLightbox = (index: number) => {
     setSelectedIndex(index);
@@ -34,10 +40,17 @@ const ImageGallery = ({ images, title }: ImageGalleryProps) => {
           className="col-span-4 md:col-span-2 row-span-2 cursor-pointer group relative overflow-hidden rounded-xl md:rounded-2xl"
           onClick={() => openLightbox(0)}
         >
+          {!loadedImages[0] && (
+            <Skeleton className="absolute inset-0 w-full h-[280px] md:h-[420px]" />
+          )}
           <img
             src={images[0]}
             alt={title}
-            className="w-full h-[280px] md:h-[420px] object-cover transition-transform duration-500 group-hover:scale-105"
+            onLoad={() => handleImageLoad(0)}
+            className={cn(
+              "w-full h-[280px] md:h-[420px] object-cover transition-all duration-500 group-hover:scale-105",
+              loadedImages[0] ? "opacity-100" : "opacity-0"
+            )}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <div className="absolute bottom-4 left-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-medium">
@@ -55,10 +68,18 @@ const ImageGallery = ({ images, title }: ImageGalleryProps) => {
             )}
             onClick={() => openLightbox(index + 1)}
           >
+            {!loadedImages[index + 1] && (
+              <Skeleton className="absolute inset-0 w-full h-[100px] md:h-[200px]" />
+            )}
             <img
               src={image}
               alt={`${title} - ${index + 2}`}
-              className="w-full h-[100px] md:h-[200px] object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+              onLoad={() => handleImageLoad(index + 1)}
+              className={cn(
+                "w-full h-[100px] md:h-[200px] object-cover transition-all duration-500 group-hover:scale-105",
+                loadedImages[index + 1] ? "opacity-100" : "opacity-0"
+              )}
             />
             <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             

@@ -316,7 +316,7 @@ const Home = () => {
         <div className="container relative">
           <div className="text-center mb-12">
             <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
-              Why Book With <span className="text-secondary">BetterView</span>
+              Why Book With <span className="text-secondary">Rental Yacht Dubai</span>
             </h2>
             <p className="text-primary-foreground/80 max-w-2xl mx-auto">
               We're committed to making your Dubai experience exceptional from start to finish
