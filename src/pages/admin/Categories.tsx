@@ -7,25 +7,33 @@ import { FolderOpen, Plus, Search } from "lucide-react";
 import CategoriesTable from "@/components/admin/CategoriesTable";
 import CategoryDialog from "@/components/admin/CategoryDialog";
 import {
-  useCategories,
+  useCategoriesWithCounts,
   useCreateCategory,
   useUpdateCategory,
   useDeleteCategory,
-  Category,
+  useBulkUpdateCategoryOrder,
+  CategoryWithCount,
   CategoryInsert,
+  CategoryUpdate,
 } from "@/hooks/useCategories";
 
 const AdminCategories = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingCategory, setEditingCategory] = useState<CategoryWithCount | null>(null);
+  const [localCategories, setLocalCategories] = useState<CategoryWithCount[] | null>(null);
 
-  const { data: categories, isLoading, error } = useCategories();
+  // Queries and mutations
+  const { data: categories = [], isLoading, error } = useCategoriesWithCounts();
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
+  const bulkUpdateOrder = useBulkUpdateCategoryOrder();
 
-  const filteredCategories = categories?.filter(
+  // Use local state for optimistic updates during drag, otherwise use fetched data
+  const displayCategories = localCategories ?? categories;
+
+  const filteredCategories = displayCategories.filter(
     (cat) =>
       cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       cat.slug.toLowerCase().includes(searchQuery.toLowerCase())
@@ -36,33 +44,59 @@ const AdminCategories = () => {
     setIsDialogOpen(true);
   };
 
-  const handleEdit = (category: Category) => {
+  const handleEdit = (category: CategoryWithCount) => {
     setEditingCategory(category);
     setIsDialogOpen(true);
   };
 
-  const handleSave = (data: CategoryInsert) => {
+  const handleSave = (data: CategoryInsert | CategoryUpdate) => {
     if (editingCategory) {
       updateCategory.mutate(
-        { id: editingCategory.id, ...data },
+        { ...data, id: editingCategory.id },
         {
           onSuccess: () => {
             setIsDialogOpen(false);
             setEditingCategory(null);
+            setLocalCategories(null);
           },
         }
       );
     } else {
-      createCategory.mutate(data, {
+      createCategory.mutate(data as CategoryInsert, {
         onSuccess: () => {
           setIsDialogOpen(false);
+          setLocalCategories(null);
         },
       });
     }
   };
 
   const handleDelete = (id: string) => {
-    deleteCategory.mutate(id);
+    deleteCategory.mutate(id, {
+      onSuccess: () => {
+        setLocalCategories(null);
+      },
+    });
+  };
+
+  const handleReorder = (reorderedCategories: CategoryWithCount[]) => {
+    // Optimistic update
+    setLocalCategories(reorderedCategories);
+
+    // Persist to database
+    const updates = reorderedCategories.map((cat, index) => ({
+      id: cat.id,
+      sort_order: index,
+    }));
+
+    bulkUpdateOrder.mutate(updates, {
+      onSuccess: () => {
+        setLocalCategories(null);
+      },
+      onError: () => {
+        setLocalCategories(null);
+      },
+    });
   };
 
   return (
@@ -75,7 +109,7 @@ const AdminCategories = () => {
               Tour Categories
             </h1>
             <p className="text-muted-foreground">
-              Organize tours into categories for better navigation
+              Organize tours into categories. Drag to reorder.
             </p>
           </div>
           <Button onClick={handleOpenCreate}>
@@ -106,12 +140,14 @@ const AdminCategories = () => {
           <div className="bg-destructive/10 text-destructive rounded-xl p-6 text-center">
             <p>Failed to load categories. Please try again.</p>
           </div>
-        ) : filteredCategories && filteredCategories.length > 0 ? (
+        ) : filteredCategories.length > 0 ? (
           <CategoriesTable
             categories={filteredCategories}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onReorder={handleReorder}
             isDeleting={deleteCategory.isPending}
+            isReordering={bulkUpdateOrder.isPending}
           />
         ) : (
           <div className="bg-card rounded-xl border border-border p-12 text-center">

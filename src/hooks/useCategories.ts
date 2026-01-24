@@ -1,40 +1,67 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  icon: string | null;
-  sort_order: number | null;
-  is_active: boolean | null;
-  created_at: string;
-  updated_at: string;
+// Types
+export type Category = Tables<"categories">;
+export type CategoryInsert = TablesInsert<"categories">;
+export type CategoryUpdate = TablesUpdate<"categories">;
+
+// Extended type with tour count
+export interface CategoryWithCount extends Category {
+  tour_count: number;
 }
 
-export type CategoryInsert = Omit<Category, "id" | "created_at" | "updated_at">;
-export type CategoryUpdate = Partial<CategoryInsert>;
-
-export const useCategories = () => {
+// Fetch all categories (simple)
+export function useCategories() {
   return useQuery({
     queryKey: ["categories"],
-    queryFn: async () => {
+    queryFn: async (): Promise<Category[]> => {
       const { data, error } = await supabase
         .from("categories")
         .select("*")
         .order("sort_order", { ascending: true });
 
       if (error) throw error;
-      return data as Category[];
+      return data || [];
     },
   });
-};
+}
 
-export const useCreateCategory = () => {
+// Fetch categories with tour counts using the database function
+export function useCategoriesWithCounts() {
+  return useQuery({
+    queryKey: ["categories", "with-counts"],
+    queryFn: async (): Promise<CategoryWithCount[]> => {
+      const { data, error } = await supabase.rpc("get_categories_with_tour_counts");
+
+      if (error) throw error;
+      return (data || []) as CategoryWithCount[];
+    },
+  });
+}
+
+// Fetch active categories for public pages
+export function useActiveCategories() {
+  return useQuery({
+    queryKey: ["categories", "active"],
+    queryFn: async (): Promise<Category[]> => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+}
+
+// Create category
+export function useCreateCategory() {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async (category: CategoryInsert) => {
@@ -49,24 +76,17 @@ export const useCreateCategory = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      toast({
-        title: "Category created",
-        description: "The category has been created successfully.",
-      });
+      toast.success("Category created successfully");
     },
     onError: (error: Error) => {
-      toast({
-        title: "Error creating category",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast.error(error.message || "Failed to create category");
     },
   });
-};
+}
 
-export const useUpdateCategory = () => {
+// Update category
+export function useUpdateCategory() {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async ({ id, ...updates }: CategoryUpdate & { id: string }) => {
@@ -82,24 +102,17 @@ export const useUpdateCategory = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      toast({
-        title: "Category updated",
-        description: "The category has been updated successfully.",
-      });
+      toast.success("Category updated successfully");
     },
     onError: (error: Error) => {
-      toast({
-        title: "Error updating category",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast.error(error.message || "Failed to update category");
     },
   });
-};
+}
 
-export const useDeleteCategory = () => {
+// Delete category
+export function useDeleteCategory() {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -109,17 +122,42 @@ export const useDeleteCategory = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      toast({
-        title: "Category deleted",
-        description: "The category has been deleted successfully.",
-      });
+      toast.success("Category deleted successfully");
     },
     onError: (error: Error) => {
-      toast({
-        title: "Error deleting category",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast.error(error.message || "Failed to delete category");
     },
   });
-};
+}
+
+// Bulk update category order
+export function useBulkUpdateCategoryOrder() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (updates: { id: string; sort_order: number }[]) => {
+      // Update each category's sort_order
+      const promises = updates.map(({ id, sort_order }) =>
+        supabase
+          .from("categories")
+          .update({ sort_order })
+          .eq("id", id)
+      );
+
+      const results = await Promise.all(promises);
+      
+      // Check for errors
+      const errors = results.filter((r) => r.error);
+      if (errors.length > 0) {
+        throw new Error("Failed to update some category orders");
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.success("Category order updated");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to update category order");
+    },
+  });
+}

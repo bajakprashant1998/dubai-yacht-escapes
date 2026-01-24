@@ -281,6 +281,7 @@ export type Database = {
         Row: {
           capacity: string | null
           category: string
+          category_id: string | null
           created_at: string | null
           description: string | null
           duration: string | null
@@ -307,6 +308,7 @@ export type Database = {
         Insert: {
           capacity?: string | null
           category: string
+          category_id?: string | null
           created_at?: string | null
           description?: string | null
           duration?: string | null
@@ -333,6 +335,7 @@ export type Database = {
         Update: {
           capacity?: string | null
           category?: string
+          category_id?: string | null
           created_at?: string | null
           description?: string | null
           duration?: string | null
@@ -356,7 +359,15 @@ export type Database = {
           title?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tours_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -384,6 +395,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_categories_with_tour_counts: {
+        Args: never
+        Returns: {
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+          tour_count: number
+          updated_at: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

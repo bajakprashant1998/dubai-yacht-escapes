@@ -77,11 +77,5 @@ export function useRelatedTours(category: string, excludeId: string) {
   });
 }
 
-// Categories for filtering
-export const categories = [
-  { id: "all", label: "All Tours" },
-  { id: "dhow-cruise", label: "Dhow Cruises" },
-  { id: "yacht-shared", label: "Shared Yacht" },
-  { id: "yacht-private", label: "Private Yacht" },
-  { id: "megayacht", label: "Megayacht" },
-];
+// Note: Categories are now managed via useCategories hook from useCategories.ts
+// The hardcoded categories array has been removed - use useActiveCategories() instead
