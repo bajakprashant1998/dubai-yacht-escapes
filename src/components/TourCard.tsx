@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Star, Clock, Users, ChevronRight, Ship } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import { Tour } from "@/lib/tourMapper";
 
 interface TourCardProps {
@@ -9,6 +12,7 @@ interface TourCardProps {
 }
 
 const TourCard = ({ tour, featured = false }: TourCardProps) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
   const discount = Math.round((1 - tour.price / tour.originalPrice) * 100);
 
   const categoryLabels: Record<string, string> = {
@@ -23,10 +27,18 @@ const TourCard = ({ tour, featured = false }: TourCardProps) => {
       <div className={`bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 h-full flex flex-col ${featured ? 'lg:flex-row' : ''}`}>
         {/* Image */}
         <div className={`relative overflow-hidden ${featured ? 'lg:w-1/2 lg:min-h-[300px]' : 'aspect-[4/3]'}`}>
+          {!imageLoaded && (
+            <Skeleton className="absolute inset-0 w-full h-full" />
+          )}
           <img
             src={tour.image}
             alt={tour.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+            onLoad={() => setImageLoaded(true)}
+            className={cn(
+              "w-full h-full object-cover group-hover:scale-105 transition-all duration-500",
+              imageLoaded ? "opacity-100" : "opacity-0"
+            )}
           />
           {/* Discount Badge */}
           {discount > 0 && (
