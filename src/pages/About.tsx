@@ -133,27 +133,27 @@ const About = () => {
       </section>
 
       {/* Values Section */}
-      <section className="py-20 bg-cream">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+      <section className="py-12 sm:py-20 bg-cream">
+        <div className="container px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">
               Our Core Values
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
               These principles guide every decision we make and every experience we create
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
             {values.map((value, index) => (
-              <div key={index} className="bg-card p-6 rounded-xl shadow-md text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                  <value.icon className="w-8 h-8 text-secondary" />
+              <div key={index} className="bg-card p-4 sm:p-6 rounded-xl shadow-md text-center">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                  <value.icon className="w-6 h-6 sm:w-8 sm:h-8 text-secondary" />
                 </div>
-                <h3 className="font-display text-xl font-semibold text-foreground mb-3">
+                <h3 className="font-display text-base sm:text-xl font-semibold text-foreground mb-2 sm:mb-3">
                   {value.title}
                 </h3>
-                <p className="text-muted-foreground text-sm">{value.description}</p>
+                <p className="text-muted-foreground text-xs sm:text-sm line-clamp-3">{value.description}</p>
               </div>
             ))}
           </div>
@@ -161,21 +161,21 @@ const About = () => {
       </section>
 
       {/* Team Section */}
-      <section className="py-20">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+      <section className="py-12 sm:py-20">
+        <div className="container px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 sm:mb-4">
               Meet Our Team
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
               The dedicated professionals behind your unforgettable cruise experience
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-8 max-w-4xl mx-auto">
             {team.map((member, index) => (
               <div key={index} className="text-center group">
-                <div className="relative mb-4 overflow-hidden rounded-xl">
+                <div className="relative mb-3 sm:mb-4 overflow-hidden rounded-xl">
                   <img
                     src={member.image}
                     alt={member.name}
@@ -183,8 +183,8 @@ const About = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-                <h3 className="font-display text-xl font-semibold text-foreground">{member.name}</h3>
-                <p className="text-secondary">{member.role}</p>
+                <h3 className="font-display text-sm sm:text-xl font-semibold text-foreground">{member.name}</h3>
+                <p className="text-secondary text-xs sm:text-base">{member.role}</p>
               </div>
             ))}
           </div>

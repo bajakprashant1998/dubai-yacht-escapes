@@ -84,13 +84,14 @@ const Tours = () => {
       </section>
 
       {/* Category Filter */}
-      <section className="py-8 bg-cream border-b border-border">
-        <div className="container">
-          <div className="flex flex-wrap justify-center gap-3">
+      <section className="py-6 sm:py-8 bg-cream border-b border-border">
+        <div className="container px-4 sm:px-6">
+          {/* Horizontal scroll on mobile, centered wrap on desktop */}
+          <div className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide snap-x-mandatory pb-2 sm:pb-0 sm:flex-wrap sm:justify-center -mx-4 px-4 sm:mx-0 sm:px-0">
             {categoriesLoading ? (
               <>
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <Skeleton key={i} className="h-10 w-32 rounded-full" />
+                  <Skeleton key={i} className="h-10 w-28 sm:w-32 rounded-full flex-shrink-0" />
                 ))}
               </>
             ) : (
@@ -98,7 +99,7 @@ const Tours = () => {
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all ${
+                  className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full font-medium transition-all flex-shrink-0 snap-start touch-target text-sm sm:text-base whitespace-nowrap ${
                     selectedCategory === category.id
                       ? "bg-primary text-primary-foreground shadow-lg"
                       : "bg-card text-foreground hover:bg-muted border border-border"
@@ -114,19 +115,19 @@ const Tours = () => {
       </section>
 
       {/* Tours Grid */}
-      <section className="py-12">
-        <div className="container">
+      <section className="py-8 sm:py-12">
+        <div className="container px-4 sm:px-6">
           {/* Stats Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-6 border-b border-border">
-            <p className="text-muted-foreground">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8 pb-4 sm:pb-6 border-b border-border">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Showing <span className="font-semibold text-foreground">{sortedTours.length}</span> experiences
             </p>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">Sort by:</span>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <span className="text-xs sm:text-sm text-muted-foreground">Sort by:</span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                className="bg-card border border-border rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-secondary"
+                className="bg-card border border-border rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-secondary flex-1 sm:flex-none h-10 touch-target"
               >
                 <option value="popular">Most Popular</option>
                 <option value="price-low">Price: Low to High</option>

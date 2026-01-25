@@ -193,13 +193,13 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-background border-b border-border shadow-xl animate-fade-in">
-            <div className="container py-6 flex flex-col gap-2">
+          <div className="lg:hidden absolute top-full left-0 right-0 bg-background border-b border-border shadow-xl animate-slide-in-right max-h-[calc(100vh-80px)] overflow-y-auto">
+            <div className="container py-4 sm:py-6 flex flex-col gap-1 sm:gap-2 px-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`text-base font-medium py-3 px-4 rounded-lg transition-colors
+                  className={`text-base font-medium py-3 px-4 rounded-lg transition-colors touch-target
                     ${isActive(link.path) ? "text-secondary bg-secondary/10" : "text-foreground hover:bg-muted/50 hover:text-secondary"}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -208,30 +208,30 @@ const Header = () => {
               ))}
               
               {/* Mobile Tour Categories */}
-              <div className="mt-4 pt-4 border-t border-border">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-3">Quick Links</p>
+              <div className="mt-3 pt-3 sm:mt-4 sm:pt-4 border-t border-border">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-2 sm:mb-3">Quick Links</p>
                 <div className="grid grid-cols-2 gap-2">
                   {tourCategories.map((category) => (
                     <Link 
                       key={category.path}
                       to={category.path} 
                       onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center gap-2 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                      className="flex items-center gap-2 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors touch-target"
                     >
-                      <category.icon className="w-4 h-4 text-secondary" />
-                      <span className="text-sm font-medium">{category.name}</span>
+                      <category.icon className="w-4 h-4 text-secondary flex-shrink-0" />
+                      <span className="text-xs sm:text-sm font-medium truncate">{category.name}</span>
                     </Link>
                   ))}
                 </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-border space-y-3">
-                <a href={`tel:${phone}`} className="flex items-center gap-2 text-sm text-muted-foreground px-4">
+              <div className="mt-3 pt-3 sm:mt-4 sm:pt-4 border-t border-border space-y-3 pb-safe">
+                <a href={`tel:${phone}`} className="flex items-center gap-2 text-sm text-muted-foreground px-4 py-2 touch-target">
                   <Phone className="w-4 h-4" />
                   {phoneFormatted}
                 </a>
                 <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold h-12">
+                  <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold h-12 touch-target">
                     Book Now
                   </Button>
                 </Link>
