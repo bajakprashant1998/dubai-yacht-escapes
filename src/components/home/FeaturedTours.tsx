@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { memo } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,20 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import TourCard from "@/components/TourCard";
 import { useFeaturedTours } from "@/hooks/useTours";
 
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15 }
-  }
-};
-
-const item = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-};
-
-const FeaturedTours = () => {
+const FeaturedTours = memo(() => {
   const { data: featuredTours = [], isLoading } = useFeaturedTours();
 
   return (
@@ -30,7 +18,7 @@ const FeaturedTours = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.4 }}
         >
           <div>
             <p className="text-secondary font-semibold tracking-wider uppercase mb-3">
@@ -68,30 +56,21 @@ const FeaturedTours = () => {
           </div>
         )}
 
-        {/* Tours Grid - Horizontal scroll on mobile */}
+        {/* Tours Grid */}
         {!isLoading && featuredTours.length > 0 && (
           <>
             {/* Mobile: Horizontal scroll carousel */}
             <div className="lg:hidden -mx-4 px-4">
-              <motion.div 
-                className="flex overflow-x-auto gap-4 pb-4 snap-x-mandatory scrollbar-hide"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-              >
+              <div className="flex overflow-x-auto gap-4 pb-4 snap-x-mandatory scrollbar-hide">
                 {featuredTours.slice(0, 4).map((tour, index) => (
-                  <motion.div 
+                  <div 
                     key={tour.id} 
                     className="flex-shrink-0 w-[85%] sm:w-[75%] snap-start"
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
                   >
                     <TourCard tour={tour} />
-                  </motion.div>
+                  </div>
                 ))}
-              </motion.div>
+              </div>
               {/* Scroll indicator */}
               <div className="flex justify-center gap-1.5 mt-2">
                 {featuredTours.slice(0, 4).map((_, index) => (
@@ -106,15 +85,15 @@ const FeaturedTours = () => {
             {/* Desktop: Grid layout */}
             <motion.div 
               className="hidden lg:grid lg:grid-cols-2 gap-6"
-              variants={container}
-              initial="hidden"
-              whileInView="show"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
               viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.4 }}
             >
               {featuredTours.slice(0, 4).map((tour) => (
-                <motion.div key={tour.id} variants={item}>
+                <div key={tour.id}>
                   <TourCard tour={tour} />
-                </motion.div>
+                </div>
               ))}
             </motion.div>
           </>
@@ -122,20 +101,18 @@ const FeaturedTours = () => {
 
         {/* Empty State */}
         {!isLoading && featuredTours.length === 0 && (
-          <motion.div 
-            className="text-center py-16 bg-muted/30 rounded-2xl"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
+          <div className="text-center py-16 bg-muted/30 rounded-2xl">
             <p className="text-muted-foreground mb-4">No featured tours available at the moment.</p>
             <Link to="/tours">
               <Button>Browse All Tours</Button>
             </Link>
-          </motion.div>
+          </div>
         )}
       </div>
     </section>
   );
-};
+});
+
+FeaturedTours.displayName = "FeaturedTours";
 
 export default FeaturedTours;

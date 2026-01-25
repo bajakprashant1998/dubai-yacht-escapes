@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { memo } from "react";
 import { motion } from "framer-motion";
 import { Ship, Users, Anchor, Crown } from "lucide-react";
 
@@ -37,53 +38,41 @@ const experienceCategories = [
   },
 ];
 
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 }
-  }
-};
-
-const item = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0 }
-};
-
-const ExperienceCategories = () => {
+const ExperienceCategories = memo(() => {
   return (
     <section className="py-6 sm:py-8 -mt-16 sm:-mt-20 relative z-20">
       <div className="container">
         <motion.div 
           className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4"
-          variants={container}
-          initial="hidden"
-          whileInView="show"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.4, staggerChildren: 0.05 }}
         >
           {experienceCategories.map((category, index) => (
-            <motion.div key={index} variants={item}>
-              <Link
-                to={category.link}
-                className="group block bg-card p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-border hover:border-secondary/30 relative overflow-hidden touch-target"
-              >
-                {/* Background Gradient */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-                
-                <div className="relative">
-                  <div className="w-10 sm:w-14 h-10 sm:h-14 rounded-lg sm:rounded-xl bg-muted/50 flex items-center justify-center mb-2.5 sm:mb-4 group-hover:scale-110 group-hover:bg-secondary/20 transition-all duration-300">
-                    <category.icon className={`w-5 sm:w-7 h-5 sm:h-7 ${category.iconColor} group-hover:text-secondary transition-colors`} />
-                  </div>
-                  <h3 className="font-display font-bold text-sm sm:text-base text-foreground mb-0.5 sm:mb-1 group-hover:text-secondary transition-colors">{category.title}</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">{category.description}</p>
+            <Link
+              key={index}
+              to={category.link}
+              className="group block bg-card p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-border hover:border-secondary/30 relative overflow-hidden touch-target hover:-translate-y-1"
+            >
+              {/* Background Gradient */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+              
+              <div className="relative">
+                <div className="w-10 sm:w-14 h-10 sm:h-14 rounded-lg sm:rounded-xl bg-muted/50 flex items-center justify-center mb-2.5 sm:mb-4 group-hover:scale-110 group-hover:bg-secondary/20 transition-all duration-300">
+                  <category.icon className={`w-5 sm:w-7 h-5 sm:h-7 ${category.iconColor} group-hover:text-secondary transition-colors`} />
                 </div>
-              </Link>
-            </motion.div>
+                <h3 className="font-display font-bold text-sm sm:text-base text-foreground mb-0.5 sm:mb-1 group-hover:text-secondary transition-colors">{category.title}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">{category.description}</p>
+              </div>
+            </Link>
           ))}
         </motion.div>
       </div>
     </section>
   );
-};
+});
+
+ExperienceCategories.displayName = "ExperienceCategories";
 
 export default ExperienceCategories;

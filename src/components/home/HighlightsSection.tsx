@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
+import { memo, useState } from "react";
 import { motion } from "framer-motion";
 import { Anchor, Utensils, Music, Camera, ArrowRight, MapPin } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import dubaiMarinaNight from "@/assets/dubai-marina-night.jpg";
 import yachtInterior from "@/assets/yacht-interior.jpg";
 import buffetDining from "@/assets/buffet-dining.jpg";
@@ -12,7 +14,32 @@ const highlights = [
   { icon: Camera, title: "Stunning Views", description: "Dubai Marina skyline" },
 ];
 
-const HighlightsSection = () => {
+interface LazyImageProps {
+  src: string;
+  alt: string;
+  className: string;
+}
+
+const LazyImage = memo(({ src, alt, className }: LazyImageProps) => {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div className={`relative ${className}`}>
+      {!loaded && <Skeleton className="absolute inset-0 w-full h-full rounded-xl md:rounded-2xl" />}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        className={`w-full h-full object-cover rounded-xl md:rounded-2xl shadow-lg hover:scale-[1.02] transition-transform duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+      />
+    </div>
+  );
+});
+
+LazyImage.displayName = "LazyImage";
+
+const HighlightsSection = memo(() => {
   return (
     <section className="py-24 bg-muted/30 overflow-hidden">
       <div className="container">
@@ -21,7 +48,7 @@ const HighlightsSection = () => {
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
+            transition={{ duration: 0.5 }}
           >
             <p className="text-secondary font-semibold tracking-wider uppercase mb-4">
               Why Choose Us
@@ -35,14 +62,9 @@ const HighlightsSection = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
               {highlights.map((item, index) => (
-                <motion.div
+                <div
                   key={index}
-                  className="flex items-start gap-3 p-3 md:p-4 bg-card rounded-xl border border-border hover:border-secondary/30 hover:shadow-lg transition-all duration-300 group touch-target"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
-                  whileHover={{ y: -4 }}
+                  className="flex items-start gap-3 p-3 md:p-4 bg-card rounded-xl border border-border hover:border-secondary/30 hover:shadow-lg transition-all duration-300 group touch-target hover:-translate-y-1"
                 >
                   <div className="w-10 md:w-12 h-10 md:h-12 rounded-xl bg-secondary/10 flex items-center justify-center shrink-0 group-hover:bg-secondary/20 transition-colors">
                     <item.icon className="w-5 md:w-6 h-5 md:h-6 text-secondary" />
@@ -51,21 +73,14 @@ const HighlightsSection = () => {
                     <h3 className="font-semibold text-foreground text-sm md:text-base">{item.title}</h3>
                     <p className="text-xs md:text-sm text-muted-foreground">{item.description}</p>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.5 }}
-            >
-              <Link to="/about" className="inline-flex items-center gap-2 mt-10 text-secondary font-semibold hover:gap-3 transition-all group">
-                Learn More About Us 
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </motion.div>
+            <Link to="/about" className="inline-flex items-center gap-2 mt-10 text-secondary font-semibold hover:gap-3 transition-all group">
+              Learn More About Us 
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </motion.div>
 
           <motion.div 
@@ -73,65 +88,42 @@ const HighlightsSection = () => {
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
+            transition={{ duration: 0.5 }}
           >
             <div className="grid grid-cols-2 gap-3 md:gap-4">
-              <motion.img 
+              <LazyImage 
                 src={dubaiMarinaNight} 
                 alt="Dubai Marina Night" 
-                className="rounded-xl md:rounded-2xl shadow-lg w-full h-36 sm:h-48 object-cover"
-                whileHover={{ scale: 1.03 }}
-                transition={{ duration: 0.3 }}
+                className="h-36 sm:h-48"
               />
-              <motion.img 
+              <LazyImage 
                 src={yachtInterior} 
                 alt="Yacht Interior" 
-                className="rounded-xl md:rounded-2xl shadow-lg w-full h-36 sm:h-48 object-cover mt-4 md:mt-8"
-                whileHover={{ scale: 1.03 }}
-                transition={{ duration: 0.3 }}
+                className="h-36 sm:h-48 mt-4 md:mt-8"
               />
-              <motion.img 
+              <LazyImage 
                 src={buffetDining} 
                 alt="Buffet Dining" 
-                className="rounded-xl md:rounded-2xl shadow-lg w-full h-36 sm:h-48 object-cover -mt-2 md:-mt-4"
-                whileHover={{ scale: 1.03 }}
-                transition={{ duration: 0.3 }}
+                className="h-36 sm:h-48 -mt-2 md:-mt-4"
               />
-              <motion.div 
-                className="bg-primary rounded-xl md:rounded-2xl p-4 md:p-6 flex flex-col justify-center items-center text-center"
-                whileHover={{ scale: 1.03 }}
-                transition={{ duration: 0.3 }}
-              >
-                <motion.p 
-                  className="text-4xl md:text-5xl font-bold text-secondary mb-1 md:mb-2"
-                  initial={{ scale: 0 }}
-                  whileInView={{ scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
-                >
-                  10+
-                </motion.p>
+              <div className="bg-primary rounded-xl md:rounded-2xl p-4 md:p-6 flex flex-col justify-center items-center text-center hover:scale-[1.02] transition-transform duration-300">
+                <p className="text-4xl md:text-5xl font-bold text-secondary mb-1 md:mb-2">10+</p>
                 <p className="text-primary-foreground text-xs md:text-sm">Years of Excellence</p>
-              </motion.div>
+              </div>
             </div>
 
-            {/* Floating Badge - Hidden on mobile, repositioned */}
-            <motion.div 
-              className="hidden sm:flex absolute -bottom-6 left-1/2 -translate-x-1/2 bg-card rounded-xl shadow-xl px-4 md:px-6 py-3 md:py-4 items-center gap-2 md:gap-3 border border-border"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.6 }}
-              whileHover={{ y: -4 }}
-            >
+            {/* Floating Badge */}
+            <div className="hidden sm:flex absolute -bottom-6 left-1/2 -translate-x-1/2 bg-card rounded-xl shadow-xl px-4 md:px-6 py-3 md:py-4 items-center gap-2 md:gap-3 border border-border hover:-translate-y-1 transition-transform">
               <MapPin className="w-4 md:w-5 h-4 md:h-5 text-secondary" />
               <span className="font-medium text-foreground text-sm md:text-base">Dubai Marina</span>
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       </div>
     </section>
   );
-};
+});
+
+HighlightsSection.displayName = "HighlightsSection";
 
 export default HighlightsSection;
