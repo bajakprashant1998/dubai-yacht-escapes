@@ -25,6 +25,7 @@ import AdminCategories from "./pages/admin/Categories";
 import AdminCustomers from "./pages/admin/Customers";
 import AdminDiscounts from "./pages/admin/Discounts";
 import AdminUploadTourImages from "./pages/admin/UploadTourImages";
+import AdminActivityLog from "./pages/admin/ActivityLog";
 import NotFound from "./pages/NotFound";
 import RequireSession from "./components/admin/RequireSession";
 
@@ -155,6 +156,14 @@ const App = () => (
             element={
               <RequireSession>
                 <AdminUploadTourImages />
+              </RequireSession>
+            }
+          />
+          <Route
+            path="/admin/activity-log"
+            element={
+              <RequireSession>
+                <AdminActivityLog />
               </RequireSession>
             }
           />
