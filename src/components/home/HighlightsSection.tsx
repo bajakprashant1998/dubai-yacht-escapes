@@ -65,44 +65,44 @@ const HighlightsSection = memo(() => {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <div className="grid grid-cols-2 gap-3 md:gap-4">
-              <div className="overflow-hidden rounded-xl md:rounded-2xl">
+            <div className="grid grid-cols-2 gap-4 md:gap-5">
+              <div className="overflow-hidden rounded-2xl shadow-lg">
                 <OptimizedImage 
                   src={dubaiMarinaNight} 
                   alt="Dubai Marina Night"
                   aspectRatio="4/3"
                   sizes="(max-width: 768px) 45vw, 25vw"
-                  containerClassName="h-36 sm:h-48 shadow-lg hover:scale-105 transition-transform duration-300"
+                  containerClassName="h-40 sm:h-48 md:h-56 hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <div className="overflow-hidden rounded-xl md:rounded-2xl">
+              <div className="overflow-hidden rounded-2xl shadow-lg">
                 <OptimizedImage 
                   src={yachtInterior} 
                   alt="Yacht Interior"
                   aspectRatio="4/3"
                   sizes="(max-width: 768px) 45vw, 25vw"
-                  containerClassName="h-36 sm:h-48 shadow-lg hover:scale-105 transition-transform duration-300"
+                  containerClassName="h-40 sm:h-48 md:h-56 hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <div className="overflow-hidden rounded-xl md:rounded-2xl">
+              <div className="overflow-hidden rounded-2xl shadow-lg">
                 <OptimizedImage 
                   src={buffetDining} 
                   alt="Buffet Dining"
                   aspectRatio="4/3"
                   sizes="(max-width: 768px) 45vw, 25vw"
-                  containerClassName="h-36 sm:h-48 shadow-lg hover:scale-105 transition-transform duration-300"
+                  containerClassName="h-40 sm:h-48 md:h-56 hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <div className="h-36 sm:h-48 bg-primary rounded-xl md:rounded-2xl p-4 md:p-6 flex flex-col justify-center items-center text-center">
-                <p className="text-4xl md:text-5xl font-bold text-secondary mb-1 md:mb-2">10+</p>
-                <p className="text-primary-foreground text-xs md:text-sm">Years of Excellence</p>
+              <div className="h-40 sm:h-48 md:h-56 bg-primary rounded-2xl p-5 md:p-6 flex flex-col justify-center items-center text-center shadow-lg">
+                <p className="text-5xl md:text-6xl font-bold text-secondary mb-2">10+</p>
+                <p className="text-primary-foreground text-sm md:text-base">Years of Excellence</p>
               </div>
             </div>
 
             {/* Floating Badge */}
-            <div className="hidden sm:flex absolute -bottom-6 left-1/2 -translate-x-1/2 bg-card rounded-xl shadow-xl px-4 md:px-6 py-3 md:py-4 items-center gap-2 md:gap-3 border border-border hover:-translate-y-1 transition-transform">
-              <MapPin className="w-4 md:w-5 h-4 md:h-5 text-secondary" />
-              <span className="font-medium text-foreground text-sm md:text-base">Dubai Marina</span>
+            <div className="flex absolute -bottom-6 left-1/2 -translate-x-1/2 bg-card rounded-full shadow-xl px-5 md:px-6 py-3 md:py-4 items-center gap-2 md:gap-3 border border-border hover:-translate-y-1 transition-transform">
+              <MapPin className="w-5 h-5 text-secondary" />
+              <span className="font-semibold text-foreground text-sm md:text-base">Dubai Marina</span>
             </div>
           </motion.div>
         </div>
