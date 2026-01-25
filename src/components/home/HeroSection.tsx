@@ -47,14 +47,14 @@ const HeroSection = memo(() => {
           <motion.div 
             className="text-primary-foreground"
             initial={{ opacity: 0, y: 40 }}
-            animate={imageLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
             {/* Badge */}
             <motion.div 
               className="inline-flex items-center gap-2 bg-secondary/20 backdrop-blur-sm text-secondary px-4 py-2 rounded-full mb-6 border border-secondary/30"
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={imageLoaded ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2, duration: 0.4 }}
             >
               <Sparkles className="w-4 h-4" />

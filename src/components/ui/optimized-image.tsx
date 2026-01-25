@@ -102,35 +102,22 @@ const OptimizedImage = memo(({
           </svg>
         </div>
       ) : (
-        <picture>
-          {/* WebP source if available - browsers will pick first supported format */}
-          {src.match(/\.(jpg|jpeg|png)$/i) && (
-            <source
-              type="image/webp"
-              srcSet={srcSet?.replace(/\.(jpg|jpeg|png)/gi, ".webp") || src.replace(/\.(jpg|jpeg|png)$/i, ".webp")}
-              sizes={sizes}
-            />
+        <img
+          src={src}
+          alt={alt}
+          srcSet={srcSet}
+          sizes={sizes}
+          loading={priority ? "eager" : "lazy"}
+          decoding={priority ? "sync" : "async"}
+          onLoad={handleLoad}
+          onError={handleError}
+          className={cn(
+            "w-full h-full transition-opacity duration-500",
+            objectFitClass,
+            loaded ? "opacity-100" : "opacity-0",
+            className
           )}
-          
-          {/* Original format fallback */}
-          <img
-            src={src}
-            alt={alt}
-            srcSet={srcSet}
-            sizes={sizes}
-            loading={priority ? "eager" : "lazy"}
-            decoding={priority ? "sync" : "async"}
-            fetchPriority={priority ? "high" : "auto"}
-            onLoad={handleLoad}
-            onError={handleError}
-            className={cn(
-              "w-full h-full transition-opacity duration-500",
-              objectFitClass,
-              loaded ? "opacity-100" : "opacity-0",
-              className
-            )}
-          />
-        </picture>
+        />
       )}
     </div>
   );
