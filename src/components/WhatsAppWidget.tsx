@@ -9,7 +9,7 @@ const WhatsAppWidget = () => {
       href={whatsappLinkWithGreeting("Hi! I'm interested in your yacht and dhow cruise experiences. Can you help me with booking?")}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 z-50 group lg:bottom-8 lg:right-8"
+      className="fixed bottom-24 right-4 z-40 group sm:bottom-6 sm:right-6 lg:bottom-8 lg:right-8"
       aria-label="Chat on WhatsApp"
     >
       {/* Tooltip */}

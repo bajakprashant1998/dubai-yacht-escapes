@@ -333,124 +333,124 @@ const Contact = () => {
                         {/* Guest Selection */}
                         <div>
                           <FormLabel className="text-base mb-4 block">Number of Guests *</FormLabel>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="flex flex-col sm:grid sm:grid-cols-3 gap-3 sm:gap-4">
                             {/* Adults */}
-                            <div className="bg-muted/50 rounded-xl p-4 border border-border">
-                              <div className="flex justify-between items-center mb-3">
-                                <div>
-                                  <span className="font-semibold text-foreground">Adults</span>
-                                  <p className="text-xs text-muted-foreground">12+ years</p>
+                            <div className="bg-muted/50 rounded-xl p-3 sm:p-4 border border-border">
+                              <div className="flex items-center justify-between sm:block">
+                                <div className="sm:mb-3">
+                                  <span className="font-semibold text-foreground text-sm sm:text-base">Adults</span>
+                                  <p className="text-[10px] sm:text-xs text-muted-foreground">12+ years</p>
                                 </div>
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-10 w-10 rounded-full"
-                                  onClick={() => {
-                                    const newValue = Math.max(1, adults - 1);
-                                    setAdults(newValue);
-                                    form.setValue("adults", newValue);
-                                  }}
-                                  disabled={adults <= 1}
-                                >
-                                  <Minus className="w-4 h-4" />
-                                </Button>
-                                <span className="font-bold text-xl text-foreground">{adults}</span>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-10 w-10 rounded-full"
-                                  onClick={() => {
-                                    const newValue = adults + 1;
-                                    setAdults(newValue);
-                                    form.setValue("adults", newValue);
-                                  }}
-                                >
-                                  <Plus className="w-4 h-4" />
-                                </Button>
+                                <div className="flex items-center gap-2 sm:gap-0 sm:justify-between">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-9 w-9 sm:h-10 sm:w-10 rounded-full touch-target"
+                                    onClick={() => {
+                                      const newValue = Math.max(1, adults - 1);
+                                      setAdults(newValue);
+                                      form.setValue("adults", newValue);
+                                    }}
+                                    disabled={adults <= 1}
+                                  >
+                                    <Minus className="w-4 h-4" />
+                                  </Button>
+                                  <span className="font-bold text-lg sm:text-xl text-foreground w-8 text-center">{adults}</span>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-9 w-9 sm:h-10 sm:w-10 rounded-full touch-target"
+                                    onClick={() => {
+                                      const newValue = adults + 1;
+                                      setAdults(newValue);
+                                      form.setValue("adults", newValue);
+                                    }}
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                  </Button>
+                                </div>
                               </div>
                             </div>
 
                             {/* Children */}
-                            <div className="bg-muted/50 rounded-xl p-4 border border-border">
-                              <div className="flex justify-between items-center mb-3">
-                                <div>
-                                  <span className="font-semibold text-foreground">Children</span>
-                                  <p className="text-xs text-muted-foreground">4-11 years • 50% off</p>
+                            <div className="bg-muted/50 rounded-xl p-3 sm:p-4 border border-border">
+                              <div className="flex items-center justify-between sm:block">
+                                <div className="sm:mb-3">
+                                  <span className="font-semibold text-foreground text-sm sm:text-base">Children</span>
+                                  <p className="text-[10px] sm:text-xs text-muted-foreground">4-11 yrs • 50% off</p>
                                 </div>
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-10 w-10 rounded-full"
-                                  onClick={() => {
-                                    const newValue = Math.max(0, children - 1);
-                                    setChildren(newValue);
-                                    form.setValue("children", newValue);
-                                  }}
-                                  disabled={children <= 0}
-                                >
-                                  <Minus className="w-4 h-4" />
-                                </Button>
-                                <span className="font-bold text-xl text-foreground">{children}</span>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-10 w-10 rounded-full"
-                                  onClick={() => {
-                                    const newValue = children + 1;
-                                    setChildren(newValue);
-                                    form.setValue("children", newValue);
-                                  }}
-                                >
-                                  <Plus className="w-4 h-4" />
-                                </Button>
+                                <div className="flex items-center gap-2 sm:gap-0 sm:justify-between">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-9 w-9 sm:h-10 sm:w-10 rounded-full touch-target"
+                                    onClick={() => {
+                                      const newValue = Math.max(0, children - 1);
+                                      setChildren(newValue);
+                                      form.setValue("children", newValue);
+                                    }}
+                                    disabled={children <= 0}
+                                  >
+                                    <Minus className="w-4 h-4" />
+                                  </Button>
+                                  <span className="font-bold text-lg sm:text-xl text-foreground w-8 text-center">{children}</span>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-9 w-9 sm:h-10 sm:w-10 rounded-full touch-target"
+                                    onClick={() => {
+                                      const newValue = children + 1;
+                                      setChildren(newValue);
+                                      form.setValue("children", newValue);
+                                    }}
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                  </Button>
+                                </div>
                               </div>
                             </div>
 
                             {/* Infants */}
-                            <div className="bg-muted/50 rounded-xl p-4 border border-border">
-                              <div className="flex justify-between items-center mb-3">
-                                <div>
-                                  <span className="font-semibold text-foreground">Infants</span>
-                                  <p className="text-xs text-muted-foreground">0-3 years • Free</p>
+                            <div className="bg-muted/50 rounded-xl p-3 sm:p-4 border border-border">
+                              <div className="flex items-center justify-between sm:block">
+                                <div className="sm:mb-3">
+                                  <span className="font-semibold text-foreground text-sm sm:text-base">Infants</span>
+                                  <p className="text-[10px] sm:text-xs text-muted-foreground">0-3 yrs • Free</p>
                                 </div>
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-10 w-10 rounded-full"
-                                  onClick={() => {
-                                    const newValue = Math.max(0, infants - 1);
-                                    setInfants(newValue);
-                                    form.setValue("infants", newValue);
-                                  }}
-                                  disabled={infants <= 0}
-                                >
-                                  <Minus className="w-4 h-4" />
-                                </Button>
-                                <span className="font-bold text-xl text-foreground">{infants}</span>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-10 w-10 rounded-full"
-                                  onClick={() => {
-                                    const newValue = infants + 1;
-                                    setInfants(newValue);
-                                    form.setValue("infants", newValue);
-                                  }}
-                                >
-                                  <Plus className="w-4 h-4" />
-                                </Button>
+                                <div className="flex items-center gap-2 sm:gap-0 sm:justify-between">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-9 w-9 sm:h-10 sm:w-10 rounded-full touch-target"
+                                    onClick={() => {
+                                      const newValue = Math.max(0, infants - 1);
+                                      setInfants(newValue);
+                                      form.setValue("infants", newValue);
+                                    }}
+                                    disabled={infants <= 0}
+                                  >
+                                    <Minus className="w-4 h-4" />
+                                  </Button>
+                                  <span className="font-bold text-lg sm:text-xl text-foreground w-8 text-center">{infants}</span>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-9 w-9 sm:h-10 sm:w-10 rounded-full touch-target"
+                                    onClick={() => {
+                                      const newValue = infants + 1;
+                                      setInfants(newValue);
+                                      form.setValue("infants", newValue);
+                                    }}
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                  </Button>
+                                </div>
                               </div>
                             </div>
                           </div>

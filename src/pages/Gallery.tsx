@@ -48,15 +48,15 @@ const Gallery = () => {
       </section>
 
       {/* Gallery Section */}
-      <section className="py-16">
-        <div className="container">
-          {/* Filter Tabs */}
-          <div className="flex flex-wrap justify-center gap-2 mb-12">
+      <section className="py-10 sm:py-16">
+        <div className="container px-4 sm:px-6">
+          {/* Filter Tabs - Horizontal scroll on mobile */}
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x-mandatory pb-2 mb-8 sm:mb-12 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:justify-center">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-6 py-2 rounded-full font-medium transition-all ${
+                className={`px-4 sm:px-6 py-2 rounded-full font-medium transition-all flex-shrink-0 snap-start touch-target text-sm sm:text-base whitespace-nowrap ${
                   selectedCategory === category
                     ? "bg-secondary text-secondary-foreground"
                     : "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -116,19 +116,20 @@ const Gallery = () => {
       {/* Lightbox */}
       {lightboxImage && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-2 sm:p-4"
           onClick={() => setLightboxImage(null)}
         >
           <button
-            className="absolute top-4 right-4 text-white hover:text-secondary transition-colors"
+            className="absolute top-4 right-4 text-white hover:text-secondary transition-colors z-10 w-12 h-12 flex items-center justify-center touch-target"
             onClick={() => setLightboxImage(null)}
+            aria-label="Close lightbox"
           >
             <X className="w-8 h-8" />
           </button>
           <img
             src={lightboxImage}
             alt="Gallery image"
-            className="max-w-full max-h-[90vh] object-contain rounded-lg"
+            className="max-w-full max-h-[85vh] sm:max-h-[90vh] object-contain rounded-lg"
             onClick={(e) => e.stopPropagation()}
           />
         </div>
