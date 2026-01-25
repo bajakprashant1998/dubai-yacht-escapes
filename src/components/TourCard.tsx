@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Link } from "react-router-dom";
 import { Star, Clock, Users, ChevronRight, Ship } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,16 +11,16 @@ interface TourCardProps {
   featured?: boolean;
 }
 
-const TourCard = ({ tour, featured = false }: TourCardProps) => {
+const categoryLabels: Record<string, string> = {
+  "dhow-cruise": "Dhow Cruise",
+  "yacht-shared": "Shared Yacht",
+  "yacht-private": "Private Charter",
+  "megayacht": "Megayacht",
+};
+
+const TourCard = memo(({ tour, featured = false }: TourCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const discount = Math.round((1 - tour.price / tour.originalPrice) * 100);
-
-  const categoryLabels: Record<string, string> = {
-    "dhow-cruise": "Dhow Cruise",
-    "yacht-shared": "Shared Yacht",
-    "yacht-private": "Private Charter",
-    "megayacht": "Megayacht",
-  };
 
   return (
     <Link to={`/tours/${tour.slug}`} className="group block">
@@ -34,9 +34,10 @@ const TourCard = ({ tour, featured = false }: TourCardProps) => {
             src={tour.image}
             alt={tour.title}
             loading="lazy"
+            decoding="async"
             onLoad={() => setImageLoaded(true)}
             className={cn(
-              "w-full h-full object-cover group-hover:scale-105 transition-all duration-500",
+              "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500",
               imageLoaded ? "opacity-100" : "opacity-0"
             )}
           />
@@ -128,6 +129,8 @@ const TourCard = ({ tour, featured = false }: TourCardProps) => {
       </div>
     </Link>
   );
-};
+});
+
+TourCard.displayName = "TourCard";
 
 export default TourCard;

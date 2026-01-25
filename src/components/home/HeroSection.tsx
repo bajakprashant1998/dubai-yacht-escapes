@@ -1,12 +1,15 @@
 import { Link } from "react-router-dom";
+import { memo, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Play, Sparkles, Waves } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 import heroDhowCruise from "@/assets/hero-dhow-cruise.jpg";
 
-const HeroSection = () => {
+const HeroSection = memo(() => {
   const { stats } = useHomepageContent();
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const statsDisplay = [
     { value: stats.guests, label: stats.guestsLabel },
@@ -17,40 +20,27 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-[95vh] flex items-center overflow-hidden">
-      {/* Background Image with Parallax Effect */}
-      <motion.div 
-        className="absolute inset-0"
-        initial={{ scale: 1.1 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
-      >
+      {/* Background Image - Priority loading, no unnecessary animations */}
+      <div className="absolute inset-0">
+        {!imageLoaded && (
+          <Skeleton className="absolute inset-0 w-full h-full" />
+        )}
         <img
           src={heroDhowCruise}
           alt="Dubai Marina at night"
-          className="w-full h-full object-cover"
+          className={`w-full h-full object-cover transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+          onLoad={() => setImageLoaded(true)}
+          fetchPriority="high"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/85 to-primary/50" />
-        
-        {/* Animated Gradient Overlay */}
-        <motion.div 
-          className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent"
-          animate={{ opacity: [0.5, 0.7, 0.5] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </motion.div>
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent" />
+      </div>
 
-      {/* Floating Elements */}
+      {/* Floating Elements - Reduced motion, uses CSS instead of JS animation */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute top-20 right-[20%] w-64 h-64 bg-secondary/10 rounded-full blur-3xl"
-          animate={{ y: [0, 30, 0], x: [0, 15, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-40 left-[10%] w-48 h-48 bg-secondary/5 rounded-full blur-2xl"
-          animate={{ y: [0, -20, 0], x: [0, -10, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        />
+        <div className="absolute top-20 right-[20%] w-64 h-64 bg-secondary/10 rounded-full blur-3xl animate-float-slow" />
+        <div className="absolute bottom-40 left-[10%] w-48 h-48 bg-secondary/5 rounded-full blur-2xl animate-float-slower" />
       </div>
 
       {/* Content */}
@@ -60,52 +50,30 @@ const HeroSection = () => {
             className="text-primary-foreground"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
           >
             {/* Badge */}
             <motion.div 
               className="inline-flex items-center gap-2 bg-secondary/20 backdrop-blur-sm text-secondary px-4 py-2 rounded-full mb-6 border border-secondary/30"
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
             >
               <Sparkles className="w-4 h-4" />
               <span className="text-sm font-semibold">Dubai's #1 Rated Cruise Experience</span>
             </motion.div>
 
-            <motion.h1 
-              className="font-display text-fluid-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.05] mb-6"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.8 }}
-            >
+            <h1 className="font-display text-fluid-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.05] mb-6">
               Experience Dubai
-              <motion.span 
-                className="block text-shimmer mt-2"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5, duration: 0.6 }}
-              >
-                From The Water
-              </motion.span>
-            </motion.h1>
+              <span className="block text-shimmer mt-2">From The Water</span>
+            </h1>
 
-            <motion.p 
-              className="text-lg md:text-xl text-primary-foreground/90 mb-8 leading-relaxed max-w-xl"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.8 }}
-            >
+            <p className="text-lg md:text-xl text-primary-foreground/90 mb-8 leading-relaxed max-w-xl">
               Unforgettable dhow cruises, luxury yacht charters, and megayacht dining experiences along Dubai Marina's stunning skyline.
-            </motion.p>
+            </p>
 
             {/* CTAs - Full width on mobile */}
-            <motion.div 
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.6 }}
-            >
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12">
               <Link to="/tours" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:w-auto bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold text-base sm:text-lg px-6 sm:px-8 h-12 sm:h-14 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 group touch-target">
                   Explore Tours
@@ -118,43 +86,25 @@ const HeroSection = () => {
                   View Gallery
                 </Button>
               </Link>
-            </motion.div>
+            </div>
 
             {/* Stats Row - Responsive Grid */}
-            <motion.div 
-              className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1, duration: 0.8 }}
-            >
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
               {statsDisplay.map((stat, index) => (
-                <motion.div 
+                <div 
                   key={index} 
-                  className="text-center bg-primary-foreground/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-primary-foreground/10"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.1 + index * 0.1, duration: 0.5 }}
-                  whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.1)" }}
+                  className="text-center bg-primary-foreground/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-primary-foreground/10 hover:scale-105 hover:bg-primary-foreground/10 transition-all duration-200"
                 >
                   <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-secondary">{stat.value}</p>
                   <p className="text-[10px] sm:text-xs text-primary-foreground/70 uppercase tracking-wider mt-1">{stat.label}</p>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
           </motion.div>
 
-          {/* Right Side - Floating Card */}
-          <motion.div 
-            className="hidden lg:block"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-          >
-            <motion.div
-              className="relative"
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            >
+          {/* Right Side - Floating Card - simplified animation */}
+          <div className="hidden lg:block">
+            <div className="relative animate-float-slow">
               <div className="bg-card/95 backdrop-blur-lg rounded-3xl p-6 shadow-2xl border border-border/50 max-w-sm ml-auto">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center">
@@ -185,27 +135,21 @@ const HeroSection = () => {
                   </Button>
                 </Link>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <motion.div 
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-      >
+      {/* Scroll Indicator - CSS animation */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce-slow">
         <div className="w-8 h-12 rounded-full border-2 border-primary-foreground/30 flex items-start justify-center p-2">
-          <motion.div 
-            className="w-1.5 h-3 bg-secondary rounded-full"
-            animate={{ y: [0, 8, 0], opacity: [1, 0.5, 1] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          />
+          <div className="w-1.5 h-3 bg-secondary rounded-full animate-scroll-indicator" />
         </div>
-      </motion.div>
+      </div>
     </section>
   );
-};
+});
+
+HeroSection.displayName = "HeroSection";
 
 export default HeroSection;
