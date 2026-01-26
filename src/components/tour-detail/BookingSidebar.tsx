@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/popover";
 import BookingModal from "./BookingModal";
 import { useContactConfig } from "@/hooks/useContactConfig";
+import { BookingFeatures, defaultBookingFeatures } from "@/lib/tourMapper";
 
 interface BookingSidebarProps {
   price: number;
@@ -36,6 +37,7 @@ interface BookingSidebarProps {
   pricingType?: "per_person" | "per_hour";
   fullYachtPrice?: number | null;
   capacity?: string;
+  bookingFeatures?: BookingFeatures;
 }
 
 const BookingSidebar = ({ 
@@ -47,7 +49,8 @@ const BookingSidebar = ({
   tourId, 
   pricingType = "per_person",
   fullYachtPrice,
-  capacity
+  capacity,
+  bookingFeatures = defaultBookingFeatures
 }: BookingSidebarProps) => {
   const [date, setDate] = useState<Date>();
   const [adults, setAdults] = useState(2);
@@ -91,22 +94,24 @@ const BookingSidebar = ({
         <div className="absolute top-0 right-0 w-48 h-48 bg-secondary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
         
         {/* Urgency Badge */}
-        <motion.div 
-          className="flex items-center gap-2 mb-4 p-2.5 bg-destructive/10 rounded-xl relative"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <motion.div
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
+        {bookingFeatures.urgency_enabled && (
+          <motion.div 
+            className="flex items-center gap-2 mb-4 p-2.5 bg-destructive/10 rounded-xl relative"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
           >
-            <Flame className="w-4 h-4 text-destructive" />
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <Flame className="w-4 h-4 text-destructive" />
+            </motion.div>
+            <span className="text-sm font-medium text-destructive">
+              {bookingFeatures.urgency_text}
+            </span>
           </motion.div>
-          <span className="text-sm font-medium text-destructive">
-            Only few spots left today!
-          </span>
-        </motion.div>
+        )}
 
 
         {/* Price */}
@@ -146,14 +151,12 @@ const BookingSidebar = ({
                     <Users className="w-4 h-4 text-secondary" />
                     <span className="font-medium">Yacht Capacity: {capacity}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Check className="w-4 h-4 text-secondary" />
-                    <span>Private experience</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Check className="w-4 h-4 text-secondary" />
-                    <span>Exclusive use</span>
-                  </div>
+                  {bookingFeatures.charter_features.map((feature, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Check className="w-4 h-4 text-secondary" />
+                      <span>{feature}</span>
+                    </div>
+                  ))}
                 </div>
               )}
             </motion.div>
@@ -324,11 +327,11 @@ const BookingSidebar = ({
         {/* Quick Info */}
         <div className="space-y-3 mb-6 pb-6 border-b border-border relative">
           {[
-            { icon: Calendar, text: "Available daily" },
-            { icon: Clock, text: duration },
-            { icon: Users, text: "Hotel pickup included" },
-            { icon: Shield, text: "Free cancellation (24h)" },
-          ].map((item, index) => (
+            { icon: Calendar, text: bookingFeatures.availability_text, show: true },
+            { icon: Clock, text: bookingFeatures.minimum_duration || duration, show: true },
+            { icon: Users, text: bookingFeatures.hotel_pickup_text, show: bookingFeatures.hotel_pickup },
+            { icon: Shield, text: bookingFeatures.cancellation_text, show: true },
+          ].filter(item => item.show).map((item, index) => (
             <motion.div 
               key={index}
               className="flex items-center gap-3"
