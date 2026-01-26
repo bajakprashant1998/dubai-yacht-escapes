@@ -459,6 +459,7 @@ export type Database = {
       }
       tours: {
         Row: {
+          booking_features: Json | null
           capacity: string | null
           category: string
           category_id: string | null
@@ -494,6 +495,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          booking_features?: Json | null
           capacity?: string | null
           category: string
           category_id?: string | null
@@ -529,6 +531,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          booking_features?: Json | null
           capacity?: string | null
           category?: string
           category_id?: string | null

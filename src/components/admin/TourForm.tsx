@@ -16,7 +16,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Upload, X, Plus, Loader2, ImageIcon, Sparkles, MapPin } from "lucide-react";
+import { Upload, X, Plus, Loader2, ImageIcon, Sparkles, MapPin, Calendar, Clock, Users, Shield, Flame } from "lucide-react";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 import { useActiveCategories } from "@/hooks/useCategories";
 import { useActiveLocations } from "@/hooks/useLocations";
@@ -25,6 +25,7 @@ import FAQEditor, { FAQItem } from "./FAQEditor";
 import CharacterCounter from "./CharacterCounter";
 import SEOPreview from "./SEOPreview";
 import KeywordsInput from "./KeywordsInput";
+import { BookingFeatures, defaultBookingFeatures } from "@/lib/tourMapper";
 
 type Tour = Tables<"tours">;
 
@@ -73,6 +74,7 @@ const TourForm = ({ tour, mode }: TourFormProps) => {
     meta_title: tour?.meta_title || "",
     meta_description: tour?.meta_description || "",
     meta_keywords: tour?.meta_keywords || [],
+    booking_features: ((tour as any)?.booking_features as BookingFeatures) || defaultBookingFeatures,
   });
 
   // Array field inputs
@@ -233,7 +235,8 @@ const TourForm = ({ tour, mode }: TourFormProps) => {
         meta_title: formData.meta_title || null,
         meta_description: formData.meta_description || null,
         meta_keywords: formData.meta_keywords?.length ? formData.meta_keywords : null,
-      };
+        booking_features: JSON.parse(JSON.stringify(formData.booking_features)),
+      } as any;
 
       if (mode === "create") {
         const { error } = await supabase.from("tours").insert(tourData as TablesInsert<"tours">);
@@ -633,6 +636,185 @@ const TourForm = ({ tour, mode }: TourFormProps) => {
                 items={formData.faqs}
                 onChange={(items) => setFormData((prev) => ({ ...prev, faqs: items }))}
               />
+            </CardContent>
+          </Card>
+
+          {/* Booking Features */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Flame className="w-5 h-5 text-secondary" />
+                Booking Sidebar Features
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Urgency Banner */}
+              <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <Label className="flex items-center gap-2">
+                    <Flame className="w-4 h-4 text-destructive" />
+                    Urgency Banner
+                  </Label>
+                  <Switch
+                    checked={formData.booking_features.urgency_enabled}
+                    onCheckedChange={(checked) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        booking_features: { ...prev.booking_features, urgency_enabled: checked },
+                      }))
+                    }
+                  />
+                </div>
+                {formData.booking_features.urgency_enabled && (
+                  <Input
+                    value={formData.booking_features.urgency_text}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        booking_features: { ...prev.booking_features, urgency_text: e.target.value },
+                      }))
+                    }
+                    placeholder="Only few spots left today!"
+                  />
+                )}
+              </div>
+
+              {/* Quick Info Items */}
+              <div className="space-y-4">
+                <Label className="text-sm font-semibold">Quick Info Items</Label>
+                
+                <div className="grid gap-3">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="w-4 h-4 text-secondary shrink-0" />
+                    <Input
+                      value={formData.booking_features.availability_text}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          booking_features: { ...prev.booking_features, availability_text: e.target.value },
+                        }))
+                      }
+                      placeholder="Available daily"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <Clock className="w-4 h-4 text-secondary shrink-0" />
+                    <Input
+                      value={formData.booking_features.minimum_duration}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          booking_features: { ...prev.booking_features, minimum_duration: e.target.value },
+                        }))
+                      }
+                      placeholder="Minimum 2 Hours Required"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Users className="w-4 h-4 text-secondary shrink-0" />
+                        <Label>Hotel Pickup</Label>
+                      </div>
+                      <Switch
+                        checked={formData.booking_features.hotel_pickup}
+                        onCheckedChange={(checked) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            booking_features: { ...prev.booking_features, hotel_pickup: checked },
+                          }))
+                        }
+                      />
+                    </div>
+                    {formData.booking_features.hotel_pickup && (
+                      <Input
+                        value={formData.booking_features.hotel_pickup_text}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            booking_features: { ...prev.booking_features, hotel_pickup_text: e.target.value },
+                          }))
+                        }
+                        placeholder="Hotel pickup included"
+                        className="ml-7"
+                      />
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <Shield className="w-4 h-4 text-secondary shrink-0" />
+                    <Input
+                      value={formData.booking_features.cancellation_text}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          booking_features: { ...prev.booking_features, cancellation_text: e.target.value },
+                        }))
+                      }
+                      placeholder="Free cancellation (24h)"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Charter Features */}
+              <div className="space-y-3 p-4 bg-secondary/5 rounded-lg">
+                <Label className="text-sm font-semibold">Private Charter Features</Label>
+                <p className="text-xs text-muted-foreground">
+                  These appear when "Full Yacht Price" is set (Private Charter mode)
+                </p>
+                <div className="space-y-2">
+                  {formData.booking_features.charter_features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input
+                        value={feature}
+                        onChange={(e) => {
+                          const newFeatures = [...formData.booking_features.charter_features];
+                          newFeatures[index] = e.target.value;
+                          setFormData((prev) => ({
+                            ...prev,
+                            booking_features: { ...prev.booking_features, charter_features: newFeatures },
+                          }));
+                        }}
+                        placeholder="Feature text"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          const newFeatures = formData.booking_features.charter_features.filter((_, i) => i !== index);
+                          setFormData((prev) => ({
+                            ...prev,
+                            booking_features: { ...prev.booking_features, charter_features: newFeatures },
+                          }));
+                        }}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        booking_features: {
+                          ...prev.booking_features,
+                          charter_features: [...prev.booking_features.charter_features, ""],
+                        },
+                      }));
+                    }}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Feature
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
 

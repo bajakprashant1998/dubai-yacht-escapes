@@ -488,6 +488,7 @@ const TourDetail = () => {
                 pricingType={tour.pricingType}
                 fullYachtPrice={tour.fullYachtPrice}
                 capacity={tour.capacity}
+                bookingFeatures={tour.bookingFeatures}
               />
             </div>
           </div>
