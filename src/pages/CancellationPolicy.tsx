@@ -1,85 +1,127 @@
 import { motion } from "framer-motion";
-import { XCircle, Calendar, RefreshCw, CloudRain, AlertCircle, CheckCircle } from "lucide-react";
+import { Shield, Lock, Eye, FileText, Users, Globe, FileCheck, AlertTriangle, CreditCard, Clock, Anchor, Scale, Calendar, RefreshCw, CloudRain, AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { useSiteSetting } from "@/hooks/useSiteSettings";
+import { LucideIcon } from "lucide-react";
+
+interface LegalSection {
+  icon: string;
+  title: string;
+  content: string[];
+}
+
+interface RefundTier {
+  timeframe: string;
+  refund: string;
+  description: string;
+  color: string;
+}
+
+const iconMap: Record<string, LucideIcon> = {
+  FileText,
+  Eye,
+  Lock,
+  Users,
+  Globe,
+  Shield,
+  Scale,
+  FileCheck,
+  AlertTriangle,
+  CreditCard,
+  Clock,
+  Anchor,
+  Calendar,
+  RefreshCw,
+  CloudRain,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+};
+
+const defaultRefundTiers: RefundTier[] = [
+  {
+    timeframe: "48+ hours before",
+    refund: "100%",
+    description: "Full refund",
+    color: "bg-green-500",
+  },
+  {
+    timeframe: "24-48 hours before",
+    refund: "50%",
+    description: "Half refund",
+    color: "bg-yellow-500",
+  },
+  {
+    timeframe: "Less than 24 hours",
+    refund: "0%",
+    description: "No refund",
+    color: "bg-red-500",
+  },
+];
+
+const defaultSections: LegalSection[] = [
+  {
+    icon: "Calendar",
+    title: "Standard Cancellation",
+    content: [
+      "Cancellations must be submitted in writing via email or through your booking account.",
+      "The cancellation date is determined by when we receive your request.",
+      "Refunds will be processed within 7-10 business days.",
+      "Refunds will be issued to the original payment method.",
+    ],
+  },
+  {
+    icon: "RefreshCw",
+    title: "Rescheduling Policy",
+    content: [
+      "Free rescheduling is available up to 24 hours before your booking.",
+      "Rescheduled bookings are subject to availability.",
+      "Each booking can be rescheduled a maximum of two times.",
+      "Rescheduled bookings must be used within 6 months of original date.",
+    ],
+  },
+  {
+    icon: "CloudRain",
+    title: "Weather-Related Cancellations",
+    content: [
+      "If we cancel due to unsafe weather conditions, you will receive a full refund or free rescheduling.",
+      "Weather decisions are made by our experienced captains for your safety.",
+      "Light rain or overcast skies generally do not qualify for weather cancellations.",
+      "We will notify you at least 2 hours before departure if weather cancellation is necessary.",
+    ],
+  },
+  {
+    icon: "AlertCircle",
+    title: "No-Show Policy",
+    content: [
+      "Failure to arrive at the departure point results in a full charge.",
+      "No refund will be provided for no-shows.",
+      "Please arrive 15 minutes before your scheduled departure time.",
+      "Contact us immediately if you're running late—we may be able to accommodate.",
+    ],
+  },
+  {
+    icon: "CheckCircle",
+    title: "Special Circumstances",
+    content: [
+      "Medical emergencies with documentation may qualify for special consideration.",
+      "Flight cancellations with proof may be eligible for full refund.",
+      "Group bookings may have different cancellation terms.",
+      "Holiday and peak season bookings may have stricter policies.",
+    ],
+  },
+];
 
 const CancellationPolicy = () => {
   const { data: siteSettings } = useSiteSetting("site");
+  const { data: cancellationSettings } = useSiteSetting("legal_cancellation");
+  
   const siteName = (siteSettings?.siteName as string) || "Rental Yacht Dubai";
-
-  const refundTiers = [
-    {
-      timeframe: "48+ hours before",
-      refund: "100%",
-      description: "Full refund",
-      color: "bg-green-500",
-    },
-    {
-      timeframe: "24-48 hours before",
-      refund: "50%",
-      description: "Half refund",
-      color: "bg-yellow-500",
-    },
-    {
-      timeframe: "Less than 24 hours",
-      refund: "0%",
-      description: "No refund",
-      color: "bg-red-500",
-    },
-  ];
-
-  const sections = [
-    {
-      icon: Calendar,
-      title: "Standard Cancellation",
-      content: [
-        "Cancellations must be submitted in writing via email or through your booking account.",
-        "The cancellation date is determined by when we receive your request.",
-        "Refunds will be processed within 7-10 business days.",
-        "Refunds will be issued to the original payment method.",
-      ],
-    },
-    {
-      icon: RefreshCw,
-      title: "Rescheduling Policy",
-      content: [
-        "Free rescheduling is available up to 24 hours before your booking.",
-        "Rescheduled bookings are subject to availability.",
-        "Each booking can be rescheduled a maximum of two times.",
-        "Rescheduled bookings must be used within 6 months of original date.",
-      ],
-    },
-    {
-      icon: CloudRain,
-      title: "Weather-Related Cancellations",
-      content: [
-        "If we cancel due to unsafe weather conditions, you will receive a full refund or free rescheduling.",
-        "Weather decisions are made by our experienced captains for your safety.",
-        "Light rain or overcast skies generally do not qualify for weather cancellations.",
-        "We will notify you at least 2 hours before departure if weather cancellation is necessary.",
-      ],
-    },
-    {
-      icon: AlertCircle,
-      title: "No-Show Policy",
-      content: [
-        "Failure to arrive at the departure point results in a full charge.",
-        "No refund will be provided for no-shows.",
-        "Please arrive 15 minutes before your scheduled departure time.",
-        "Contact us immediately if you're running late—we may be able to accommodate.",
-      ],
-    },
-    {
-      icon: CheckCircle,
-      title: "Special Circumstances",
-      content: [
-        "Medical emergencies with documentation may qualify for special consideration.",
-        "Flight cancellations with proof may be eligible for full refund.",
-        "Group bookings may have different cancellation terms.",
-        "Holiday and peak season bookings may have stricter policies.",
-      ],
-    },
-  ];
+  const lastUpdated = (cancellationSettings?.lastUpdated as string) || "January 2026";
+  const contactEmail = (cancellationSettings?.contactEmail as string) || `bookings@${siteName.toLowerCase().replace(/\s+/g, '')}.com`;
+  const heroDescription = (cancellationSettings?.heroDescription as string) || `We understand plans change. Here's everything you need to know about cancellations and refunds at ${siteName}.`;
+  const refundTiers = (cancellationSettings?.refundTiers as unknown as RefundTier[]) || defaultRefundTiers;
+  const sections = (cancellationSettings?.sections as unknown as LegalSection[]) || defaultSections;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -126,10 +168,10 @@ const CancellationPolicy = () => {
               Cancellation Policy
             </h1>
             <p className="text-primary-foreground/80 text-lg">
-              We understand plans change. Here's everything you need to know about cancellations and refunds at {siteName}.
+              {heroDescription}
             </p>
             <p className="text-primary-foreground/60 text-sm mt-4">
-              Last updated: January 2026
+              Last updated: {lastUpdated}
             </p>
           </motion.div>
         </div>
@@ -186,35 +228,38 @@ const CancellationPolicy = () => {
             initial="hidden"
             animate="visible"
           >
-            {sections.map((section, index) => (
-              <motion.div
-                key={index}
-                className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow"
-                variants={itemVariants}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <section.icon className="w-6 h-6 text-secondary" />
+            {sections.map((section, index) => {
+              const IconComponent = iconMap[section.icon] || Calendar;
+              return (
+                <motion.div
+                  key={index}
+                  className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-md transition-shadow"
+                  variants={itemVariants}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <IconComponent className="w-6 h-6 text-secondary" />
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="font-display text-xl md:text-2xl font-semibold text-foreground mb-4">
+                        {section.title}
+                      </h2>
+                      <ul className="space-y-3">
+                        {section.content.map((item, idx) => (
+                          <li
+                            key={idx}
+                            className="flex items-start gap-3 text-muted-foreground"
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 flex-shrink-0" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h2 className="font-display text-xl md:text-2xl font-semibold text-foreground mb-4">
-                      {section.title}
-                    </h2>
-                    <ul className="space-y-3">
-                      {section.content.map((item, idx) => (
-                        <li
-                          key={idx}
-                          className="flex items-start gap-3 text-muted-foreground"
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 flex-shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
 
             {/* Contact Section */}
             <motion.div
@@ -229,7 +274,7 @@ const CancellationPolicy = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <p className="text-secondary font-medium">
-                  Email: bookings@{siteName.toLowerCase().replace(/\s+/g, '')}.com
+                  Email: {contactEmail}
                 </p>
                 <span className="hidden sm:block text-primary-foreground/40">|</span>
                 <p className="text-secondary font-medium">
