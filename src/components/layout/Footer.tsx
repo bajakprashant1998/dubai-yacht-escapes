@@ -312,7 +312,7 @@ const Footer = () => {
         <div className="container py-4 sm:py-6 px-4 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-4">
             <p className="text-primary-foreground/60 text-xs sm:text-sm text-center md:text-left">
-              © 2024 Rental Yacht Dubai. All rights reserved.
+              © 2026 Rental Yacht Dubai. All rights reserved.
             </p>
             <div className="hidden sm:flex items-center gap-2">
               <CreditCard className="w-4 h-4 text-secondary/60" />
@@ -329,6 +329,22 @@ const Footer = () => {
             <Link to="/cancellation-policy" className="text-primary-foreground/60 hover:text-secondary transition-colors py-1 touch-target">
               Cancellation
             </Link>
+          </div>
+        </div>
+        {/* Dibull Credit */}
+        <div className="border-t border-primary-foreground/10">
+          <div className="container py-3 px-4 sm:px-6">
+            <p className="text-center text-primary-foreground/50 text-xs">
+              Created and maintained by{" "}
+              <a
+                href="https://www.dibull.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-secondary hover:text-secondary/80 transition-colors font-medium"
+              >
+                Dibull
+              </a>
+            </p>
           </div>
         </div>
       </div>
