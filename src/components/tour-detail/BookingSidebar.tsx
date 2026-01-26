@@ -144,7 +144,7 @@ const BookingSidebar = ({
                   AED {fullYachtPrice.toLocaleString()}
                 </motion.span>
               </div>
-              <p className="text-muted-foreground text-sm">per yacht (entire charter)</p>
+              <p className="text-muted-foreground text-sm">Per Hour</p>
               {capacity && (
                 <div className="mt-3 p-3 bg-secondary/10 rounded-xl space-y-1.5">
                   <div className="flex items-center gap-2 text-sm">
