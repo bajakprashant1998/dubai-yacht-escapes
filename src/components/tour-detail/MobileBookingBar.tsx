@@ -37,7 +37,7 @@ const MobileBookingBar = ({
   const bookingType = isFullYacht ? "full_yacht" : "per_person";
   const displayPrice = isFullYacht ? fullYachtPrice : price;
   const priceLabel = isFullYacht 
-    ? "per yacht" 
+    ? "Per Hour" 
     : (pricingType === "per_hour" ? "per hour" : "per person");
 
   return (

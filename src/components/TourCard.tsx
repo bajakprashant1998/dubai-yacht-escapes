@@ -110,7 +110,7 @@ const TourCard = memo(({ tour, featured = false }: TourCardProps) => {
                   </div>
                   <p className="text-secondary text-[10px] sm:text-xs font-medium flex items-center gap-1">
                     <Ship className="w-3 h-3" />
-                    per yacht
+                    Per Hour
                   </p>
                 </>
               ) : (
