@@ -59,7 +59,7 @@ type DbTour = Tables<"tours">;
 export function mapDbTourToTour(dbTour: DbTour): Tour {
   // Parse booking features from database or use defaults
   const dbBookingFeatures = (dbTour as any).booking_features as BookingFeatures | null;
-  const bookingFeatures: BookingFeatures = dbBookingFeatures 
+  const bookingFeatures: BookingFeatures = dbBookingFeatures
     ? { ...defaultBookingFeatures, ...dbBookingFeatures }
     : defaultBookingFeatures;
 
@@ -76,8 +76,8 @@ export function mapDbTourToTour(dbTour: DbTour): Tour {
     duration: dbTour.duration || "",
     rating: Number(dbTour.rating) || 4.5,
     reviewCount: dbTour.review_count || 0,
-    image: dbTour.image_url || "/placeholder.svg",
-    gallery: dbTour.gallery || [],
+    image: normalizeImagePath(dbTour.image_url),
+    gallery: (dbTour.gallery || []).map(normalizeImagePath),
     highlights: dbTour.highlights || [],
     included: dbTour.included || [],
     excluded: dbTour.excluded || [],
@@ -90,6 +90,16 @@ export function mapDbTourToTour(dbTour: DbTour): Tour {
     fullYachtPrice: (dbTour as any).full_yacht_price ? Number((dbTour as any).full_yacht_price) : null,
     bookingFeatures,
   };
+}
+
+// Helper to normalize image paths
+// Ensure all tour images point to /assets/tours/ instead of just /tours/
+function normalizeImagePath(path: string | null): string {
+  if (!path) return "/placeholder.svg";
+  if (path.startsWith("/tours/")) {
+    return "/assets" + path;
+  }
+  return path;
 }
 
 // Map array of database tours
