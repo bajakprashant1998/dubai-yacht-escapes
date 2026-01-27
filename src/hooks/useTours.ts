@@ -19,12 +19,13 @@ export function useTours() {
   });
 }
 
-// Fetch a single tour by slug
+// Fetch a single tour by slug or seo_slug
 export function useTour(slug: string) {
   return useQuery({
     queryKey: ["tour", slug],
     queryFn: async (): Promise<Tour | null> => {
-      const { data, error } = await supabase
+      // First try to find by regular slug
+      let { data, error } = await supabase
         .from("tours")
         .select("*")
         .eq("slug", slug)
@@ -32,6 +33,20 @@ export function useTour(slug: string) {
         .maybeSingle();
 
       if (error) throw error;
+      
+      // If not found by slug, try to find by seo_slug
+      if (!data) {
+        const seoResult = await supabase
+          .from("tours")
+          .select("*")
+          .eq("seo_slug", slug)
+          .eq("status", "active")
+          .maybeSingle();
+          
+        if (seoResult.error) throw seoResult.error;
+        data = seoResult.data;
+      }
+
       return data ? mapDbTourToTour(data) : null;
     },
     enabled: !!slug,

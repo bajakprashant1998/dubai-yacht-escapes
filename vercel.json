@@ -1,4 +1,11 @@
 {
+    "redirects": [
+        {
+            "source": "/tours/:slug((?!$)[^?]*)",
+            "destination": "/dubai/tours/:slug",
+            "permanent": true
+        }
+    ],
     "rewrites": [
         {
             "source": "/(.*)",

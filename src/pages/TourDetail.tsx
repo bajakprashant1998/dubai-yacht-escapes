@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   Star, 
@@ -37,9 +37,12 @@ import MobileBookingBar from "@/components/tour-detail/MobileBookingBar";
 
 import BookingModal from "@/components/tour-detail/BookingModal";
 import { useTour, useRelatedTours } from "@/hooks/useTours";
+import { getTourUrl, getCategoryFromPath } from "@/lib/seoUtils";
 
 const TourDetail = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug, categoryPath } = useParams<{ slug: string; categoryPath?: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { data: tour, isLoading, error } = useTour(slug || "");
   const { data: relatedTours = [] } = useRelatedTours(
@@ -48,6 +51,15 @@ const TourDetail = () => {
   );
   const [isSaved, setIsSaved] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+
+  // Redirect old URLs to new SEO-friendly URLs
+  useEffect(() => {
+    if (tour && !categoryPath && location.pathname.startsWith("/tours/")) {
+      // Old URL format detected, redirect to new SEO URL
+      const newUrl = getTourUrl(tour);
+      navigate(newUrl, { replace: true });
+    }
+  }, [tour, categoryPath, location.pathname, navigate]);
 
   // Load saved state from localStorage
   useEffect(() => {

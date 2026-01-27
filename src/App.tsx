@@ -78,6 +78,10 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/tours" element={<Tours />} />
+            {/* New SEO-friendly tour routes */}
+            <Route path="/dubai/:categoryPath/:slug" element={<TourDetail />} />
+            <Route path="/dubai/:categoryPath" element={<Tours />} />
+            {/* Legacy route - kept for backwards compatibility */}
             <Route path="/tours/:slug" element={<TourDetail />} />
             <Route path="/saved-tours" element={<SavedTours />} />
             <Route path="/gallery" element={<Gallery />} />

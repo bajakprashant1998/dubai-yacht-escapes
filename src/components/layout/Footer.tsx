@@ -214,23 +214,23 @@ const Footer = () => {
             <h4 className="font-display text-base sm:text-lg font-semibold text-secondary mb-4 sm:mb-6">Our Tours</h4>
             <ul className="space-y-2 sm:space-y-3">
               <li>
-                <Link to="/tours/dhow-cruise-marina" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Dhow Cruise Marina
+                <Link to="/dubai/dhow-cruises" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Dhow Cruises
                 </Link>
               </li>
               <li>
-                <Link to="/tours" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Upper Deck Experience
+                <Link to="/dubai/shared-yacht-tours" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Shared Yacht Tours
                 </Link>
               </li>
               <li>
-                <Link to="/tours" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Private Charter
+                <Link to="/dubai/private-yacht-charter" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Private Yacht Charter
                 </Link>
               </li>
               <li>
-                <Link to="/tours" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Sunset Cruise
+                <Link to="/dubai/megayacht-experiences" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Megayacht Experiences
                 </Link>
               </li>
             </ul>

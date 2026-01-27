@@ -4,6 +4,7 @@ import { Star, Clock, Users, ChevronRight, Ship, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Tour } from "@/lib/tourMapper";
+import { getTourUrl } from "@/lib/seoUtils";
 
 interface TourCardProps {
   tour: Tour;
@@ -22,7 +23,7 @@ const TourCard = memo(({ tour, featured = false }: TourCardProps) => {
   const isPrivateCharter = tour.fullYachtPrice && tour.fullYachtPrice > 0;
 
   return (
-    <Link to={`/tours/${tour.slug}`} className="group block">
+    <Link to={getTourUrl(tour)} className="group block">
       <div className={`bg-card rounded-xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col ${featured ? 'lg:flex-row' : ''}`}>
         {/* Image with WebP support and srcset */}
         <div className={`relative overflow-hidden ${featured ? 'lg:w-1/2 lg:min-h-[300px]' : ''}`}>

@@ -672,6 +672,7 @@ export type Database = {
           pricing_type: string | null
           rating: number | null
           review_count: number | null
+          seo_slug: string | null
           slug: string
           status: string | null
           subtitle: string | null
@@ -708,6 +709,7 @@ export type Database = {
           pricing_type?: string | null
           rating?: number | null
           review_count?: number | null
+          seo_slug?: string | null
           slug: string
           status?: string | null
           subtitle?: string | null
@@ -744,6 +746,7 @@ export type Database = {
           pricing_type?: string | null
           rating?: number | null
           review_count?: number | null
+          seo_slug?: string | null
           slug?: string
           status?: string | null
           subtitle?: string | null
@@ -759,6 +762,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      url_redirects: {
+        Row: {
+          created_at: string
+          hits: number | null
+          id: string
+          new_path: string
+          old_path: string
+          redirect_type: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hits?: number | null
+          id?: string
+          new_path: string
+          old_path: string
+          redirect_type?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hits?: number | null
+          id?: string
+          new_path?: string
+          old_path?: string
+          redirect_type?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
