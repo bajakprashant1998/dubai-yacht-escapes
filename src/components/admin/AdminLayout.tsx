@@ -56,7 +56,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   const [loading, setLoading] = useState(true);
   const [adminGateError, setAdminGateError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+
   // Track if admin has been verified to prevent re-checking on token refresh
   const adminVerifiedRef = useRef(false);
 
@@ -103,7 +103,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         setIsAdmin(false);
         clearAdminCache();
         setAdminGateError(
-          "We couldn't verify admin access right now. Please retry (or sign out/in).",
+          `We couldn't verify admin access right now. Error: ${(error as any)?.message || "Unknown error"}. Please retry (or sign out/in).`,
         );
         toast({
           title: "Admin check failed",
@@ -132,12 +132,12 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
 
         if (session?.user) {
           setUser(session.user);
-          
+
           // Skip role check if already verified and just a token refresh
           if (adminVerifiedRef.current && event === "TOKEN_REFRESHED") {
             return;
           }
-          
+
           // Only verify on meaningful auth events
           if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
             await checkAdminRole(session.user.id);
@@ -168,7 +168,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         }
 
         setUser(session.user);
-        
+
         // Check sessionStorage cache first for instant load
         const cache = getAdminCache();
         if (cache && cache.userId === session.user.id && cache.verified) {
@@ -179,7 +179,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
           checkAdminRole(session.user.id);
           return;
         }
-        
+
         await checkAdminRole(session.user.id);
       } catch (err) {
         console.error("Error checking auth:", err);
