@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Youtube, Shield, Lock, CreditCard } from "lucide-react";
 import rentalYachtLogo from "@/assets/rental-yacht-logo.png";
 import { supabase } from "@/integrations/supabase/client";
-import { ADMIN_CACHE_KEY, ADMIN_USER_KEY } from "@/components/admin/AdminLayout";
+import { ADMIN_CACHE_KEY, ADMIN_USER_KEY, getAdminCache } from "@/lib/adminAuth";
 import { useContactConfig } from "@/hooks/useContactConfig";
 
 // Payment brand icons as inline SVGs
@@ -53,7 +53,7 @@ const Footer = () => {
           .eq("user_id", userId)
           .eq("role", "admin")
           .limit(1);
-        
+
         if (!cancelled) {
           setIsAdmin(Array.isArray(data) ? data.length > 0 : !!data);
         }
@@ -63,15 +63,10 @@ const Footer = () => {
     };
 
     const checkCache = () => {
-      try {
-        const userId = sessionStorage.getItem(ADMIN_USER_KEY);
-        const verified = sessionStorage.getItem(ADMIN_CACHE_KEY);
-        if (userId && verified === "true") {
-          setIsAdmin(true);
-          return true;
-        }
-      } catch {
-        // Ignore storage errors
+      const cache = getAdminCache();
+      if (cache) {
+        setIsAdmin(true);
+        return true;
       }
       return false;
     };
@@ -79,12 +74,12 @@ const Footer = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (cancelled) return;
-        
+
         if (event === "SIGNED_OUT") {
           setIsAdmin(false);
           return;
         }
-        
+
         if (session?.user) {
           if (!checkCache()) {
             setTimeout(() => {
@@ -99,7 +94,7 @@ const Footer = () => {
 
     const init = async () => {
       if (checkCache()) return;
-      
+
       const { data } = await supabase.auth.getSession();
       if (data.session?.user && !cancelled) {
         checkAdminStatus(data.session.user.id);
@@ -145,9 +140,9 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-4 col-span-2 md:col-span-1">
             <div className="flex items-center gap-3">
-              <img 
-                src={rentalYachtLogo} 
-                alt="Rental Yacht Dubai" 
+              <img
+                src={rentalYachtLogo}
+                alt="Rental Yacht Dubai"
                 className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-lg"
               />
               <div className="flex flex-col">
@@ -156,7 +151,7 @@ const Footer = () => {
               </div>
             </div>
             <p className="text-primary-foreground/80 text-xs sm:text-sm leading-relaxed">
-              Experience the magic of Dubai with our premium yacht charters and dhow cruise experiences. 
+              Experience the magic of Dubai with our premium yacht charters and dhow cruise experiences.
               Creating unforgettable memories on the waters of Dubai Marina.
             </p>
             <div className="flex gap-3 sm:gap-4">
@@ -282,7 +277,7 @@ const Footer = () => {
               Your transactions are protected with industry-leading encryption
             </p>
           </div>
-          
+
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
             {paymentMethods.map((method, index) => (
               <div

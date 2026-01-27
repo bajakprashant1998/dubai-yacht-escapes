@@ -3,46 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
-import { withTimeout } from "@/lib/withTimeout";
+
 import { Button } from "@/components/ui/button";
 import AdminSidebar from "./AdminSidebar";
 import AdminTopBar from "./AdminTopBar";
 
-// SessionStorage keys for admin caching
-export const ADMIN_CACHE_KEY = "admin_verified";
-export const ADMIN_USER_KEY = "admin_user_id";
-
-// Helper functions for cache management
-export const getAdminCache = (): { userId: string; verified: boolean } | null => {
-  try {
-    const userId = sessionStorage.getItem(ADMIN_USER_KEY);
-    const verified = sessionStorage.getItem(ADMIN_CACHE_KEY);
-    if (userId && verified === "true") {
-      return { userId, verified: true };
-    }
-    return null;
-  } catch {
-    return null;
-  }
-};
-
-export const setAdminCache = (userId: string) => {
-  try {
-    sessionStorage.setItem(ADMIN_USER_KEY, userId);
-    sessionStorage.setItem(ADMIN_CACHE_KEY, "true");
-  } catch {
-    // Ignore storage errors
-  }
-};
-
-export const clearAdminCache = () => {
-  try {
-    sessionStorage.removeItem(ADMIN_USER_KEY);
-    sessionStorage.removeItem(ADMIN_CACHE_KEY);
-  } catch {
-    // Ignore storage errors
-  }
-};
+import {
+  ADMIN_CACHE_KEY,
+  ADMIN_USER_KEY,
+  getAdminCache,
+  setAdminCache,
+  clearAdminCache,
+} from "@/lib/adminAuth";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -66,21 +38,31 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     const checkAdminRole = async (userId: string) => {
       setLoading(true);
       setAdminGateError(null);
+
+      // Create a timeout promise that doesn't throw but returns a special flag
+      const timeoutPromise = new Promise<{ timeout: true }>((resolve) => {
+        setTimeout(() => resolve({ timeout: true }), 15000);
+      });
+
+      const queryPromise = supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle(); // Use maybeSingle for better 0/1 row handling
+
       try {
-        const { data, error } = await withTimeout(
-          supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", userId)
-            .eq("role", "admin")
-            .limit(1),
-          15000,
-          "Role check timed out",
-        );
+        const result = await Promise.race([queryPromise, timeoutPromise]);
+
+        if ("timeout" in result) {
+          throw new Error("Connection timed out");
+        }
+
+        const { data, error } = result;
 
         if (error) throw error;
 
-        const hasAdminRole = Array.isArray(data) ? data.length > 0 : !!data;
+        const hasAdminRole = !!data;
 
         if (hasAdminRole) {
           setIsAdmin(true);
@@ -102,12 +84,17 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         console.error("Error checking admin role:", error);
         setIsAdmin(false);
         clearAdminCache();
+
+        const errorMessage = (error as Error).message === "Connection timed out"
+          ? "Connection timed out. Please check your internet connection."
+          : (error as any)?.message || "Unknown error";
+
         setAdminGateError(
-          `We couldn't verify admin access right now. Error: ${(error as any)?.message || "Unknown error"}. Please retry (or sign out/in).`,
+          `We couldn't verify admin access. Error: ${errorMessage}. Please retry.`
         );
         toast({
-          title: "Admin check failed",
-          description: "Couldn't verify admin access. Please refresh and try again.",
+          title: "Admin verification failed",
+          description: "Please refresh and try again.",
           variant: "destructive",
         });
       } finally {
@@ -149,11 +136,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     const init = async () => {
       setLoading(true);
       try {
-        const { data, error } = await withTimeout(
-          supabase.auth.getSession(),
-          8000,
-          "Auth check timed out",
-        );
+        const { data, error } = await supabase.auth.getSession();
         if (cancelled) return;
         if (error) throw error;
 
@@ -168,6 +151,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         }
 
         setUser(session.user);
+        console.log("DEBUG: Session User", session.user, "App Metadata:", session.user.app_metadata);
 
         // Check sessionStorage cache first for instant load
         const cache = getAdminCache();
