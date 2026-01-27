@@ -1,249 +1,176 @@
 
+# Fix Loading Issues Across Admin and Frontend
 
-# Chat Enhancements: Push Notifications, Analytics Dashboard & Canned Responses
+## Problem Analysis
 
-## Overview
+After reviewing the codebase, I've identified several root causes for the loading issues:
 
-Implementing three major enhancements to the live chat system:
-1. **Browser Push Notifications** - Instant alerts for admins when visitors request support
-2. **Chat Analytics Dashboard** - Comprehensive metrics for conversation performance
-3. **Canned Responses** - Pre-defined templates for quick agent replies
+### 1. Missing Timeout Protection
+The `withTimeout` utility exists in `src/lib/withTimeout.ts` but is **not being used** in most hooks:
+- `useChat.ts` - No timeout on conversation initialization or message fetching
+- `useConversations.ts` - No timeout on fetching conversations
+- `useChatAnalytics.ts` - No timeout on analytics queries
+- `useCannedResponses.ts` - No timeout on canned response queries
+
+### 2. N+1 Query Problem in useConversations
+The `fetchConversations` function makes a separate query for each conversation to get the last message, causing significant slowdown:
+```typescript
+const convsWithMessages = await Promise.all(
+  (convs || []).map(async (conv) => {
+    const { data: msgs } = await supabase
+      .from("chat_messages")
+      .select("content")
+      .eq("conversation_id", conv.id)
+      // ...N queries for N conversations
+```
+
+### 3. Large Dataset Fetches in Analytics
+`useChatAnalytics` fetches all messages and conversations without pagination, which can be slow with large datasets.
+
+### 4. Simultaneous Subscriptions
+Multiple realtime subscriptions created without cleanup coordination can cause resource contention.
 
 ---
 
-## 1. Browser Push Notifications
+## Solution Plan
 
-### How It Works
+### Phase 1: Add Timeout Protection to All Database Hooks
 
-When a visitor requests a live agent, admins who are online will receive a browser push notification with a sound alert. This works alongside the existing email notifications.
+**Files to modify:**
+- `src/hooks/useChat.ts`
+- `src/hooks/useConversations.ts`
+- `src/hooks/useChatAnalytics.ts`
+- `src/hooks/useCannedResponses.ts`
+- `src/hooks/useAdminPresence.ts`
 
-### Implementation
+Wrap all Supabase queries with the `withTimeout` utility:
+```typescript
+import { withTimeout } from "@/lib/withTimeout";
 
-**New Hook: `src/hooks/usePushNotifications.ts`**
-- Request notification permission from browser
-- Play notification sound when new conversations arrive
-- Show desktop notifications with visitor info and quick action button
-- Track permission status (granted/denied/default)
+// Before
+const { data } = await supabase.from("table").select("*");
 
-**Updates to LiveChatDashboard**
-- Integrate push notification hook
-- Show permission request button if not granted
-- Subscribe to realtime `chat_conversations` changes for `waiting_agent` status
-
-**Notification Flow:**
-```text
-Visitor requests agent
-        |
-        v
-Database updates status = 'waiting_agent'
-        |
-        v
-Realtime subscription triggers in admin dashboard
-        |
-        v
-If admin online + notifications enabled:
-  - Play notification sound
-  - Show browser notification with visitor name
-  - Clicking notification focuses the chat window
+// After  
+const { data } = await withTimeout(
+  supabase.from("table").select("*"),
+  8000,
+  "Failed to load data"
+);
 ```
 
-**Browser Notification API Usage:**
+### Phase 2: Fix N+1 Query in Conversations
+
+Replace the loop that fetches last message for each conversation with a single aggregated query using a database function or client-side grouping:
+
+**Option A: Fetch all recent messages in one query**
 ```typescript
-new Notification("New Chat Request", {
-  body: `${visitorName} is waiting for support`,
-  icon: "/logo.jpeg",
-  tag: conversationId, // Prevents duplicate notifications
-  requireInteraction: true
-});
-```
+// Get all conversations
+const { data: convs } = await supabase
+  .from("chat_conversations")
+  .select("*")
+  .in("status", ["active", "waiting_agent"]);
 
----
-
-## 2. Chat Analytics Dashboard
-
-### Metrics to Display
-
-| Metric | Description | Data Source |
-|--------|-------------|-------------|
-| Total Conversations | All-time chat sessions | `chat_conversations` count |
-| Conversations Today | Sessions started today | `chat_conversations` filtered by date |
-| Average Response Time | Time from visitor message to agent reply | Calculated from `chat_messages` timestamps |
-| Lead Conversion Rate | % of chats that captured lead data | `chat_leads` / `chat_conversations` |
-| Agent vs Bot Handled | Split of who resolved chats | `is_agent_connected` field |
-| Messages per Conversation | Average message count | `chat_messages` aggregation |
-| Active Hours | Peak chat activity times | `chat_messages.created_at` distribution |
-
-### New Components
-
-**`src/components/admin/chat/ChatAnalytics.tsx`** - Main analytics container with:
-- Stat cards for key metrics
-- Time period selector (Today, 7 Days, 30 Days, All Time)
-- Recharts visualizations
-
-**`src/components/admin/chat/ConversationVolumeChart.tsx`**
-- Line chart showing conversations over time
-- Compare bot vs agent handled
-
-**`src/components/admin/chat/ResponseTimeChart.tsx`**
-- Bar chart showing average response times by day
-- Target line for performance benchmarks
-
-**`src/components/admin/chat/LeadConversionCard.tsx`**
-- Circular progress showing conversion percentage
-- Comparison with previous period
-
-**`src/components/admin/chat/PeakHoursChart.tsx`**
-- Heatmap or bar chart of activity by hour
-
-### New Hook
-
-**`src/hooks/useChatAnalytics.ts`**
-```typescript
-interface ChatAnalytics {
-  totalConversations: number;
-  conversationsToday: number;
-  avgResponseTime: number; // in seconds
-  leadConversionRate: number; // percentage
-  agentHandledCount: number;
-  botHandledCount: number;
-  messagesPerConversation: number;
-  hourlyDistribution: { hour: number; count: number }[];
-  dailyTrend: { date: string; conversations: number; leads: number }[];
+// Get last message for all conversations in ONE query
+const convIds = convs?.map(c => c.id) || [];
+if (convIds.length > 0) {
+  const { data: recentMessages } = await supabase
+    .from("chat_messages")
+    .select("conversation_id, content, created_at")
+    .in("conversation_id", convIds)
+    .order("created_at", { ascending: false });
+  
+  // Group by conversation_id client-side
 }
 ```
 
-### Dashboard Integration
+### Phase 3: Optimize Analytics Queries
 
-Add a new "Analytics" tab to the LiveChat page, or create a dedicated `/admin/chat-analytics` page accessible from the sidebar.
+Add limits and pagination to analytics queries:
+- Limit messages to last 1000 for response time calculation
+- Add row limits to prevent large data fetches
+- Cache results for 5 minutes using React Query's `staleTime`
 
----
+### Phase 4: Improve Admin Role Verification
 
-## 3. Canned Responses / Quick Reply Templates
+The current 15-second timeout is too long. Reduce it and add better error handling:
+- Reduce timeout from 15s to 8s
+- Show more specific error messages
+- Add retry with exponential backoff
 
-### Database Schema
+### Phase 5: Add Loading Error Boundaries
 
-**New Table: `canned_responses`**
-| Column | Type | Description |
-|--------|------|-------------|
-| id | UUID | Primary key |
-| title | TEXT | Short label (e.g., "Greeting") |
-| content | TEXT | Full response text |
-| category | TEXT | Grouping (e.g., "Welcome", "Pricing", "Booking") |
-| shortcut | TEXT | Keyboard shortcut (e.g., "/greet") |
-| is_active | BOOLEAN | Enable/disable |
-| sort_order | INTEGER | Display order |
-| created_at | TIMESTAMPTZ | Timestamp |
-| updated_at | TIMESTAMPTZ | Timestamp |
-
-**RLS Policies:**
-- Only admins can read/write canned responses
-
-### Components
-
-**`src/components/admin/chat/CannedResponsePicker.tsx`**
-- Dropdown/popover with search functionality
-- Grouped by category
-- Triggered by clicking button or typing `/` in chat input
-- Shows shortcut hints
-
-**`src/components/admin/chat/CannedResponseManager.tsx`**
-- CRUD interface for managing responses
-- Category management
-- Drag-and-drop reordering
-- Import/export functionality
-
-### Integration with Admin Chat Input
-
-Modify `AdminChatInput.tsx`:
-- Add canned response button next to send
-- Detect `/` prefix to show autocomplete
-- Insert selected response into input
-- Support variable substitution (e.g., `{visitor_name}`)
-
-### Default Templates
-
-Pre-populate with common responses:
-```text
-/greet - "Hello! Thank you for reaching out. How can I assist you today?"
-/wait - "Please give me a moment while I look into this for you."
-/booking - "I'd be happy to help you with a booking. Could you share your preferred date and number of guests?"
-/pricing - "Our packages start from AED X. You can view all options at [Tours Page]."
-/thanks - "Thank you for choosing Luxury Dhow Escapes! Have a wonderful day."
-/offline - "Our team is currently offline. Please leave your contact details and we'll get back to you shortly."
-```
+Create error boundaries to gracefully handle loading failures and provide retry options instead of blank screens.
 
 ---
 
-## File Changes Summary
+## Technical Implementation Details
 
-### New Files
+### File: `src/hooks/useChat.ts`
 
-| File | Purpose |
-|------|---------|
-| `src/hooks/usePushNotifications.ts` | Browser notification logic |
-| `src/hooks/useChatAnalytics.ts` | Analytics data fetching |
-| `src/components/admin/chat/ChatAnalytics.tsx` | Analytics dashboard container |
-| `src/components/admin/chat/ConversationVolumeChart.tsx` | Conversations over time |
-| `src/components/admin/chat/ResponseTimeChart.tsx` | Response time visualization |
-| `src/components/admin/chat/LeadConversionCard.tsx` | Conversion metric card |
-| `src/components/admin/chat/PeakHoursChart.tsx` | Activity by hour |
-| `src/components/admin/chat/CannedResponsePicker.tsx` | Response selector popup |
-| `src/components/admin/chat/CannedResponseManager.tsx` | CRUD for templates |
+**Changes:**
+1. Import `withTimeout`
+2. Wrap `initConversation` database calls with timeout
+3. Wrap `sendMessage` calls with timeout
+4. Add error recovery (retry logic)
 
-### Modified Files
+### File: `src/hooks/useConversations.ts`
 
-| File | Changes |
-|------|---------|
-| `src/components/admin/chat/LiveChatDashboard.tsx` | Add tabs for Conversations/Analytics, integrate notifications |
-| `src/components/admin/chat/AdminChatInput.tsx` | Add canned response button and `/` detection |
-| `src/components/admin/AdminSidebar.tsx` | Optional: Add Chat Analytics link |
+**Changes:**
+1. Import `withTimeout`
+2. Replace N+1 query pattern with batch fetch
+3. Add timeout to all database operations
+4. Optimize message fetching with single query + client-side grouping
 
-### Database Migration
+### File: `src/hooks/useChatAnalytics.ts`
 
-Create `canned_responses` table with RLS policies for admin access.
+**Changes:**
+1. Import `withTimeout`
+2. Add limits to queries (`.limit(1000)`)
+3. Wrap all queries with timeout
+4. Add row count estimates before full fetches
+
+### File: `src/hooks/useCannedResponses.ts`
+
+**Changes:**
+1. Import `withTimeout`
+2. Wrap all CRUD operations with timeout
+
+### File: `src/hooks/useAdminPresence.ts`
+
+**Changes:**
+1. Import `withTimeout`
+2. Wrap presence update operations with timeout
+
+### File: `src/lib/withTimeout.ts`
+
+**Changes:**
+Reduce default timeout from 8000ms to 5000ms for faster feedback.
+
+### File: `src/components/admin/AdminLayout.tsx`
+
+**Changes:**
+1. Reduce timeout from 15s to 8s
+2. Add retry mechanism with exponential backoff
+3. Improve error messaging
 
 ---
 
-## Implementation Phases
+## Expected Outcomes
 
-### Phase 1: Browser Push Notifications
-1. Create `usePushNotifications` hook
-2. Add notification permission UI to LiveChatDashboard
-3. Subscribe to realtime for new waiting conversations
-4. Trigger notifications with sound
-
-### Phase 2: Canned Responses
-1. Create database migration for `canned_responses` table
-2. Build CannedResponseManager CRUD interface
-3. Create CannedResponsePicker component
-4. Integrate with AdminChatInput
-5. Seed default templates
-
-### Phase 3: Chat Analytics
-1. Create `useChatAnalytics` hook with data aggregation queries
-2. Build individual chart components
-3. Create ChatAnalytics container with period selector
-4. Add Analytics tab to LiveChatDashboard
+1. **Faster Feedback**: Users will see error states within 5-8 seconds instead of indefinite loading
+2. **Fewer Hangs**: Timeout protection prevents infinite loading states
+3. **Better Performance**: N+1 query fix reduces conversation list load time significantly
+4. **Graceful Degradation**: Error boundaries allow users to retry failed loads
+5. **Improved UX**: Specific error messages help users understand what went wrong
 
 ---
 
-## Technical Considerations
+## Testing Checklist
 
-### Push Notification Permissions
-- Request permission on first online toggle
-- Store preference in localStorage to avoid repeated prompts
-- Gracefully handle denied permissions
-
-### Analytics Performance
-- Use database aggregation queries (GROUP BY) instead of fetching all records
-- Cache results with React Query (5-minute stale time)
-- Limit date range to prevent large data fetches
-
-### Canned Response Variables
-Support dynamic placeholders:
-- `{visitor_name}` - From conversation data
-- `{date}` - Current date
-- `{agent_name}` - Current admin name
-
-These get replaced when response is selected.
-
+After implementation, verify:
+- [ ] Admin dashboard loads within 5 seconds
+- [ ] Live Chat dashboard shows conversations quickly
+- [ ] Chat widget initializes without hanging
+- [ ] Analytics tab loads within reasonable time
+- [ ] Slow network conditions show timeout errors (not infinite loading)
+- [ ] Retry buttons work when errors occur
