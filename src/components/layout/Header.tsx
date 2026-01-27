@@ -38,25 +38,25 @@ const Header = () => {
   const tourCategories = [
     { 
       name: "Dhow Cruises", 
-      path: "/tours?category=dhow-cruise", 
+      path: "/dubai/dhow-cruises", 
       icon: Ship,
       description: "Traditional wooden vessel dining experience"
     },
     { 
       name: "Shared Yacht Tours", 
-      path: "/tours?category=yacht-shared", 
+      path: "/dubai/shared-yacht-tours", 
       icon: Users,
       description: "Affordable luxury with live BBQ"
     },
     { 
       name: "Private Charters", 
-      path: "/tours?category=yacht-private", 
+      path: "/dubai/private-yacht-charter", 
       icon: Anchor,
       description: "Exclusive yacht experience for groups"
     },
     { 
       name: "Megayacht Dining", 
-      path: "/tours?category=megayacht", 
+      path: "/dubai/megayacht-experiences", 
       icon: Crown,
       description: "Premium multi-deck cruise experience"
     },

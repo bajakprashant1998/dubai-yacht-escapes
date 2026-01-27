@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Filter, Ship, Anchor, Crown, Users, ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import Layout from "@/components/layout/Layout";
 import TourCard from "@/components/TourCard";
 import { useTours } from "@/hooks/useTours";
 import { useActiveCategories } from "@/hooks/useCategories";
+import { getCategoryFromPath, getCategoryUrl } from "@/lib/seoUtils";
 
 const categoryIcons: Record<string, React.ReactNode> = {
   "all": <Filter className="w-4 h-4" />,
@@ -40,33 +41,58 @@ const itemVariants = {
 };
 
 const Tours = () => {
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const { categoryPath } = useParams<{ categoryPath?: string }>();
+  const [searchParams] = useSearchParams();
+  
+  // Determine selected category from URL
+  const getCategoryFromUrl = (): string => {
+    // New SEO-friendly URL: /dubai/:categoryPath
+    if (categoryPath) {
+      return getCategoryFromPath(categoryPath);
+    }
+    // Legacy URL: /tours?category=xxx
+    const queryCategory = searchParams.get("category");
+    if (queryCategory) {
+      return queryCategory;
+    }
+    return "all";
+  };
+
+  const [selectedCategory, setSelectedCategory] = useState(getCategoryFromUrl());
   const [sortBy, setSortBy] = useState<"popular" | "price-low" | "price-high">("popular");
   const [showScrollTop, setShowScrollTop] = useState(false);
   
   const { data: tours = [], isLoading: toursLoading, error: toursError } = useTours();
   const { data: dbCategories = [], isLoading: categoriesLoading } = useActiveCategories();
 
+  // Update selected category when URL changes
+  useEffect(() => {
+    setSelectedCategory(getCategoryFromUrl());
+  }, [categoryPath, searchParams]);
+
   // Handle scroll to top button visibility
-  if (typeof window !== "undefined") {
-    window.addEventListener("scroll", () => {
+  useEffect(() => {
+    const handleScroll = () => {
       setShowScrollTop(window.scrollY > 500);
-    });
-  }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Build categories array with "All Tours" option
-  const categories: Array<{ id: string; label: string; slug: string; description?: string | null; count?: number }> = [
-    { id: "all", label: "All Tours", slug: "all", count: tours.length },
+  // Build categories array with "All Tours" option using SEO-friendly URLs
+  const categories: Array<{ id: string; label: string; slug: string; description?: string | null; count?: number; url: string }> = [
+    { id: "all", label: "All Tours", slug: "all", count: tours.length, url: "/tours" },
     ...dbCategories.map((cat) => ({
       id: cat.slug,
       label: cat.name,
       slug: cat.slug,
       description: cat.description,
       count: tours.filter(t => t.category === cat.slug).length,
+      url: getCategoryUrl(cat.slug),
     })),
   ];
 
@@ -205,37 +231,40 @@ const Tours = () => {
               </>
             ) : (
               categories.map((category) => (
-                <motion.button
+                <Link
                   key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={`relative flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full font-medium transition-all flex-shrink-0 snap-start touch-target text-sm sm:text-base whitespace-nowrap ${
-                    selectedCategory === category.id
-                      ? "bg-primary text-primary-foreground shadow-lg"
-                      : "bg-card text-foreground hover:bg-muted border border-border"
-                  }`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  layout
+                  to={category.url}
                 >
-                  {categoryIcons[category.id] || <Filter className="w-4 h-4" />}
-                  <span>{category.label}</span>
-                  {category.count !== undefined && category.count > 0 && (
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                      selectedCategory === category.id 
-                        ? "bg-primary-foreground/20" 
-                        : "bg-muted"
-                    }`}>
-                      {category.count}
-                    </span>
-                  )}
-                  {selectedCategory === category.id && (
-                    <motion.div
-                      className="absolute inset-0 bg-primary rounded-full -z-10"
-                      layoutId="categoryBackground"
-                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    />
-                  )}
-                </motion.button>
+                  <motion.button
+                    className={`relative flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full font-medium transition-all flex-shrink-0 snap-start touch-target text-sm sm:text-base whitespace-nowrap ${
+                      selectedCategory === category.id
+                        ? "bg-primary text-primary-foreground shadow-lg"
+                        : "bg-card text-foreground hover:bg-muted border border-border"
+                    }`}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    layout
+                  >
+                    {categoryIcons[category.id] || <Filter className="w-4 h-4" />}
+                    <span>{category.label}</span>
+                    {category.count !== undefined && category.count > 0 && (
+                      <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                        selectedCategory === category.id 
+                          ? "bg-primary-foreground/20" 
+                          : "bg-muted"
+                      }`}>
+                        {category.count}
+                      </span>
+                    )}
+                    {selectedCategory === category.id && (
+                      <motion.div
+                        className="absolute inset-0 bg-primary rounded-full -z-10"
+                        layoutId="categoryBackground"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )}
+                  </motion.button>
+                </Link>
               ))
             )}
           </div>

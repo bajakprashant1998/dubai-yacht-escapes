@@ -16,7 +16,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Upload, X, Plus, Loader2, ImageIcon, Sparkles, MapPin, Calendar, Clock, Users, Shield, Flame, RotateCcw } from "lucide-react";
+import { Upload, X, Plus, Loader2, ImageIcon, Sparkles, MapPin, Calendar, Clock, Users, Shield, Flame, RotateCcw, Link as LinkIcon } from "lucide-react";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 import { useActiveCategories } from "@/hooks/useCategories";
 import { useActiveLocations } from "@/hooks/useLocations";
@@ -26,6 +26,7 @@ import CharacterCounter from "./CharacterCounter";
 import SEOPreview from "./SEOPreview";
 import KeywordsInput from "./KeywordsInput";
 import { BookingFeatures, defaultBookingFeatures } from "@/lib/tourMapper";
+import { generateSeoSlug, getCategoryPath } from "@/lib/seoUtils";
 
 type Tour = Tables<"tours">;
 
@@ -50,6 +51,7 @@ const TourForm = ({ tour, mode }: TourFormProps) => {
   const [formData, setFormData] = useState({
     title: tour?.title || "",
     slug: tour?.slug || "",
+    seo_slug: (tour as any)?.seo_slug || "",
     subtitle: tour?.subtitle || "",
     description: tour?.description || "",
     long_description: tour?.long_description || "",
@@ -211,6 +213,7 @@ const TourForm = ({ tour, mode }: TourFormProps) => {
       const tourData: TablesInsert<"tours"> | TablesUpdate<"tours"> = {
         title: formData.title,
         slug: formData.slug,
+        seo_slug: formData.seo_slug || null,
         subtitle: formData.subtitle || null,
         description: formData.description || null,
         long_description: formData.long_description || null,
@@ -292,6 +295,37 @@ const TourForm = ({ tour, mode }: TourFormProps) => {
                     required
                   />
                 </div>
+              </div>
+
+              {/* SEO-Friendly Slug */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="seo_slug" className="flex items-center gap-2">
+                    <LinkIcon className="w-4 h-4" />
+                    SEO-Friendly URL Slug
+                  </Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      const seoSlug = generateSeoSlug(formData.title, formData.category, formData.location);
+                      setFormData((prev) => ({ ...prev, seo_slug: seoSlug }));
+                    }}
+                  >
+                    <Sparkles className="w-4 h-4 mr-1" />
+                    Auto-generate
+                  </Button>
+                </div>
+                <Input
+                  id="seo_slug"
+                  value={formData.seo_slug}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, seo_slug: e.target.value }))}
+                  placeholder="e.g., luxury-44ft-yacht-charter-dubai-marina"
+                />
+                <p className="text-xs text-muted-foreground">
+                  SEO-optimized URL: <span className="font-mono text-secondary">/dubai/{getCategoryPath(formData.category)}/{formData.seo_slug || formData.slug}</span>
+                </p>
               </div>
 
               <div className="space-y-2">

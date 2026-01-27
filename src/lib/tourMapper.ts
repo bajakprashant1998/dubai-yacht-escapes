@@ -28,6 +28,7 @@ export const defaultBookingFeatures: BookingFeatures = {
 export interface Tour {
   id: string;
   slug: string;
+  seoSlug: string | null;
   title: string;
   subtitle: string;
   description: string;
@@ -65,6 +66,7 @@ export function mapDbTourToTour(dbTour: DbTour): Tour {
   return {
     id: dbTour.id,
     slug: dbTour.slug,
+    seoSlug: (dbTour as any).seo_slug || null,
     title: dbTour.title,
     subtitle: dbTour.subtitle || "",
     description: dbTour.description || "",
