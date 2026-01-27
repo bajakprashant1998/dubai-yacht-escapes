@@ -49,7 +49,7 @@ const AdminChatWindow = ({
           </div>
           <div className="flex items-center gap-2">
             {!conversation.is_agent_connected && (
-              <Button size="sm" onClick={onJoin} className="bg-green-600 hover:bg-green-700">
+              <Button size="sm" onClick={onJoin} className="bg-primary hover:bg-primary/90">
                 <Headset className="w-4 h-4 mr-1" />
                 Join Chat
               </Button>
@@ -71,9 +71,9 @@ const AdminChatWindow = ({
 
         {/* Agent connected banner */}
         {conversation.is_agent_connected && (
-          <div className="px-4 py-2 bg-green-600/10 border-t border-green-600/20 flex items-center gap-2">
-            <Headset className="w-4 h-4 text-green-600" />
-            <span className="text-xs text-green-600 font-medium">
+          <div className="px-4 py-2 bg-primary/10 border-t border-primary/20 flex items-center gap-2">
+            <Headset className="w-4 h-4 text-primary" />
+            <span className="text-xs text-primary font-medium">
               You are connected to this conversation
             </span>
           </div>
@@ -81,7 +81,10 @@ const AdminChatWindow = ({
 
         {/* Input */}
         {conversation.is_agent_connected ? (
-          <AdminChatInput onSend={onSend} />
+          <AdminChatInput
+            onSend={onSend}
+            visitorName={conversation.visitor_name || undefined}
+          />
         ) : (
           <div className="p-4 border-t border-border bg-muted/30 text-center">
             <p className="text-sm text-muted-foreground">

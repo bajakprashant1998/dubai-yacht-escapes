@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
 import { useConversations } from "@/hooks/useConversations";
 import { useAdminPresence } from "@/hooks/useAdminPresence";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { supabase } from "@/integrations/supabase/client";
 import OnlineStatusToggle from "./OnlineStatusToggle";
 import ConversationList from "./ConversationList";
 import AdminChatWindow from "./AdminChatWindow";
+import ChatAnalytics from "./ChatAnalytics";
+import CannedResponseManager from "./CannedResponseManager";
+import NotificationPermissionBanner from "./NotificationPermissionBanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Download, MessageSquare } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RefreshCw, Download, MessageSquare, BarChart3, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const LiveChatDashboard = () => {
@@ -24,8 +29,10 @@ const LiveChatDashboard = () => {
   } = useConversations();
 
   const { isOnline, toggleOnline, userId } = useAdminPresence();
+  const { permission, isSupported, requestPermission } = usePushNotifications(isOnline);
   const { toast } = useToast();
   const [agentName, setAgentName] = useState("Support Agent");
+  const [activeTab, setActiveTab] = useState("conversations");
 
   // Get agent name from profile
   useEffect(() => {
@@ -121,76 +128,118 @@ const LiveChatDashboard = () => {
   const waitingCount = conversations.filter((c) => c.status === "waiting_agent").length;
 
   return (
-    <div className="h-full flex gap-4">
-      {/* Sidebar */}
-      <div className="w-80 flex-shrink-0 flex flex-col gap-4">
-        {/* Online Status */}
-        <OnlineStatusToggle isOnline={isOnline} onToggle={toggleOnline} />
+    <div className="h-full flex flex-col">
+      {/* Notification Permission Banner */}
+      <NotificationPermissionBanner
+        permission={permission}
+        isSupported={isSupported}
+        onRequestPermission={requestPermission}
+      />
 
-        {/* Stats */}
-        <Card>
-          <CardHeader className="py-3 px-4">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-semibold">Active Chats</CardTitle>
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" onClick={refresh} className="h-7 w-7">
-                  <RefreshCw className="w-4 h-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={handleExportChats} className="h-7 w-7">
-                  <Download className="w-4 h-4" />
-                </Button>
-              </div>
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+        <TabsList className="w-fit mb-4">
+          <TabsTrigger value="conversations" className="gap-2">
+            <MessageSquare className="w-4 h-4" />
+            Conversations
+            {waitingCount > 0 && (
+              <span className="ml-1 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                {waitingCount}
+              </span>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="gap-2">
+            <BarChart3 className="w-4 h-4" />
+            Analytics
+          </TabsTrigger>
+          <TabsTrigger value="templates" className="gap-2">
+            <Zap className="w-4 h-4" />
+            Quick Replies
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="conversations" className="flex-1 mt-0">
+          <div className="h-full flex gap-4">
+            {/* Sidebar */}
+            <div className="w-80 flex-shrink-0 flex flex-col gap-4">
+              {/* Online Status */}
+              <OnlineStatusToggle isOnline={isOnline} onToggle={toggleOnline} />
+
+              {/* Stats */}
+              <Card>
+                <CardHeader className="py-3 px-4">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm font-semibold">Active Chats</CardTitle>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" onClick={refresh} className="h-7 w-7">
+                        <RefreshCw className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={handleExportChats} className="h-7 w-7">
+                        <Download className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="py-2 px-4">
+                  <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-lg">{conversations.length}</span>
+                      <span className="text-muted-foreground">Total</span>
+                    </div>
+                    {waitingCount > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-lg text-orange-500">{waitingCount}</span>
+                        <span className="text-muted-foreground">Waiting</span>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Conversations List */}
+              <Card className="flex-1">
+                <CardHeader className="py-3 px-4 border-b border-border">
+                  <CardTitle className="text-sm font-semibold">Conversations</CardTitle>
+                </CardHeader>
+                <ConversationList
+                  conversations={conversations}
+                  isLoading={isLoading}
+                  selectedId={selectedConversation?.id || null}
+                  onSelect={selectConversation}
+                />
+              </Card>
             </div>
-          </CardHeader>
-          <CardContent className="py-2 px-4">
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-lg">{conversations.length}</span>
-                <span className="text-muted-foreground">Total</span>
-              </div>
-              {waitingCount > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-lg text-orange-500">{waitingCount}</span>
-                  <span className="text-muted-foreground">Waiting</span>
+
+            {/* Main Chat Area */}
+            <div className="flex-1">
+              {selectedConversation ? (
+                <AdminChatWindow
+                  conversation={selectedConversation}
+                  messages={selectedMessages}
+                  onJoin={handleJoin}
+                  onSend={handleSend}
+                  onClose={handleClose}
+                />
+              ) : (
+                <div className="h-full flex items-center justify-center bg-card rounded-lg border border-border">
+                  <div className="text-center text-muted-foreground">
+                    <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p className="text-sm">Select a conversation to view</p>
+                  </div>
                 </div>
               )}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Conversations List */}
-        <Card className="flex-1">
-          <CardHeader className="py-3 px-4 border-b border-border">
-            <CardTitle className="text-sm font-semibold">Conversations</CardTitle>
-          </CardHeader>
-          <ConversationList
-            conversations={conversations}
-            isLoading={isLoading}
-            selectedId={selectedConversation?.id || null}
-            onSelect={selectConversation}
-          />
-        </Card>
-      </div>
-
-      {/* Main Chat Area */}
-      <div className="flex-1">
-        {selectedConversation ? (
-          <AdminChatWindow
-            conversation={selectedConversation}
-            messages={selectedMessages}
-            onJoin={handleJoin}
-            onSend={handleSend}
-            onClose={handleClose}
-          />
-        ) : (
-          <div className="h-full flex items-center justify-center bg-card rounded-lg border border-border">
-            <div className="text-center text-muted-foreground">
-              <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p className="text-sm">Select a conversation to view</p>
-            </div>
           </div>
-        )}
-      </div>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="flex-1 mt-0">
+          <ChatAnalytics />
+        </TabsContent>
+
+        <TabsContent value="templates" className="flex-1 mt-0">
+          <CannedResponseManager />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
