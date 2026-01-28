@@ -100,6 +100,14 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         }
       } catch (error) {
         console.error("Error checking admin role:", error);
+
+        // IMPORANT Fix: If this is a background check and we fail (e.g. network timeout on tab switch),
+        // DO NOT log the user out. Assume they are still admin.
+        if (background && adminVerifiedRef.current) {
+          console.warn("Background admin check failed, keeping session active.");
+          return;
+        }
+
         setIsAdmin(false);
         clearAdminCache();
 
