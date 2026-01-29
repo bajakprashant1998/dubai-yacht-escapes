@@ -20,6 +20,7 @@ import {
   History,
   Scale,
   Headset,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +43,15 @@ const navItems: NavItem[] = [
       { title: "All Tours", href: "/admin/tours" },
       { title: "Add Tour", href: "/admin/tours/add" },
       { title: "Categories", href: "/admin/tours/categories" },
+    ],
+  },
+  {
+    title: "Services",
+    icon: Sparkles,
+    children: [
+      { title: "All Services", href: "/admin/services" },
+      { title: "Add Service", href: "/admin/services/add" },
+      { title: "Categories", href: "/admin/services/categories" },
     ],
   },
   { title: "Inquiries", href: "/admin/inquiries", icon: MessageSquare },
@@ -70,7 +80,7 @@ interface AdminSidebarProps {
 
 const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
   const location = useLocation();
-  const [expandedItems, setExpandedItems] = useState<string[]>(["Tours", "Settings"]);
+  const [expandedItems, setExpandedItems] = useState<string[]>(["Tours", "Settings", "Services"]);
 
   const toggleExpand = (title: string) => {
     setExpandedItems((prev) =>

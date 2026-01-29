@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Phone, Mail, ChevronDown, Ship, Anchor, Crown, Users } from "lucide-react";
+import { Menu, X, Phone, Mail, ChevronDown, Ship, Anchor, Crown, Users, Sparkles, Sun, FerrisWheel, Waves, MapPin } from "lucide-react";
 import rentalYachtLogo from "@/assets/rental-yacht-logo.png";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +30,7 @@ const Header = () => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Tours", path: "/tours", hasDropdown: true },
+    { name: "Experiences", path: "/services", hasDropdown: true, isExperiences: true },
     { name: "Gallery", path: "/gallery" },
     { name: "About Us", path: "/about" },
     { name: "Contact", path: "/contact" },
@@ -59,6 +60,33 @@ const Header = () => {
       path: "/dubai/megayacht-experiences", 
       icon: Crown,
       description: "Premium multi-deck cruise experience"
+    },
+  ];
+
+  const experienceCategories = [
+    { 
+      name: "Desert Safari", 
+      path: "/dubai/services/desert-safari", 
+      icon: Sun,
+      description: "Thrilling desert adventures with BBQ dinner"
+    },
+    { 
+      name: "Theme Parks", 
+      path: "/dubai/services/theme-parks", 
+      icon: FerrisWheel,
+      description: "World-class theme parks and attractions"
+    },
+    { 
+      name: "Water Sports", 
+      path: "/dubai/services/water-sports", 
+      icon: Waves,
+      description: "Exciting water activities and adventures"
+    },
+    { 
+      name: "City Tours", 
+      path: "/dubai/services/city-tours", 
+      icon: MapPin,
+      description: "Explore Dubai's landmarks and hidden gems"
     },
   ];
 
@@ -124,9 +152,11 @@ const Header = () => {
                       <NavigationMenuContent>
                         <div className="w-[400px] p-4 grid gap-2">
                           <div className="mb-2">
-                            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Explore Our Experiences</p>
+                            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                              {link.isExperiences ? "Popular Experiences" : "Explore Our Experiences"}
+                            </p>
                           </div>
-                          {tourCategories.map((category) => (
+                          {(link.isExperiences ? experienceCategories : tourCategories).map((category) => (
                             <NavigationMenuLink asChild key={category.path}>
                               <Link
                                 to={category.path}
@@ -143,8 +173,8 @@ const Header = () => {
                             </NavigationMenuLink>
                           ))}
                           <div className="mt-2 pt-3 border-t border-border">
-                            <Link to="/tours" className="flex items-center justify-center gap-2 text-sm font-medium text-secondary hover:underline">
-                              View All Tours →
+                            <Link to={link.isExperiences ? "/services" : "/tours"} className="flex items-center justify-center gap-2 text-sm font-medium text-secondary hover:underline">
+                              {link.isExperiences ? "View All Experiences →" : "View All Tours →"}
                             </Link>
                           </div>
                         </div>
