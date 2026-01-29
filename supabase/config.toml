@@ -1,10 +1,1 @@
-project_id = "jmiigncmyirihxkuxybo"
-
-[functions.send-booking-email]
-verify_jwt = false
-
-[functions.chat-bot]
-verify_jwt = false
-
-[functions.notify-agent-request]
-verify_jwt = false
+project_id = "gvcwbwwznkgomejehzab"
