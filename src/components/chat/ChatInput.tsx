@@ -2,6 +2,7 @@ import { useState, FormEvent, KeyboardEvent } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -27,26 +28,45 @@ const ChatInput = ({ onSend, disabled, placeholder = "Type your message..." }: C
     }
   };
 
+  const hasText = message.trim().length > 0;
+
   return (
-    <form onSubmit={handleSubmit} className="p-3 border-t border-border bg-card/50">
+    <form onSubmit={handleSubmit} className="p-3 border-t border-border/30 bg-gradient-to-t from-card to-card/80">
       <div className="flex items-end gap-2">
-        <Textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          disabled={disabled}
-          className="min-h-[44px] max-h-[120px] resize-none bg-background/50 border-muted focus-visible:ring-secondary"
-          rows={1}
-        />
-        <Button
-          type="submit"
-          size="icon"
-          disabled={!message.trim() || disabled}
-          className="h-11 w-11 bg-secondary hover:bg-secondary/90 text-primary flex-shrink-0"
-        >
-          <Send className="w-5 h-5" />
-        </Button>
+        <div className="flex-1 relative">
+          <Textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            disabled={disabled}
+            className="min-h-[48px] max-h-[120px] resize-none bg-background/80 border-border/50 rounded-2xl pr-4 focus-visible:ring-secondary/50 focus-visible:border-secondary/50 transition-all duration-200 placeholder:text-muted-foreground/60"
+            rows={1}
+          />
+        </div>
+        
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={hasText ? "active" : "inactive"}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <Button
+              type="submit"
+              size="icon"
+              disabled={!hasText || disabled}
+              className={`h-12 w-12 rounded-full flex-shrink-0 shadow-md transition-all duration-200 ${
+                hasText 
+                  ? "bg-gradient-to-br from-secondary to-secondary/80 hover:from-secondary/90 hover:to-secondary/70 text-primary" 
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
+              <Send className={`w-5 h-5 transition-transform duration-200 ${hasText ? "-rotate-45" : ""}`} />
+            </Button>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </form>
   );
