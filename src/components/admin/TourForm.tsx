@@ -25,6 +25,7 @@ import FAQEditor, { FAQItem } from "./FAQEditor";
 import CharacterCounter from "./CharacterCounter";
 import SEOPreview from "./SEOPreview";
 import KeywordsInput from "./KeywordsInput";
+import RichTextEditor from "./RichTextEditor";
 import { BookingFeatures, defaultBookingFeatures } from "@/lib/tourMapper";
 import { generateSeoSlug, getCategoryPath } from "@/lib/seoUtils";
 
@@ -338,27 +339,25 @@ const TourForm = ({ tour, mode }: TourFormProps) => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Short Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-                  placeholder="Short description for cards"
-                  rows={3}
-                />
-              </div>
+              <RichTextEditor
+                id="description"
+                label="Short Description"
+                value={formData.description}
+                onChange={(value) => setFormData((prev) => ({ ...prev, description: value }))}
+                placeholder="Compelling summary for tour cards. Use **bold** for key features and *italics* for highlights."
+                rows={4}
+                helpText="Used on tour cards and search results. Keep it concise and engaging."
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="long_description">Full Description</Label>
-                <Textarea
-                  id="long_description"
-                  value={formData.long_description}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, long_description: e.target.value }))}
-                  placeholder="Detailed tour description"
-                  rows={6}
-                />
-              </div>
+              <RichTextEditor
+                id="long_description"
+                label="Full Description"
+                value={formData.long_description}
+                onChange={(value) => setFormData((prev) => ({ ...prev, long_description: value }))}
+                placeholder="Create a luxurious, detailed description using the formatting toolbar..."
+                rows={12}
+                helpText="Displayed on the tour detail page. Use headings, lists, and links to create premium content."
+              />
             </CardContent>
           </Card>
 
