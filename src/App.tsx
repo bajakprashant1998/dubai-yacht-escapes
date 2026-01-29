@@ -14,6 +14,8 @@ import Home from "./pages/Home";
 // Lazy-loaded pages for code splitting
 const Tours = lazy(() => import("./pages/Tours"));
 const TourDetail = lazy(() => import("./pages/TourDetail"));
+const Services = lazy(() => import("./pages/Services"));
+const ServiceDetail = lazy(() => import("./pages/ServiceDetail"));
 const SavedTours = lazy(() => import("./pages/SavedTours"));
 const Gallery = lazy(() => import("./pages/Gallery"));
 const About = lazy(() => import("./pages/About"));
@@ -42,6 +44,10 @@ const AdminUploadTourImages = lazy(() => import("./pages/admin/UploadTourImages"
 const AdminActivityLog = lazy(() => import("./pages/admin/ActivityLog"));
 const AdminLegalPages = lazy(() => import("./pages/admin/LegalPages"));
 const AdminLiveChat = lazy(() => import("./pages/admin/LiveChat"));
+const AdminServices = lazy(() => import("./pages/admin/Services"));
+const AdminAddService = lazy(() => import("./pages/admin/AddService"));
+const AdminEditService = lazy(() => import("./pages/admin/EditService"));
+const AdminServiceCategories = lazy(() => import("./pages/admin/ServiceCategories"));
 
 // RequireSession must be loaded synchronously as it's a wrapper component
 import RequireSession from "./components/admin/RequireSession";
@@ -86,6 +92,10 @@ const App = () => (
             <Route path="/dubai/:categoryPath" element={<Tours />} />
             {/* Legacy route - kept for backwards compatibility */}
             <Route path="/tours/:slug" element={<TourDetail />} />
+            {/* Services routes */}
+            <Route path="/services" element={<Services />} />
+            <Route path="/dubai/services/:categoryPath" element={<Services />} />
+            <Route path="/dubai/services/:categoryPath/:slug" element={<ServiceDetail />} />
             <Route path="/saved-tours" element={<SavedTours />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/about" element={<About />} />
@@ -228,6 +238,39 @@ const App = () => (
               element={
                 <RequireSession>
                   <AdminLiveChat />
+                </RequireSession>
+              }
+            />
+            {/* Admin Services Routes */}
+            <Route
+              path="/admin/services"
+              element={
+                <RequireSession>
+                  <AdminServices />
+                </RequireSession>
+              }
+            />
+            <Route
+              path="/admin/services/add"
+              element={
+                <RequireSession>
+                  <AdminAddService />
+                </RequireSession>
+              }
+            />
+            <Route
+              path="/admin/services/edit/:slug"
+              element={
+                <RequireSession>
+                  <AdminEditService />
+                </RequireSession>
+              }
+            />
+            <Route
+              path="/admin/services/categories"
+              element={
+                <RequireSession>
+                  <AdminServiceCategories />
                 </RequireSession>
               }
             />

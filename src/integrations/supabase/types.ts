@@ -84,6 +84,7 @@ export type Database = {
         Row: {
           adults: number
           booking_date: string
+          booking_source: string | null
           booking_type: string | null
           children: number
           created_at: string
@@ -92,6 +93,7 @@ export type Database = {
           customer_phone: string
           id: string
           infants: number
+          service_id: string | null
           special_requests: string | null
           status: string
           total_price: number
@@ -103,6 +105,7 @@ export type Database = {
         Insert: {
           adults?: number
           booking_date: string
+          booking_source?: string | null
           booking_type?: string | null
           children?: number
           created_at?: string
@@ -111,6 +114,7 @@ export type Database = {
           customer_phone: string
           id?: string
           infants?: number
+          service_id?: string | null
           special_requests?: string | null
           status?: string
           total_price: number
@@ -122,6 +126,7 @@ export type Database = {
         Update: {
           adults?: number
           booking_date?: string
+          booking_source?: string | null
           booking_type?: string | null
           children?: number
           created_at?: string
@@ -130,6 +135,7 @@ export type Database = {
           customer_phone?: string
           id?: string
           infants?: number
+          service_id?: string | null
           special_requests?: string | null
           status?: string
           total_price?: number
@@ -138,7 +144,15 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       canned_responses: {
         Row: {
@@ -616,6 +630,158 @@ export type Database = {
             columns: ["tour_id"]
             isOneToOne: false
             referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          name: string
+          slug: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name: string
+          slug: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name?: string
+          slug?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          booking_type: string | null
+          cancellation_policy: string | null
+          category_id: string | null
+          created_at: string | null
+          description: string | null
+          duration: string | null
+          excluded: string[] | null
+          gallery: string[] | null
+          highlights: string[] | null
+          hotel_pickup: boolean | null
+          id: string
+          image_url: string | null
+          included: string[] | null
+          instant_confirmation: boolean | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          long_description: string | null
+          max_participants: number | null
+          meeting_point: string | null
+          meta_description: string | null
+          meta_keywords: string[] | null
+          meta_title: string | null
+          min_participants: number | null
+          original_price: number | null
+          price: number
+          rating: number | null
+          review_count: number | null
+          slug: string
+          sort_order: number | null
+          subtitle: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          booking_type?: string | null
+          cancellation_policy?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration?: string | null
+          excluded?: string[] | null
+          gallery?: string[] | null
+          highlights?: string[] | null
+          hotel_pickup?: boolean | null
+          id?: string
+          image_url?: string | null
+          included?: string[] | null
+          instant_confirmation?: boolean | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          long_description?: string | null
+          max_participants?: number | null
+          meeting_point?: string | null
+          meta_description?: string | null
+          meta_keywords?: string[] | null
+          meta_title?: string | null
+          min_participants?: number | null
+          original_price?: number | null
+          price: number
+          rating?: number | null
+          review_count?: number | null
+          slug: string
+          sort_order?: number | null
+          subtitle?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          booking_type?: string | null
+          cancellation_policy?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration?: string | null
+          excluded?: string[] | null
+          gallery?: string[] | null
+          highlights?: string[] | null
+          hotel_pickup?: boolean | null
+          id?: string
+          image_url?: string | null
+          included?: string[] | null
+          instant_confirmation?: boolean | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          long_description?: string | null
+          max_participants?: number | null
+          meeting_point?: string | null
+          meta_description?: string | null
+          meta_keywords?: string[] | null
+          meta_title?: string | null
+          min_participants?: number | null
+          original_price?: number | null
+          price?: number
+          rating?: number | null
+          review_count?: number | null
+          slug?: string
+          sort_order?: number | null
+          subtitle?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
             referencedColumns: ["id"]
           },
         ]
