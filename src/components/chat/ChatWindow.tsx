@@ -64,8 +64,11 @@ const ChatWindow = ({ onMinimize, onClose }: ChatWindowProps) => {
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 20, scale: 0.95 }}
-      transition={{ duration: 0.2 }}
-      className="w-full sm:w-[380px] h-[70vh] sm:h-[520px] bg-card rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-border"
+      transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+      className="w-full sm:w-[400px] h-[75vh] sm:h-[550px] bg-card rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-border/50 backdrop-blur-sm"
+      style={{
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+      }}
     >
       {/* Header */}
       <ChatHeader
@@ -75,13 +78,20 @@ const ChatWindow = ({ onMinimize, onClose }: ChatWindowProps) => {
         onClose={onClose}
       />
 
-      {/* Messages Area */}
-      <ScrollArea className="flex-1 p-4">
+      {/* Messages Area with subtle gradient background */}
+      <ScrollArea className="flex-1 p-4 bg-gradient-to-b from-background/50 to-background">
         {isLoading ? (
           <div className="space-y-4">
-            <Skeleton className="h-12 w-3/4" />
-            <Skeleton className="h-12 w-1/2 ml-auto" />
-            <Skeleton className="h-12 w-2/3" />
+            <div className="flex items-end gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/20 animate-pulse" />
+              <div className="space-y-2">
+                <div className="h-16 w-48 rounded-2xl bg-primary/10 animate-pulse" />
+              </div>
+            </div>
+            <div className="flex items-end gap-2 flex-row-reverse">
+              <div className="w-8 h-8 rounded-full bg-secondary/20 animate-pulse" />
+              <div className="h-10 w-32 rounded-2xl bg-secondary/10 animate-pulse" />
+            </div>
           </div>
         ) : (
           <>

@@ -37,28 +37,46 @@ const ChatWidget = () => {
         ) : null}
       </AnimatePresence>
 
-      {/* Floating Button */}
+      {/* Floating Button with enhanced styling */}
       <motion.button
         onClick={isOpen && isMinimized ? handleOpen : isOpen ? handleClose : handleOpen}
-        className="relative w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow group"
-        whileHover={{ scale: 1.05 }}
+        className="relative w-14 h-14 bg-gradient-to-br from-primary to-primary/90 rounded-full flex items-center justify-center shadow-xl hover:shadow-2xl transition-all group"
+        whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
         aria-label={isOpen ? "Close chat" : "Open chat"}
+        style={{
+          boxShadow: '0 10px 40px -10px rgba(0, 0, 0, 0.3), 0 0 20px -5px hsl(var(--primary) / 0.3)'
+        }}
       >
-        {/* Pulse animation when closed */}
+        {/* Glow ring animation when closed */}
         {!isOpen && (
-          <motion.div
-            className="absolute inset-0 bg-primary rounded-full"
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.5, 0, 0.5],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
+          <>
+            <motion.div
+              className="absolute inset-0 bg-primary rounded-full"
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [0.4, 0, 0.4],
+              }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+            <motion.div
+              className="absolute inset-0 bg-secondary/30 rounded-full"
+              animate={{
+                scale: [1, 1.5, 1],
+                opacity: [0.2, 0, 0.2],
+              }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.5,
+              }}
+            />
+          </>
         )}
 
         {/* Icon */}
