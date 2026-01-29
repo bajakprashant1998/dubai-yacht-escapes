@@ -1,322 +1,296 @@
 
-# Admin Panel Enhancement Plan
+# Extra Booking Services Enhancement Plan
 
-This plan provides a comprehensive overhaul of the admin panel covering visual design, new features, performance optimizations, and mobile experience improvements.
+This plan adds a comprehensive "Extra Services" feature inspired by Klook's Dubai offerings. This will allow the business to expand beyond yacht charters to offer additional Dubai experiences as add-ons or standalone bookings.
 
 ---
 
 ## Overview
 
-The enhancements will transform the admin panel into a more modern, performant, and user-friendly interface while maintaining consistency with the existing design system.
+The enhancement creates a new service type system that allows the admin to manage additional tourism services (Desert Safari, Airport Transfers, Theme Park Tickets, etc.) that customers can book alongside or instead of yacht tours.
 
 ---
 
-## Phase 1: Visual Design and UI Improvements
+## Database Schema Changes
 
-### 1.1 Loading Skeleton Components
+### New Table: `services`
 
-Create reusable skeleton components to replace spinner loaders for better perceived performance.
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| slug | text | URL-friendly identifier |
+| title | text | Service name |
+| subtitle | text | Short tagline |
+| description | text | Brief description |
+| long_description | text | Full details (markdown) |
+| price | numeric | Base price in AED |
+| original_price | numeric | Original price for discount display |
+| duration | text | Duration (e.g., "6 Hours") |
+| image_url | text | Main image |
+| gallery | text[] | Additional images |
+| category_id | uuid | FK to service_categories |
+| highlights | text[] | Key features |
+| included | text[] | What's included |
+| excluded | text[] | What's not included |
+| meeting_point | text | Pickup/meeting location |
+| rating | numeric | Average rating (default 4.5) |
+| review_count | integer | Number of reviews |
+| is_featured | boolean | Show on homepage |
+| is_active | boolean | Published status |
+| booking_type | text | 'per_person', 'per_group', 'per_vehicle' |
+| min_participants | integer | Minimum guests required |
+| max_participants | integer | Maximum capacity |
+| cancellation_policy | text | Free cancellation details |
+| instant_confirmation | boolean | Instant booking |
+| hotel_pickup | boolean | Includes hotel pickup |
+| sort_order | integer | Display order |
+| meta_title | text | SEO title |
+| meta_description | text | SEO description |
+| created_at | timestamp | Creation date |
+| updated_at | timestamp | Last update |
 
-**New File: `src/components/admin/Skeleton.tsx`**
+### New Table: `service_categories`
 
-| Component | Usage |
-|-----------|-------|
-| `TableSkeleton` | For data tables (Bookings, Tours, Customers, etc.) |
-| `StatCardSkeleton` | For stat cards at the top of each page |
-| `ChartSkeleton` | For dashboard charts |
-| `FormSkeleton` | For tour form and settings pages |
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| name | text | Category name |
+| slug | text | URL-friendly identifier |
+| description | text | Category description |
+| icon | text | Lucide icon name |
+| image_url | text | Category banner image |
+| is_active | boolean | Published status |
+| sort_order | integer | Display order |
+| created_at | timestamp | Creation date |
 
-### 1.2 Enhanced Card Animations
+### Service Categories (Initial Data)
 
-Add subtle entrance animations to stat cards and table rows:
-- Staggered fade-in for stat cards
-- Row hover effects with subtle scale
-- Smooth transitions on status changes
-
-**Files to modify:**
-- `src/components/admin/StatCard.tsx` - Add hover effects and entrance animation
-- All admin pages - Add staggered animation delays to stat cards
-
-### 1.3 Improved Color Scheme for Status Badges
-
-Enhance the status badge system with more distinctive colors and icons:
-
-| Status | Current | Enhanced |
-|--------|---------|----------|
-| Pending | Amber background | Amber with pulse dot |
-| Confirmed | Green background | Green with check icon |
-| Cancelled | Red background | Red with X icon |
-| New | Blue background | Blue with notification dot |
-
-### 1.4 Enhanced Dashboard Cards
-
-Modernize the dashboard stat cards:
-- Add sparkline mini-charts showing 7-day trends
-- Add tooltips with more detailed information
-- Improve icon styling with gradient backgrounds
-
----
-
-## Phase 2: New Features and Functionality
-
-### 2.1 Global Admin Search (Command Palette)
-
-Add a keyboard-accessible command palette (Cmd/Ctrl+K) for quick navigation and search.
-
-**New File: `src/components/admin/CommandPalette.tsx`**
-
-Features:
-- Search across bookings, tours, customers, and inquiries
-- Quick navigation to any admin page
-- Recent searches history
-- Keyboard shortcuts display
-
-### 2.2 Quick Actions Menu
-
-Add a floating quick actions button for common tasks:
-
-| Action | Description |
-|--------|-------------|
-| Add Tour | Quick link to tour creation |
-| View Pending | Filter to pending bookings |
-| Export Data | Quick export current page data |
-| Toggle Theme | Switch between light/dark modes |
-
-### 2.3 Enhanced Filters with Date Range Picker
-
-Add date range filtering to Bookings, Inquiries, and Reviews pages:
-- Preset options: Today, This Week, This Month, Last 30 Days
-- Custom date range picker
-- Save filter preferences
-
-**Files to modify:**
-- `src/pages/admin/Bookings.tsx`
-- `src/pages/admin/Inquiries.tsx`
-- `src/pages/admin/Reviews.tsx`
-
-### 2.4 Inline Editing for Tables
-
-Enable inline editing for quick updates without opening dialogs:
-- Click-to-edit status dropdown
-- Quick notes field
-- Inline price/quantity adjustments
-
-### 2.5 Dashboard Activity Feed
-
-Add a real-time activity feed widget showing recent actions:
-- New bookings
-- Status changes
-- New inquiries
-- Review submissions
-
-**New File: `src/components/admin/ActivityFeed.tsx`**
+| Name | Slug | Icon |
+|------|------|------|
+| Desert Safari | desert-safari | sun |
+| Theme Parks | theme-parks | ferris-wheel |
+| Observation Decks | observation-decks | binoculars |
+| Water Sports | water-sports | waves |
+| Airport Transfers | airport-transfers | plane |
+| City Tours | city-tours | map-pin |
+| Adventure Sports | adventure-sports | mountain |
+| Dining Experiences | dining-experiences | utensils |
 
 ---
 
-## Phase 3: Performance and Loading Improvements
+## Frontend Components
 
-### 3.1 Skeleton Loaders Implementation
+### New Pages
 
-Replace all spinner loaders with contextual skeleton screens:
+**1. Services Listing Page (`src/pages/Services.tsx`)**
+- Hero section with Dubai skyline
+- Category filter tabs (similar to Tours page)
+- Grid of service cards with filtering and sorting
+- SEO-friendly URLs: `/dubai/services/:category/:slug`
+
+**2. Service Detail Page (`src/pages/ServiceDetail.tsx`)**
+- Image gallery with lightbox
+- Key info badges (duration, pickup, cancellation)
+- Description with highlights
+- Booking sidebar with date picker
+- Reviews section
+- Related services carousel
+
+### New Components
+
+**1. `src/components/ServiceCard.tsx`**
+- Image with category badge
+- Title, rating, and review count
+- Duration and key features
+- Price with discount display
+- "Book Now" and "Details" buttons
+
+**2. `src/components/service-detail/ServiceBookingSidebar.tsx`**
+- Date selection
+- Guest count (if per_person)
+- Price calculator
+- Instant confirmation badge
+- WhatsApp inquiry button
+
+**3. `src/components/home/PopularServices.tsx`**
+- Homepage section showcasing featured services
+- Horizontal scrolling carousel on mobile
+- "View All" link to services page
+
+### Header Navigation Update
+
+Add "Experiences" dropdown in Header.tsx:
 
 ```text
-Before: [Spinner]
-After:  [████████████]
-        [██████]
-        [████████████████]
+Tours (existing)
+  |-- Dhow Cruises
+  |-- Shared Yacht
+  |-- Private Charter
+  |-- Megayacht
+
+Experiences (new)
+  |-- Desert Safari
+  |-- Theme Parks
+  |-- Water Sports
+  |-- City Tours
+  |-- View All
 ```
-
-### 3.2 Optimistic Updates
-
-Implement optimistic updates for status changes:
-- Update UI immediately
-- Show subtle indicator during save
-- Rollback on error with toast notification
-
-**Files to modify:**
-- `src/pages/admin/Bookings.tsx` - Status updates
-- `src/pages/admin/Inquiries.tsx` - Status updates
-- `src/pages/admin/Reviews.tsx` - Approve/reject actions
-
-### 3.3 Data Prefetching
-
-Prefetch data for adjacent pages on hover:
-- Dashboard prefetches Bookings and Tours data
-- Sidebar links prefetch on hover
-- Related content prefetching
-
-### 3.4 Virtualized Tables
-
-Implement virtual scrolling for large datasets:
-- Only render visible rows
-- Smooth scrolling performance
-- Maintain selection state
-
-**New dependency: Consider using `@tanstack/react-virtual`**
-
-### 3.5 Image Lazy Loading
-
-Optimize tour images in admin tables:
-- Lazy load images below the fold
-- Use thumbnail versions in table views
-- Progressive image loading
 
 ---
 
-## Phase 4: Mobile Experience Improvements
+## Admin Panel Updates
 
-### 4.1 Responsive Sidebar
+### New Admin Pages
 
-Enhance the mobile sidebar experience:
-- Bottom sheet style on mobile
-- Gesture-based open/close (swipe)
-- Quick access toolbar at bottom
+**1. `src/pages/admin/Services.tsx`**
+- List all services with search and filter
+- Status toggle (active/inactive)
+- Featured toggle
+- Quick edit actions
+- Bulk actions toolbar
 
-### 4.2 Mobile-Optimized Tables
+**2. `src/pages/admin/AddService.tsx`**
+- Form similar to TourForm
+- Rich text editor for descriptions
+- Image upload for main image and gallery
+- Category dropdown
+- Pricing and availability settings
+- SEO fields
 
-Transform tables into card layouts on mobile:
+**3. `src/pages/admin/EditService.tsx`**
+- Pre-populated edit form
+- Version history (optional)
+
+**4. `src/pages/admin/ServiceCategories.tsx`**
+- Manage service categories
+- Drag-to-reorder
+- Icon picker
+
+### Admin Sidebar Update
+
+Add "Services" section in AdminSidebar.tsx:
 
 ```text
-Desktop: [Col1] [Col2] [Col3] [Col4] [Actions]
-
-Mobile:  ┌─────────────────────────┐
-         │ Customer Name      [★★★]│
-         │ tour@email.com          │
-         │ ────────────────────────│
-         │ Date: Jan 28  |  $2,500 │
-         │ [Confirm] [View] [More] │
-         └─────────────────────────┘
+Services (new section)
+  |-- All Services
+  |-- Add Service
+  |-- Service Categories
 ```
-
-**Files to modify:**
-- `src/pages/admin/Bookings.tsx`
-- `src/pages/admin/Customers.tsx`
-- `src/pages/admin/Tours.tsx`
-- `src/pages/admin/Inquiries.tsx`
-- `src/pages/admin/Reviews.tsx`
-
-### 4.3 Touch-Friendly Actions
-
-Increase touch targets and add swipe actions:
-- Swipe left to reveal quick actions
-- Long press for context menu
-- Pull-to-refresh on mobile
-- Larger checkboxes and buttons (minimum 44x44px)
-
-### 4.4 Mobile Bottom Navigation
-
-Add a fixed bottom navigation bar on mobile with key actions:
-- Dashboard
-- Bookings
-- Live Chat
-- Notifications
-- More (opens menu)
-
-**New File: `src/components/admin/MobileBottomNav.tsx`**
-
-### 4.5 Collapsible Filters
-
-Convert filter sections to collapsible panels on mobile:
-- Filters collapsed by default
-- "X filters active" badge indicator
-- Full-screen filter modal option
 
 ---
 
-## Implementation Files
+## Hooks and Data Layer
 
-### New Files to Create
+### New Hooks
+
+**`src/hooks/useServices.ts`**
+- `useServices()` - Fetch all active services
+- `useFeaturedServices()` - Fetch featured services
+- `useService(slug)` - Fetch single service
+- `useServicesByCategory(category)` - Filter by category
+- `useCreateService()` - Admin mutation
+- `useUpdateService()` - Admin mutation
+- `useDeleteService()` - Admin mutation
+
+**`src/hooks/useServiceCategories.ts`**
+- `useServiceCategories()` - Fetch all categories
+- `useActiveServiceCategories()` - Public categories
+- CRUD mutations for admin
+
+### Service Mapper
+
+**`src/lib/serviceMapper.ts`**
+- Map database records to frontend interface
+- Handle image path normalization
+- Default values for optional fields
+
+---
+
+## Booking Flow Integration
+
+### Option A: Separate Booking System
+- New `service_bookings` table
+- Similar structure to `bookings` table
+- Separate admin view for service bookings
+
+### Option B: Unified Booking System (Recommended)
+- Add `booking_source` column to existing `bookings` table ('tour' or 'service')
+- Add `service_id` nullable foreign key
+- Reuse existing booking modal with minor adaptations
+- Single admin bookings view with source filter
+
+---
+
+## SEO and Routing
+
+### New Routes in App.tsx
+
+```typescript
+// Service listing with category
+<Route path="/dubai/services/:categoryPath" element={<Services />} />
+// Individual service detail
+<Route path="/dubai/services/:categoryPath/:slug" element={<ServiceDetail />} />
+// General services page
+<Route path="/services" element={<Services />} />
+```
+
+### URL Structure
+
+| Page | URL |
+|------|-----|
+| All Services | `/services` |
+| Desert Safari Category | `/dubai/services/desert-safari` |
+| Specific Safari Tour | `/dubai/services/desert-safari/evening-desert-safari-bbq` |
+
+---
+
+## Files to Create
 
 | File | Purpose |
 |------|---------|
-| `src/components/admin/Skeleton.tsx` | Skeleton loader components |
-| `src/components/admin/CommandPalette.tsx` | Global search command palette |
-| `src/components/admin/ActivityFeed.tsx` | Real-time activity widget |
-| `src/components/admin/MobileBottomNav.tsx` | Mobile bottom navigation |
-| `src/components/admin/DateRangePicker.tsx` | Date range filter component |
-| `src/components/admin/MobileTableCard.tsx` | Card layout for mobile tables |
+| `src/pages/Services.tsx` | Services listing page |
+| `src/pages/ServiceDetail.tsx` | Service detail page |
+| `src/components/ServiceCard.tsx` | Service card component |
+| `src/components/service-detail/ServiceBookingSidebar.tsx` | Booking sidebar |
+| `src/components/service-detail/ServiceImageGallery.tsx` | Image gallery |
+| `src/components/home/PopularServices.tsx` | Homepage featured services |
+| `src/pages/admin/Services.tsx` | Admin services list |
+| `src/pages/admin/AddService.tsx` | Add service form |
+| `src/pages/admin/EditService.tsx` | Edit service form |
+| `src/pages/admin/ServiceCategories.tsx` | Service categories management |
+| `src/components/admin/ServiceForm.tsx` | Reusable service form |
+| `src/components/admin/ServicesTable.tsx` | Services table component |
+| `src/components/admin/ServiceCategoryDialog.tsx` | Category create/edit dialog |
+| `src/hooks/useServices.ts` | Services data hooks |
+| `src/hooks/useServiceCategories.ts` | Service categories hooks |
+| `src/lib/serviceMapper.ts` | Database to frontend mapping |
 
-### Files to Modify
+## Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/components/admin/AdminLayout.tsx` | Add command palette, mobile nav |
-| `src/components/admin/AdminSidebar.tsx` | Mobile gesture support |
-| `src/components/admin/StatCard.tsx` | Animations, sparklines |
-| `src/pages/admin/Dashboard.tsx` | Activity feed, skeleton loading |
-| `src/pages/admin/Bookings.tsx` | Mobile cards, date filters, skeletons |
-| `src/pages/admin/Tours.tsx` | Mobile cards, optimistic updates |
-| `src/pages/admin/Customers.tsx` | Mobile cards, skeleton loading |
-| `src/pages/admin/Inquiries.tsx` | Mobile cards, date filters |
-| `src/pages/admin/Reviews.tsx` | Mobile cards, inline actions |
-| `src/pages/admin/Settings.tsx` | Touch-friendly inputs |
-| `tailwind.config.ts` | Add new animation keyframes |
+| `src/App.tsx` | Add service routes |
+| `src/components/layout/Header.tsx` | Add Experiences dropdown |
+| `src/components/admin/AdminSidebar.tsx` | Add Services section |
+| `src/pages/Home.tsx` | Add PopularServices section |
+| `supabase/migrations/` | New tables and RLS policies |
 
 ---
 
-## Technical Implementation Details
+## Implementation Priority
 
-### Skeleton Component Structure
+**Phase 1: Foundation**
+1. Create database tables with RLS policies
+2. Create service categories with initial data
+3. Build admin CRUD for services
 
-```typescript
-// TableSkeleton - renders rows of animated placeholders
-// StatCardSkeleton - mimics stat card shape
-// Each skeleton uses animate-pulse with varying widths
-```
+**Phase 2: Public Frontend**
+4. Services listing page
+5. Service detail page with booking
+6. Header navigation update
+7. Homepage integration
 
-### Command Palette Integration
-
-```typescript
-// Keyboard shortcut: Cmd/Ctrl + K
-// Uses cmdk library (already installed)
-// Searches: tours, bookings, customers, pages
-// Recent items stored in localStorage
-```
-
-### Mobile Card Layout Detection
-
-```typescript
-// Use useIsMobile() hook for breakpoint detection
-// Conditionally render Table vs CardList
-// Maintain same data structure, different presentation
-```
-
-### Optimistic Update Pattern
-
-```typescript
-// 1. Update local state immediately
-// 2. Show subtle saving indicator
-// 3. Make API call in background
-// 4. On success: clear indicator
-// 5. On error: rollback state, show toast
-```
-
----
-
-## Priority Order
-
-1. **High Priority** (Immediate impact)
-   - Skeleton loaders for all pages
-   - Mobile card layouts for tables
-   - Enhanced stat card animations
-
-2. **Medium Priority** (User experience)
-   - Command palette (Cmd+K search)
-   - Date range filters
-   - Optimistic updates
-
-3. **Lower Priority** (Polish)
-   - Activity feed widget
-   - Swipe gestures
-   - Sparkline mini-charts
-   - Mobile bottom navigation
-
----
-
-## Expected Outcomes
-
-- 40% improvement in perceived loading speed through skeleton screens
-- Significantly better mobile usability with card layouts
-- Faster task completion with command palette and inline editing
-- More engaging visual experience with animations and modern styling
-- Reduced user frustration with optimistic updates
+**Phase 3: Polish**
+8. Search and advanced filtering
+9. Related services recommendations
+10. Analytics and reporting
