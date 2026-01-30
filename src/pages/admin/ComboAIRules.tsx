@@ -303,14 +303,17 @@ const ComboAIRules = () => {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-xs">Budget Tier</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
+                            <Select 
+                              onValueChange={(val) => field.onChange(val === "__any__" ? "" : val)} 
+                              value={field.value || "__any__"}
+                            >
                               <FormControl>
                                 <SelectTrigger>
                                   <SelectValue placeholder="Any budget" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="">Any</SelectItem>
+                                <SelectItem value="__any__">Any</SelectItem>
                                 <SelectItem value="low">Low</SelectItem>
                                 <SelectItem value="medium">Medium</SelectItem>
                                 <SelectItem value="luxury">Luxury</SelectItem>
@@ -325,14 +328,17 @@ const ComboAIRules = () => {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-xs">Travel Style</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
+                            <Select 
+                              onValueChange={(val) => field.onChange(val === "__any__" ? "" : val)} 
+                              value={field.value || "__any__"}
+                            >
                               <FormControl>
                                 <SelectTrigger>
                                   <SelectValue placeholder="Any style" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="">Any</SelectItem>
+                                <SelectItem value="__any__">Any</SelectItem>
                                 <SelectItem value="family">Family</SelectItem>
                                 <SelectItem value="couple">Couple</SelectItem>
                                 <SelectItem value="adventure">Adventure</SelectItem>
