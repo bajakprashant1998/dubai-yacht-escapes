@@ -1,51 +1,60 @@
 import { useParams, Link } from "react-router-dom";
+import { useEffect } from "react";
+import { motion } from "framer-motion";
 import Layout from "@/components/layout/Layout";
 import { useBlogPost } from "@/hooks/useBlogPosts";
-import BlogSidebar from "@/components/blog/BlogSidebar";
+import FloatingShareBar from "@/components/blog/FloatingShareBar";
+import TableOfContents from "@/components/blog/TableOfContents";
+import AuthorBadge from "@/components/blog/AuthorBadge";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, Calendar, Clock, User, Share2, Facebook, Twitter, Linkedin } from "lucide-react";
-import { format } from "date-fns";
+import { ChevronLeft, ChevronRight, Home, Eye } from "lucide-react";
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: post, isLoading, error } = useBlogPost(slug || "");
-  
-  const handleShare = (platform: string) => {
-    const url = window.location.href;
-    const title = post?.title || "";
-    
-    const urls: Record<string, string> = {
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-      twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`,
-      linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`,
-    };
-    
-    window.open(urls[platform], "_blank", "width=600,height=400");
-  };
-  
+
+  // Add IDs to headings in content for TOC navigation
+  useEffect(() => {
+    if (post?.content) {
+      const contentDiv = document.querySelector(".blog-content");
+      if (contentDiv) {
+        const headings = contentDiv.querySelectorAll("h2, h3");
+        headings.forEach((heading, index) => {
+          if (!heading.id) {
+            heading.id = `heading-${index}`;
+          }
+        });
+      }
+    }
+  }, [post?.content]);
+
   if (isLoading) {
     return (
       <Layout>
         <div className="min-h-screen pt-32 pb-16">
-          <div className="container max-w-5xl">
-            <Skeleton className="h-8 w-48 mb-8" />
-            <Skeleton className="aspect-video w-full rounded-xl mb-8" />
-            <Skeleton className="h-10 w-3/4 mb-4" />
-            <Skeleton className="h-6 w-1/2" />
+          <div className="container max-w-6xl">
+            <Skeleton className="h-4 w-48 mb-6" />
+            <Skeleton className="h-6 w-24 mb-4" />
+            <Skeleton className="h-12 w-3/4 mb-4" />
+            <Skeleton className="h-6 w-1/2 mb-8" />
+            <Skeleton className="aspect-[21/9] w-full rounded-2xl mb-12" />
           </div>
         </div>
       </Layout>
     );
   }
-  
+
   if (error || !post) {
     return (
       <Layout>
         <div className="min-h-screen pt-32 pb-16 flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Post Not Found</h1>
+            <p className="text-muted-foreground mb-6">
+              The article you're looking for doesn't exist or has been removed.
+            </p>
             <Link to="/blog">
               <Button>Back to Blog</Button>
             </Link>
@@ -55,123 +64,201 @@ const BlogPost = () => {
     );
   }
 
+  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+
   return (
     <Layout>
-      <div className="min-h-screen pt-32 pb-16">
-        <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Main Content */}
-            <article className="lg:col-span-3">
-              {/* Breadcrumb */}
-              <Link
-                to="/blog"
-                className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
+      <article className="min-h-screen pt-28 pb-16">
+        <div className="container max-w-6xl">
+          {/* Breadcrumb */}
+          <motion.nav
+            className="flex items-center gap-2 text-sm text-muted-foreground mb-8"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <Link
+              to="/"
+              className="flex items-center gap-1 hover:text-foreground transition-colors"
+            >
+              <Home className="w-3.5 h-3.5" />
+              <span>Home</span>
+            </Link>
+            <ChevronRight className="w-4 h-4" />
+            <Link to="/blog" className="hover:text-foreground transition-colors">
+              Blog
+            </Link>
+            {post.category && (
+              <>
+                <ChevronRight className="w-4 h-4" />
+                <Link
+                  to={`/blog/category/${post.category.slug}`}
+                  className="hover:text-foreground transition-colors"
+                >
+                  {post.category.name}
+                </Link>
+              </>
+            )}
+          </motion.nav>
+
+          {/* Header Section */}
+          <header className="mb-10">
+            {/* Category Badge */}
+            {post.category && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
               >
-                <ChevronLeft className="w-4 h-4" />
-                Back to Blog
-              </Link>
-              
-              {/* Featured Image */}
-              <div className="relative aspect-video rounded-xl overflow-hidden mb-8">
-                <img
-                  src={post.featured_image || "/placeholder.svg"}
-                  alt={post.title}
-                  className="w-full h-full object-cover"
-                />
-                {post.category && (
-                  <Link
-                    to={`/blog/category/${post.category.slug}`}
-                    className="absolute top-4 left-4"
-                  >
-                    <Badge className="bg-secondary text-secondary-foreground">
-                      {post.category.name}
-                    </Badge>
-                  </Link>
-                )}
-              </div>
-              
-              {/* Header */}
-              <header className="mb-8">
-                <h1 className="text-3xl md:text-4xl font-bold mb-4">{post.title}</h1>
-                
-                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                  {post.author?.full_name && (
-                    <div className="flex items-center gap-1">
-                      <User className="w-4 h-4" />
-                      <span>{post.author.full_name}</span>
-                    </div>
-                  )}
-                  {post.published_at && (
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      <span>{format(new Date(post.published_at), "MMMM d, yyyy")}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    <span>{post.reading_time} min read</span>
-                  </div>
-                </div>
-              </header>
-              
-              {/* Content */}
-              <div 
-                className="prose prose-lg max-w-none mb-8"
+                <Link to={`/blog/category/${post.category.slug}`}>
+                  <Badge className="bg-secondary/10 text-secondary hover:bg-secondary/20 px-4 py-1.5 text-sm font-medium mb-6">
+                    {post.category.name}
+                  </Badge>
+                </Link>
+              </motion.div>
+            )}
+
+            {/* Title */}
+            <motion.h1
+              className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6 leading-tight"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.15 }}
+            >
+              {post.title}
+            </motion.h1>
+
+            {/* Excerpt */}
+            {post.excerpt && (
+              <motion.p
+                className="text-lg text-muted-foreground mb-8 max-w-3xl"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+              >
+                {post.excerpt}
+              </motion.p>
+            )}
+
+            {/* Author & Meta */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.25 }}
+            >
+              <AuthorBadge
+                author={post.author}
+                publishedAt={post.published_at}
+                readingTime={post.reading_time}
+                viewCount={post.view_count}
+              />
+            </motion.div>
+          </header>
+
+          {/* Featured Image */}
+          <motion.div
+            className="relative aspect-[21/9] rounded-2xl overflow-hidden mb-12 shadow-xl"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <img
+              src={post.featured_image || "/placeholder.svg"}
+              alt={post.title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/30 via-transparent to-transparent" />
+
+            {/* Badges on image */}
+            <div className="absolute bottom-4 left-4 flex items-center gap-3">
+              {post.category && (
+                <Badge className="bg-secondary text-secondary-foreground shadow-lg">
+                  {post.category.name}
+                </Badge>
+              )}
+              {post.view_count && post.view_count > 0 && (
+                <Badge
+                  variant="secondary"
+                  className="bg-primary/80 text-primary-foreground backdrop-blur-sm"
+                >
+                  <Eye className="w-3 h-3 mr-1" />
+                  {post.view_count.toLocaleString()} reads
+                </Badge>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Main Content Area */}
+          <div className="grid grid-cols-12 gap-8">
+            {/* Floating Share Bar */}
+            <div className="col-span-1">
+              <FloatingShareBar url={currentUrl} title={post.title} />
+            </div>
+
+            {/* Main Content */}
+            <motion.div
+              className="col-span-12 lg:col-span-8 xl:col-span-7"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <div
+                className="blog-content prose prose-lg max-w-none 
+                  prose-headings:font-display prose-headings:font-bold prose-headings:text-foreground
+                  prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:border-b prose-h2:border-border prose-h2:pb-4
+                  prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4
+                  prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-6
+                  prose-a:text-secondary prose-a:no-underline hover:prose-a:underline
+                  prose-strong:text-foreground prose-strong:font-semibold
+                  prose-ul:my-6 prose-li:text-muted-foreground prose-li:mb-2
+                  prose-ol:my-6
+                  prose-blockquote:border-l-4 prose-blockquote:border-secondary prose-blockquote:bg-muted/30 
+                  prose-blockquote:rounded-r-lg prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:not-italic
+                  prose-blockquote:text-foreground prose-blockquote:font-medium
+                  prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+                  prose-pre:bg-primary prose-pre:text-primary-foreground prose-pre:rounded-xl prose-pre:p-6
+                  prose-img:rounded-xl prose-img:shadow-lg prose-img:my-8
+                "
                 dangerouslySetInnerHTML={{ __html: post.content || "" }}
               />
-              
+
               {/* Tags */}
-              {post.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-8 pb-8 border-b">
+              {post.tags && post.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-12 pt-8 border-t border-border">
+                  <span className="text-sm font-medium text-muted-foreground mr-2">
+                    Tags:
+                  </span>
                   {post.tags.map((tag) => (
                     <Link key={tag} to={`/blog/tag/${tag}`}>
-                      <Badge variant="outline" className="hover:bg-muted">
+                      <Badge
+                        variant="outline"
+                        className="hover:bg-muted transition-colors"
+                      >
                         #{tag}
                       </Badge>
                     </Link>
                   ))}
                 </div>
               )}
-              
-              {/* Share */}
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-medium flex items-center gap-2">
-                  <Share2 className="w-4 h-4" />
-                  Share:
-                </span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleShare("facebook")}
-                >
-                  <Facebook className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleShare("twitter")}
-                >
-                  <Twitter className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleShare("linkedin")}
-                >
-                  <Linkedin className="w-4 h-4" />
-                </Button>
+
+              {/* Back to Blog */}
+              <div className="mt-12 pt-8 border-t border-border">
+                <Link to="/blog">
+                  <Button variant="outline" className="group">
+                    <ChevronLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+                    Back to All Articles
+                  </Button>
+                </Link>
               </div>
-            </article>
-            
-            {/* Sidebar */}
-            <aside className="lg:col-span-1">
-              <div className="sticky top-24">
-                <BlogSidebar />
-              </div>
-            </aside>
+            </motion.div>
+
+            {/* Table of Contents */}
+            <div className="hidden xl:block col-span-3">
+              <TableOfContents content={post.content || ""} />
+            </div>
           </div>
         </div>
-      </div>
+      </article>
     </Layout>
   );
 };
