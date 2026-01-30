@@ -5,6 +5,7 @@ import BlogSidebar from "@/components/blog/BlogSidebar";
 import BlogHero from "@/components/blog/BlogHero";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookOpen } from "lucide-react";
+import SEOHead from "@/components/SEOHead";
 
 const Blog = () => {
   const { data: posts = [], isLoading } = useBlogPosts();
@@ -14,6 +15,12 @@ const Blog = () => {
 
   return (
     <Layout>
+      <SEOHead
+        title="Dubai Travel Blog"
+        description="Discover travel guides, tips, and insider knowledge to make the most of your Dubai adventure. Expert advice on tours, attractions, and experiences."
+        canonical="/blog"
+        keywords={["Dubai travel blog", "Dubai travel tips", "Dubai guides", "UAE tourism"]}
+      />
       <div className="min-h-screen bg-muted/30 pt-32 pb-16">
         <div className="container">
           {/* Header */}

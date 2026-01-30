@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useServices } from "@/hooks/useServices";
 import { useContactConfig } from "@/hooks/useContactConfig";
+import SEOHead from "@/components/SEOHead";
 
 const experienceCategories = [
   {
@@ -154,6 +155,12 @@ const Experiences = () => {
 
   return (
     <Layout>
+      <SEOHead
+        title="Dubai Activities & Experiences"
+        description="Explore Dubai's best activities: desert safaris, theme parks, yacht tours, water sports, and more. Book unforgettable experiences with Betterview Tourism."
+        canonical="/experiences"
+        keywords={["Dubai activities", "Dubai experiences", "desert safari", "theme parks Dubai", "water sports Dubai", "Dubai tours"]}
+      />
       {/* Hero Section */}
       <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-primary/90" />
