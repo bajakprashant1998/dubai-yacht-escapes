@@ -661,6 +661,208 @@ export type Database = {
           },
         ]
       }
+      combo_ai_rules: {
+        Row: {
+          combo_id: string
+          conditions: Json
+          created_at: string
+          id: string
+          is_active: boolean | null
+          max_discount_percent: number | null
+          priority: number
+          rule_name: string
+          updated_at: string
+          upsell_combos: string[] | null
+        }
+        Insert: {
+          combo_id: string
+          conditions?: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          max_discount_percent?: number | null
+          priority?: number
+          rule_name: string
+          updated_at?: string
+          upsell_combos?: string[] | null
+        }
+        Update: {
+          combo_id?: string
+          conditions?: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          max_discount_percent?: number | null
+          priority?: number
+          rule_name?: string
+          updated_at?: string
+          upsell_combos?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "combo_ai_rules_combo_id_fkey"
+            columns: ["combo_id"]
+            isOneToOne: false
+            referencedRelation: "combo_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      combo_package_items: {
+        Row: {
+          combo_id: string
+          created_at: string
+          day_number: number
+          description: string | null
+          end_time: string | null
+          id: string
+          is_flexible: boolean | null
+          is_mandatory: boolean | null
+          item_id: string | null
+          item_type: string
+          metadata: Json | null
+          price_aed: number
+          sort_order: number | null
+          start_time: string | null
+          title: string
+        }
+        Insert: {
+          combo_id: string
+          created_at?: string
+          day_number?: number
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          is_flexible?: boolean | null
+          is_mandatory?: boolean | null
+          item_id?: string | null
+          item_type: string
+          metadata?: Json | null
+          price_aed?: number
+          sort_order?: number | null
+          start_time?: string | null
+          title: string
+        }
+        Update: {
+          combo_id?: string
+          created_at?: string
+          day_number?: number
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          is_flexible?: boolean | null
+          is_mandatory?: boolean | null
+          item_id?: string | null
+          item_type?: string
+          metadata?: Json | null
+          price_aed?: number
+          sort_order?: number | null
+          start_time?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "combo_package_items_combo_id_fkey"
+            columns: ["combo_id"]
+            isOneToOne: false
+            referencedRelation: "combo_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      combo_packages: {
+        Row: {
+          base_price_aed: number
+          blackout_dates: Json | null
+          combo_type: string
+          created_at: string
+          description: string | null
+          discount_percent: number
+          duration_days: number
+          duration_nights: number
+          final_price_aed: number
+          gallery: string[] | null
+          highlights: string[] | null
+          hotel_star_rating: number | null
+          id: string
+          image_url: string | null
+          includes_hotel: boolean | null
+          includes_transport: boolean | null
+          includes_visa: boolean | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          long_description: string | null
+          meta_description: string | null
+          meta_title: string | null
+          name: string
+          seasonal_pricing: Json | null
+          slug: string
+          sort_order: number | null
+          transport_type: string | null
+          updated_at: string
+        }
+        Insert: {
+          base_price_aed?: number
+          blackout_dates?: Json | null
+          combo_type?: string
+          created_at?: string
+          description?: string | null
+          discount_percent?: number
+          duration_days?: number
+          duration_nights?: number
+          final_price_aed?: number
+          gallery?: string[] | null
+          highlights?: string[] | null
+          hotel_star_rating?: number | null
+          id?: string
+          image_url?: string | null
+          includes_hotel?: boolean | null
+          includes_transport?: boolean | null
+          includes_visa?: boolean | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          long_description?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          name: string
+          seasonal_pricing?: Json | null
+          slug: string
+          sort_order?: number | null
+          transport_type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          base_price_aed?: number
+          blackout_dates?: Json | null
+          combo_type?: string
+          created_at?: string
+          description?: string | null
+          discount_percent?: number
+          duration_days?: number
+          duration_nights?: number
+          final_price_aed?: number
+          gallery?: string[] | null
+          highlights?: string[] | null
+          hotel_star_rating?: number | null
+          id?: string
+          image_url?: string | null
+          includes_hotel?: boolean | null
+          includes_transport?: boolean | null
+          includes_visa?: boolean | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          long_description?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          name?: string
+          seasonal_pricing?: Json | null
+          slug?: string
+          sort_order?: number | null
+          transport_type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       currency_rates: {
         Row: {
           created_at: string

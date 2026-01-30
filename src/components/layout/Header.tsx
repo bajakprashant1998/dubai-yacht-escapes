@@ -48,6 +48,7 @@ const Header = () => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Plan Trip", path: "/plan-trip", highlight: true },
+    { name: "Combo Packages", path: "/combo-packages" },
     { name: "Activities", path: "/experiences", hasDropdown: true },
     { name: "Car Rentals", path: "/car-rentals" },
     { name: "Hotels", path: "/hotels" },
