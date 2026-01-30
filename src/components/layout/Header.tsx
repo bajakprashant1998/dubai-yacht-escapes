@@ -14,7 +14,11 @@ import {
   Waves, 
   MapPin,
   Search,
-  ArrowRight
+  ArrowRight,
+  Car,
+  Building,
+  Star,
+  FileText
 } from "lucide-react";
 import betterviewLogo from "@/assets/betterview-logo.png";
 import { Button } from "@/components/ui/button";
@@ -22,12 +26,14 @@ import { Input } from "@/components/ui/input";
 import { useContactConfig } from "@/hooks/useContactConfig";
 import { cn } from "@/lib/utils";
 
+type DropdownType = "activities" | "hotels" | "cars" | null;
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showMegaMenu, setShowMegaMenu] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<DropdownType>(null);
   const location = useLocation();
   const { phone, phoneFormatted, email } = useContactConfig();
 
@@ -42,16 +48,16 @@ const Header = () => {
   // Close mobile menu on route change
   useEffect(() => {
     setIsMenuOpen(false);
-    setShowMegaMenu(false);
+    setActiveDropdown(null);
   }, [location.pathname]);
 
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Plan Trip", path: "/plan-trip", highlight: true },
     { name: "Combo Packages", path: "/combo-packages" },
-    { name: "Activities", path: "/experiences", hasDropdown: true },
-    { name: "Car Rentals", path: "/car-rentals" },
-    { name: "Hotels", path: "/hotels" },
+    { name: "Activities", path: "/experiences", dropdown: "activities" as DropdownType },
+    { name: "Car Rentals", path: "/car-rentals", dropdown: "cars" as DropdownType },
+    { name: "Hotels", path: "/hotels", dropdown: "hotels" as DropdownType },
     { name: "Visa", path: "/visa-services" },
     { name: "Blog", path: "/blog" },
     { name: "Contact", path: "/contact" },
@@ -102,6 +108,18 @@ const Header = () => {
     },
   ];
 
+  const hotelCategories = [
+    { name: "5-Star Luxury", path: "/hotels/5-star", icon: Star },
+    { name: "4-Star Hotels", path: "/hotels/4-star", icon: Building },
+    { name: "Beach Resorts", path: "/hotels/luxury", icon: Waves },
+  ];
+
+  const carCategories = [
+    { name: "Economy", path: "/car-rentals/economy", icon: Car },
+    { name: "Luxury", path: "/car-rentals/luxury", icon: Sparkles },
+    { name: "SUV", path: "/car-rentals/suv", icon: Car },
+  ];
+
   const featuredActivities = activityCategories.slice(0, 3);
 
   const isActive = (path: string) => location.pathname === path;
@@ -111,6 +129,139 @@ const Header = () => {
     if (searchQuery.trim()) {
       window.location.href = `/experiences?search=${encodeURIComponent(searchQuery)}`;
     }
+  };
+
+  const renderDropdown = (type: DropdownType) => {
+    if (type === "activities") {
+      return (
+        <div className="bg-card rounded-2xl shadow-2xl border border-border overflow-hidden">
+          <div className="grid grid-cols-3 gap-0">
+            <div className="col-span-2 p-6 border-r border-border">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                Browse Categories
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {activityCategories.map((category) => (
+                  <Link
+                    key={category.path}
+                    to={category.path}
+                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted/50 transition-all group"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors shrink-0">
+                      <category.icon className="w-5 h-5 text-secondary" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground group-hover:text-secondary transition-colors text-sm">{category.name}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-1">{category.description}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div className="p-6 bg-muted/30">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                Featured
+              </p>
+              <div className="space-y-3">
+                {featuredActivities.map((activity) => (
+                  <Link
+                    key={activity.path}
+                    to={activity.path}
+                    className="block group"
+                  >
+                    <div className="relative aspect-[16/9] rounded-lg overflow-hidden mb-2">
+                      <img 
+                        src={activity.image} 
+                        alt={activity.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    </div>
+                    <p className="text-sm font-medium text-foreground group-hover:text-secondary transition-colors">
+                      {activity.name}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+              <Link 
+                to="/experiences"
+                className="flex items-center gap-2 text-sm font-semibold text-secondary mt-4 hover:underline"
+              >
+                View All Activities
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (type === "hotels") {
+      return (
+        <div className="bg-card rounded-xl shadow-2xl border border-border overflow-hidden p-5 w-[320px]">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            Hotel Categories
+          </p>
+          <div className="space-y-1 mb-4">
+            {hotelCategories.map((category) => (
+              <Link
+                key={category.path}
+                to={category.path}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-all group"
+              >
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
+                  <category.icon className="w-4 h-4 text-secondary" />
+                </div>
+                <span className="font-medium text-sm text-foreground group-hover:text-secondary transition-colors">
+                  {category.name}
+                </span>
+              </Link>
+            ))}
+          </div>
+          <Link 
+            to="/hotels"
+            className="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-secondary text-secondary-foreground rounded-lg text-sm font-semibold hover:bg-secondary/90 transition-colors"
+          >
+            View All Hotels
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      );
+    }
+
+    if (type === "cars") {
+      return (
+        <div className="bg-card rounded-xl shadow-2xl border border-border overflow-hidden p-5 w-[320px]">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+            Vehicle Types
+          </p>
+          <div className="space-y-1 mb-4">
+            {carCategories.map((category) => (
+              <Link
+                key={category.path}
+                to={category.path}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-all group"
+              >
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
+                  <category.icon className="w-4 h-4 text-secondary" />
+                </div>
+                <span className="font-medium text-sm text-foreground group-hover:text-secondary transition-colors">
+                  {category.name}
+                </span>
+              </Link>
+            ))}
+          </div>
+          <Link 
+            to="/car-rentals"
+            className="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-secondary text-secondary-foreground rounded-lg text-sm font-semibold hover:bg-secondary/90 transition-colors"
+          >
+            Browse All Vehicles
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -134,7 +285,7 @@ const Header = () => {
           </div>
           <div className="flex items-center gap-4 text-secondary font-medium">
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+              <span className="w-2 h-2 bg-secondary rounded-full animate-pulse" />
               Instant Confirmation
             </span>
             <span>•</span>
@@ -161,12 +312,12 @@ const Header = () => {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
-              link.hasDropdown ? (
+              link.dropdown ? (
                 <div 
                   key={link.path}
                   className="relative"
-                  onMouseEnter={() => setShowMegaMenu(true)}
-                  onMouseLeave={() => setShowMegaMenu(false)}
+                  onMouseEnter={() => setActiveDropdown(link.dropdown)}
+                  onMouseLeave={() => setActiveDropdown(null)}
                 >
                   <button
                     className={cn(
@@ -175,80 +326,23 @@ const Header = () => {
                     )}
                   >
                     {link.name}
-                    <ChevronDown className={cn("w-4 h-4 transition-transform", showMegaMenu && "rotate-180")} />
+                    <ChevronDown className={cn("w-4 h-4 transition-transform", activeDropdown === link.dropdown && "rotate-180")} />
                   </button>
 
-                  {/* Mega Menu */}
+                  {/* Dropdown Menu */}
                   <AnimatePresence>
-                    {showMegaMenu && (
+                    {activeDropdown === link.dropdown && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-[700px]"
+                        className={cn(
+                          "absolute top-full pt-4",
+                          link.dropdown === "activities" ? "left-1/2 -translate-x-1/2 w-[700px]" : "left-0"
+                        )}
                       >
-                        <div className="bg-card rounded-2xl shadow-2xl border border-border overflow-hidden">
-                          <div className="grid grid-cols-3 gap-0">
-                            {/* Categories List */}
-                            <div className="col-span-2 p-6 border-r border-border">
-                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                                Browse Categories
-                              </p>
-                              <div className="grid grid-cols-2 gap-2">
-                                {activityCategories.map((category) => (
-                                  <Link
-                                    key={category.path}
-                                    to={category.path}
-                                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted/50 transition-all group"
-                                  >
-                                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors shrink-0">
-                                      <category.icon className="w-5 h-5 text-secondary" />
-                                    </div>
-                                    <div>
-                                      <p className="font-medium text-foreground group-hover:text-secondary transition-colors text-sm">{category.name}</p>
-                                      <p className="text-xs text-muted-foreground line-clamp-1">{category.description}</p>
-                                    </div>
-                                  </Link>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Featured */}
-                            <div className="p-6 bg-muted/30">
-                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                                Featured
-                              </p>
-                              <div className="space-y-3">
-                                {featuredActivities.map((activity) => (
-                                  <Link
-                                    key={activity.path}
-                                    to={activity.path}
-                                    className="block group"
-                                  >
-                                    <div className="relative aspect-[16/9] rounded-lg overflow-hidden mb-2">
-                                      <img 
-                                        src={activity.image} 
-                                        alt={activity.name}
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                      />
-                                    </div>
-                                    <p className="text-sm font-medium text-foreground group-hover:text-secondary transition-colors">
-                                      {activity.name}
-                                    </p>
-                                  </Link>
-                                ))}
-                              </div>
-                              <Link 
-                                to="/experiences"
-                                className="flex items-center gap-2 text-sm font-semibold text-secondary mt-4 hover:underline"
-                              >
-                                View All Activities
-                                <ArrowRight className="w-4 h-4" />
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
+                        {renderDropdown(link.dropdown)}
                       </motion.div>
                     )}
                   </AnimatePresence>
