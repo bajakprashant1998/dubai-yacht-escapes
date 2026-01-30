@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { quickReplies } from "@/lib/chatUtils";
-import { Ship, DollarSign, Calendar, Phone } from "lucide-react";
+import { Sun, Ship, FerrisWheel, Calendar, DollarSign, Headset } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface QuickReplyButtonsProps {
@@ -8,10 +8,12 @@ interface QuickReplyButtonsProps {
 }
 
 const icons = {
-  tours: Ship,
-  pricing: DollarSign,
+  safari: Sun,
+  yacht: Ship,
+  "theme-parks": FerrisWheel,
   booking: Calendar,
-  contact: Phone,
+  pricing: DollarSign,
+  contact: Headset,
 };
 
 const QuickReplyButtons = ({ onSelect }: QuickReplyButtonsProps) => {
