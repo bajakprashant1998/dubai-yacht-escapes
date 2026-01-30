@@ -16,7 +16,8 @@ const Tours = lazy(() => import("./pages/Tours"));
 const TourDetail = lazy(() => import("./pages/TourDetail"));
 const Services = lazy(() => import("./pages/Services"));
 const Experiences = lazy(() => import("./pages/Experiences"));
-const Cruises = lazy(() => import("./pages/Cruises"));
+// Cruises page redirects to sightseeing-cruises category
+import { Navigate } from "react-router-dom";
 const ServiceDetail = lazy(() => import("./pages/ServiceDetail"));
 const SavedTours = lazy(() => import("./pages/SavedTours"));
 const Gallery = lazy(() => import("./pages/Gallery"));
@@ -97,9 +98,9 @@ const App = () => (
             <Route path="/dubai/:categoryPath" element={<Tours />} />
             {/* Legacy route - kept for backwards compatibility */}
             <Route path="/tours/:slug" element={<TourDetail />} />
-            {/* Services routes */}
+            {/* Activities routes */}
             <Route path="/experiences" element={<Experiences />} />
-            <Route path="/cruises" element={<Cruises />} />
+            <Route path="/cruises" element={<Navigate to="/dubai/services/sightseeing-cruises" replace />} />
             <Route path="/services" element={<Services />} />
             <Route path="/dubai/services/:categoryPath" element={<Services />} />
             <Route path="/dubai/services/:categoryPath/:slug" element={<ServiceDetail />} />

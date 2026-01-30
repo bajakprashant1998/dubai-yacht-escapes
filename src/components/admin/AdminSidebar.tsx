@@ -47,11 +47,11 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    title: "Services",
+    title: "Activities",
     icon: Sparkles,
     children: [
-      { title: "All Services", href: "/admin/services" },
-      { title: "Add Service", href: "/admin/services/add" },
+      { title: "All Activities", href: "/admin/services" },
+      { title: "Add Activity", href: "/admin/services/add" },
       { title: "Categories", href: "/admin/services/categories" },
     ],
   },
@@ -82,7 +82,7 @@ interface AdminSidebarProps {
 
 const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
   const location = useLocation();
-  const [expandedItems, setExpandedItems] = useState<string[]>(["Tours", "Settings", "Services"]);
+  const [expandedItems, setExpandedItems] = useState<string[]>(["Tours", "Settings", "Activities"]);
 
   const toggleExpand = (title: string) => {
     setExpandedItems((prev) =>

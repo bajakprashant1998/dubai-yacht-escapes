@@ -180,13 +180,8 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/cruises" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Cruises
-                </Link>
-              </li>
-              <li>
                 <Link to="/experiences" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Experiences
+                  Activities
                 </Link>
               </li>
               <li>
@@ -214,28 +209,28 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Tours */}
+          {/* Popular Activities */}
           <div className="hidden sm:block">
-            <h4 className="font-display text-base sm:text-lg font-semibold text-secondary mb-4 sm:mb-6">Our Tours</h4>
+            <h4 className="font-display text-base sm:text-lg font-semibold text-secondary mb-4 sm:mb-6">Popular Activities</h4>
             <ul className="space-y-2 sm:space-y-3">
               <li>
-                <Link to="/dubai/dhow-cruises" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Dhow Cruises
+                <Link to="/dubai/services/desert-safari" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Desert Safari
                 </Link>
               </li>
               <li>
-                <Link to="/dubai/shared-yacht-tours" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Shared Yacht Tours
+                <Link to="/dubai/services/theme-parks" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Theme Parks
                 </Link>
               </li>
               <li>
-                <Link to="/dubai/private-yacht-charter" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Private Yacht Charter
+                <Link to="/dubai/services/sightseeing-cruises" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Sightseeing Cruises
                 </Link>
               </li>
               <li>
-                <Link to="/dubai/megayacht-experiences" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Megayacht Experiences
+                <Link to="/dubai/services/water-sports" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Water Sports
                 </Link>
               </li>
             </ul>
