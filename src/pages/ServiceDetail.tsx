@@ -31,6 +31,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useService } from "@/hooks/useServices";
 import { useContactConfig } from "@/hooks/useContactConfig";
+import ServiceBookingModal from "@/components/service-detail/ServiceBookingModal";
 
 const ServiceDetail = () => {
   const { slug, categoryPath } = useParams();
@@ -38,6 +39,7 @@ const ServiceDetail = () => {
   const { data: service, isLoading, error } = useService(slug || "");
   const { whatsappLink } = useContactConfig();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -367,7 +369,10 @@ const ServiceDetail = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 h-12 text-lg font-semibold">
+                  <Button 
+                    onClick={() => setIsBookingOpen(true)}
+                    className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 h-12 text-lg font-semibold"
+                  >
                     <Calendar className="w-5 h-5 mr-2" />
                     Check Availability
                   </Button>
@@ -400,6 +405,22 @@ const ServiceDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Booking Modal */}
+      {service && (
+        <ServiceBookingModal
+          isOpen={isBookingOpen}
+          onClose={() => setIsBookingOpen(false)}
+          service={{
+            id: service.id,
+            slug: service.slug,
+            title: service.title,
+            price: service.price,
+            bookingType: service.bookingType,
+            maxParticipants: service.maxParticipants,
+          }}
+        />
+      )}
     </Layout>
   );
 };
