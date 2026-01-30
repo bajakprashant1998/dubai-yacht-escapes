@@ -56,7 +56,7 @@ const HeroSearchBar = () => {
       </form>
 
       {/* Category Pills */}
-      <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
+      <div className="flex flex-wrap gap-2 justify-center">
         <span className="text-primary-foreground/60 text-sm font-medium mr-1 self-center">Popular:</span>
         {popularCategories.map((category) => (
           <button
