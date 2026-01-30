@@ -5,38 +5,6 @@ import { Ship, Users, Anchor, Crown, Sun, FerrisWheel, Waves, Mountain } from "l
 
 const experienceCategories = [
   {
-    icon: Ship,
-    title: "Dhow Cruises",
-    description: "Traditional dining experience",
-    link: "/tours?category=dhow-cruise",
-    gradient: "from-blue-500/20 to-cyan-500/20",
-    iconColor: "text-blue-500"
-  },
-  {
-    icon: Users,
-    title: "Shared Yacht",
-    description: "Live BBQ on the water",
-    link: "/tours?category=yacht-shared",
-    gradient: "from-orange-500/20 to-amber-500/20",
-    iconColor: "text-orange-500"
-  },
-  {
-    icon: Anchor,
-    title: "Private Charter",
-    description: "Exclusive yacht rental",
-    link: "/tours?category=yacht-private",
-    gradient: "from-emerald-500/20 to-teal-500/20",
-    iconColor: "text-emerald-500"
-  },
-  {
-    icon: Crown,
-    title: "Megayacht",
-    description: "Premium luxury cruise",
-    link: "/tours?category=megayacht",
-    gradient: "from-purple-500/20 to-pink-500/20",
-    iconColor: "text-purple-500"
-  },
-  {
     icon: Sun,
     title: "Desert Safari",
     description: "Dune bashing & BBQ",
@@ -61,12 +29,44 @@ const experienceCategories = [
     iconColor: "text-sky-500"
   },
   {
+    icon: Ship,
+    title: "Cruises",
+    description: "Dhow & yacht tours",
+    link: "/dubai/services/sightseeing-cruises",
+    gradient: "from-blue-500/20 to-cyan-500/20",
+    iconColor: "text-blue-500"
+  },
+  {
     icon: Mountain,
     title: "Adventure",
     description: "Skydive & hot air balloon",
     link: "/dubai/services/adventure-sports",
     gradient: "from-slate-500/20 to-zinc-500/20",
     iconColor: "text-slate-500"
+  },
+  {
+    icon: Users,
+    title: "City Tours",
+    description: "Explore Dubai landmarks",
+    link: "/dubai/services/city-tours",
+    gradient: "from-emerald-500/20 to-teal-500/20",
+    iconColor: "text-emerald-500"
+  },
+  {
+    icon: Crown,
+    title: "Observation",
+    description: "Burj Khalifa & more",
+    link: "/dubai/services/observation-decks",
+    gradient: "from-purple-500/20 to-pink-500/20",
+    iconColor: "text-purple-500"
+  },
+  {
+    icon: Anchor,
+    title: "Dining",
+    description: "Unique culinary experiences",
+    link: "/dubai/services/dining-experiences",
+    gradient: "from-orange-500/20 to-amber-500/20",
+    iconColor: "text-orange-500"
   },
 ];
 

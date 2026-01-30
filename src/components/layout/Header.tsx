@@ -29,41 +29,13 @@ const Header = () => {
 
   const navLinks = [
     { name: "Home", path: "/" },
-    { name: "Cruises", path: "/cruises", hasDropdown: true },
-    { name: "Experiences", path: "/experiences", hasDropdown: true, isExperiences: true },
+    { name: "Activities", path: "/experiences", hasDropdown: true },
     { name: "Gallery", path: "/gallery" },
     { name: "About Us", path: "/about" },
     { name: "Contact", path: "/contact" },
   ];
 
-  const tourCategories = [
-    { 
-      name: "Dhow Cruises", 
-      path: "/dubai/dhow-cruises", 
-      icon: Ship,
-      description: "Traditional wooden vessel dining experience"
-    },
-    { 
-      name: "Shared Yacht Tours", 
-      path: "/dubai/shared-yacht-tours", 
-      icon: Users,
-      description: "Affordable luxury with live BBQ"
-    },
-    { 
-      name: "Private Charters", 
-      path: "/dubai/private-yacht-charter", 
-      icon: Anchor,
-      description: "Exclusive yacht experience for groups"
-    },
-    { 
-      name: "Megayacht Dining", 
-      path: "/dubai/megayacht-experiences", 
-      icon: Crown,
-      description: "Premium multi-deck cruise experience"
-    },
-  ];
-
-  const experienceCategories = [
+  const activityCategories = [
     { 
       name: "Desert Safari", 
       path: "/dubai/services/desert-safari", 
@@ -87,6 +59,18 @@ const Header = () => {
       path: "/dubai/services/city-tours", 
       icon: MapPin,
       description: "Explore Dubai's landmarks and hidden gems"
+    },
+    { 
+      name: "Sightseeing Cruises", 
+      path: "/dubai/services/sightseeing-cruises", 
+      icon: Ship,
+      description: "Dhow cruises, yacht tours & marina experiences"
+    },
+    { 
+      name: "Adventure Sports", 
+      path: "/dubai/services/adventure-sports", 
+      icon: Sparkles,
+      description: "Skydiving, hot air balloons & more"
     },
   ];
 
@@ -153,10 +137,10 @@ const Header = () => {
                         <div className="w-[400px] p-4 grid gap-2">
                           <div className="mb-2">
                             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            {link.isExperiences ? "Popular Experiences" : "Cruise Experiences"}
-                          </p>
-                        </div>
-                          {(link.isExperiences ? experienceCategories : tourCategories).map((category) => (
+                              Popular Activities
+                            </p>
+                          </div>
+                          {activityCategories.map((category) => (
                             <NavigationMenuLink asChild key={category.path}>
                               <Link
                                 to={category.path}
@@ -172,9 +156,9 @@ const Header = () => {
                               </Link>
                             </NavigationMenuLink>
                           ))}
-                        <div className="mt-2 pt-3 border-t border-border">
-                            <Link to={link.isExperiences ? "/experiences" : "/cruises"} className="flex items-center justify-center gap-2 text-sm font-medium text-secondary hover:underline">
-                              {link.isExperiences ? "View All Experiences →" : "View All Cruises →"}
+                          <div className="mt-2 pt-3 border-t border-border">
+                            <Link to="/experiences" className="flex items-center justify-center gap-2 text-sm font-medium text-secondary hover:underline">
+                              View All Activities →
                             </Link>
                           </div>
                         </div>
@@ -237,11 +221,11 @@ const Header = () => {
                 </Link>
               ))}
               
-              {/* Mobile Tour Categories */}
+              {/* Mobile Activity Categories */}
               <div className="mt-3 pt-3 sm:mt-4 sm:pt-4 border-t border-border">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-2 sm:mb-3">Quick Links</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-2 sm:mb-3">Popular Activities</p>
                 <div className="grid grid-cols-2 gap-2">
-                  {tourCategories.map((category) => (
+                  {activityCategories.map((category) => (
                     <Link 
                       key={category.path}
                       to={category.path} 

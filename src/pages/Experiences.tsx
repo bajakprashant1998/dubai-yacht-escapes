@@ -175,10 +175,10 @@ const Experiences = () => {
           >
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-6">
               Discover Dubai{" "}
-              <span className="text-secondary">Experiences</span>
+              <span className="text-secondary">Activities</span>
             </h1>
             <p className="text-lg md:text-xl text-primary-foreground/80 max-w-2xl mx-auto mb-8">
-              From thrilling desert adventures to luxury yacht cruises, explore the best of Dubai with our curated collection of unforgettable experiences.
+              From thrilling desert adventures to sightseeing cruises, explore the best of Dubai with our curated collection of unforgettable activities.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
@@ -268,10 +268,10 @@ const Experiences = () => {
           <div className="container px-4">
             <div className="text-center mb-12">
               <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Featured Experiences
+                Featured Activities
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Our most popular experiences, handpicked for an unforgettable Dubai adventure.
+                Our most popular activities, handpicked for an unforgettable Dubai adventure.
               </p>
             </div>
 
@@ -332,7 +332,7 @@ const Experiences = () => {
             <div className="text-center mt-10">
               <Button asChild size="lg" variant="outline">
                 <Link to="/services">
-                  View All Experiences
+                  View All Activities
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
@@ -373,7 +373,7 @@ const Experiences = () => {
               Ready to Explore Dubai?
             </h2>
             <p className="text-secondary-foreground/80 max-w-2xl mx-auto mb-8">
-              Let us help you plan the perfect Dubai experience. Contact us today and our travel experts will create a customized itinerary just for you.
+              Let us help you plan the perfect Dubai adventure. Contact us today and our travel experts will create a customized itinerary just for you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 

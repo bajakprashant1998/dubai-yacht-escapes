@@ -55,7 +55,8 @@ const navigationItems: CommandItem[] = [
 ];
 
 const actionItems: CommandItem[] = [
-  { id: "add-tour", title: "Add New Tour", icon: Plus, href: "/admin/tours/add", keywords: ["create", "new"], group: "actions" },
+  { id: "add-activity", title: "Add New Activity", icon: Plus, href: "/admin/services/add", keywords: ["create", "new", "service"], group: "actions" },
+  { id: "add-tour", title: "Add New Tour", icon: Plus, href: "/admin/tours/add", keywords: ["create", "new", "cruise"], group: "actions" },
   { id: "view-pending", title: "View Pending Bookings", icon: Calendar, href: "/admin/bookings?status=pending", keywords: ["pending"], group: "actions" },
 ];
 
