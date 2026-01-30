@@ -304,3 +304,37 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* Print styles for PDF export */
+@media print {
+  /* Force all collapsible content to show */
+  [data-state="closed"] {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
+  /* Hide interactive elements except those marked as print-visible */
+  button:not(.print-visible),
+  .sticky {
+    display: none !important;
+  }
+  
+  /* Reset sticky positioning */
+  .sticky {
+    position: static !important;
+  }
+  
+  /* Hide navigation and footer */
+  header,
+  footer,
+  nav {
+    display: none !important;
+  }
+  
+  /* Full width for print */
+  .container {
+    max-width: 100% !important;
+    padding: 0 1rem !important;
+  }
+}
