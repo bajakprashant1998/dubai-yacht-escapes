@@ -34,7 +34,11 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')!;
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
+    
+    if (!geminiApiKey) {
+      throw new Error('GEMINI_API_KEY is not configured');
+    }
     
     const supabase = createClient(supabaseUrl, supabaseKey);
     const { action, tripId, visitorId, input }: TripRequest = await req.json();
@@ -166,32 +170,34 @@ Return a JSON object with this exact structure:
       ? `Current trip needs modification: ${input.modifications}. Update the itinerary accordingly.`
       : `Generate a complete ${totalDays}-day Dubai trip itinerary for ${totalTravelers} travelers (${input.adults} adults, ${input.children} children) with ${input.budgetTier} budget and ${input.travelStyle} travel style.${input.specialOccasion && input.specialOccasion !== 'none' ? ` Special occasion: ${input.specialOccasion}.` : ''}`;
 
-    // Call Lovable AI
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    // Call Gemini API directly
+    const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${lovableApiKey}`,
       },
       body: JSON.stringify({
-        model: 'google/gemini-3-flash-preview',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userMessage }
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: `${systemPrompt}\n\n${userMessage}` }]
+          }
         ],
-        temperature: 0.7,
-        max_tokens: 4000,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 4000,
+        },
       }),
     });
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
-      console.error('AI API Error:', errorText);
-      throw new Error(`AI API error: ${aiResponse.status}`);
+      console.error('Gemini API Error:', errorText);
+      throw new Error(`Gemini API error: ${aiResponse.status}`);
     }
 
     const aiResult = await aiResponse.json();
-    const aiContent = aiResult.choices?.[0]?.message?.content;
+    const aiContent = aiResult.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!aiContent) {
       throw new Error('No content returned from AI');
@@ -228,7 +234,7 @@ Return a JSON object with this exact structure:
         display_currency: 'AED',
         display_price: tripPlan.summary?.grandTotal || 0,
         metadata: {
-          ai_model: 'google/gemini-3-flash-preview',
+          ai_model: 'gemini-2.0-flash',
           generated_at: new Date().toISOString(),
           version: 1,
         },
