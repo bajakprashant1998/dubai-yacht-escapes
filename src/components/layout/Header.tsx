@@ -146,19 +146,15 @@ const Header = () => {
       <nav className="container py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to="/" className="flex items-center group">
             <motion.img 
               src={betterviewLogo} 
               alt="Betterview Tourism" 
               className={cn(
                 "object-contain rounded-lg transition-all duration-300",
-                isScrolled ? "w-9 h-9" : "w-11 h-11"
+                isScrolled ? "h-12 w-auto" : "h-14 w-auto"
               )}
             />
-            <div className="flex flex-col">
-              <span className="font-display font-bold text-xl text-primary leading-tight tracking-tight">Betterview</span>
-              <span className="text-[10px] text-muted-foreground tracking-[0.2em] uppercase font-medium">Tourism</span>
-            </div>
           </Link>
 
           {/* Desktop Navigation */}
@@ -263,9 +259,9 @@ const Header = () => {
                   className={cn(
                     'text-sm font-medium transition-all px-4 py-2 rounded-lg',
                     link.highlight 
-                      ? 'bg-secondary/10 text-secondary hover:bg-secondary/20'
+                      ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-md'
                       : 'hover:bg-muted/50',
-                    isActive(link.path) 
+                    isActive(link.path) && !link.highlight
                       ? 'text-secondary bg-secondary/10' 
                       : link.highlight ? '' : 'text-foreground hover:text-secondary'
                   )}

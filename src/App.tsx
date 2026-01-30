@@ -85,6 +85,7 @@ const AdminBlog = lazy(() => import("./pages/admin/Blog"));
 const AdminAddBlogPost = lazy(() => import("./pages/admin/AddBlogPost"));
 const AdminEditBlogPost = lazy(() => import("./pages/admin/EditBlogPost"));
 const AdminBlogCategories = lazy(() => import("./pages/admin/BlogCategories"));
+const AdminNewsletter = lazy(() => import("./pages/admin/Newsletter"));
 const AdminAITripDashboard = lazy(() => import("./pages/admin/AITripDashboard"));
 
 // RequireSession must be loaded synchronously as it's a wrapper component
@@ -376,6 +377,8 @@ const App = () => (
             <Route path="/admin/blog/add" element={<RequireSession><AdminAddBlogPost /></RequireSession>} />
             <Route path="/admin/blog/edit/:slug" element={<RequireSession><AdminEditBlogPost /></RequireSession>} />
             <Route path="/admin/blog/categories" element={<RequireSession><AdminBlogCategories /></RequireSession>} />
+            {/* Newsletter Admin */}
+            <Route path="/admin/newsletter" element={<RequireSession><AdminNewsletter /></RequireSession>} />
             {/* AI Trip Dashboard Admin */}
             <Route path="/admin/ai-trips" element={<RequireSession><AdminAITripDashboard /></RequireSession>} />
             {/* Auth routes */}

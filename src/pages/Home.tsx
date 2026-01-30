@@ -13,6 +13,7 @@ import TestimonialsCarousel from "@/components/home/TestimonialsCarousel";
 import NewsletterSection from "@/components/home/NewsletterSection";
 import PartnersStrip from "@/components/home/PartnersStrip";
 import CTASection from "@/components/home/CTASection";
+import QuickServices from "@/components/home/QuickServices";
 
 const Home = () => {
   return (
@@ -22,6 +23,7 @@ const Home = () => {
       <ExperienceCategories />
       <FeaturedExperiences />
       <RecentlyViewedSection />
+      <QuickServices />
       <PopularDestinations />
       <CategoryShowcase />
       <FeaturedTours />

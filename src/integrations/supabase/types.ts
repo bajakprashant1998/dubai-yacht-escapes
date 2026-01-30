@@ -1082,6 +1082,36 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_subscribers: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          is_active: boolean | null
+          source: string | null
+          subscribed_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          is_active?: boolean | null
+          source?: string | null
+          subscribed_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          is_active?: boolean | null
+          source?: string | null
+          subscribed_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       permissions: {
         Row: {
           action: string

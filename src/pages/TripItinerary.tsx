@@ -234,7 +234,12 @@ const TripItinerary = () => {
                   <Share2 className="w-4 h-4" />
                   Share
                 </Button>
-                <Button variant="secondary" size="sm" className="gap-2">
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  className="gap-2"
+                  onClick={() => window.print()}
+                >
                   <Download className="w-4 h-4" />
                   PDF
                 </Button>
