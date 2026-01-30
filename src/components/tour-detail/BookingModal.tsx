@@ -189,30 +189,24 @@ const BookingModal = ({
         booking_type: bookingType,
       };
 
-      const { data: savedBooking, error } = await supabase.from("bookings").insert(bookingData).select().single();
+      // Insert without .select().single() to avoid RLS SELECT policy issues for anonymous users
+      const { error: insertError } = await supabase.from("bookings").insert(bookingData);
 
-      if (error) {
-        console.error("Booking error:", error);
-        if (error.code === "42501") {
+      if (insertError) {
+        console.error("Booking error:", insertError);
+        if (insertError.code === "42501") {
           throw new Error("Unable to create booking. Please try again or contact support.");
         }
-        throw new Error(error.message);
+        throw new Error(insertError.message);
       }
 
-      // Send confirmation email (don't block on failure)
-      if (savedBooking?.id) {
-        sendBookingEmail(savedBooking.id, "pending")
-          .then(result => {
-            if (!result.success) {
-              console.warn("Email notification failed, but booking was created");
-            }
-          })
-          .catch(console.warn);
-      }
+      // Booking succeeded! Email will be handled by admin or backend trigger
+      // Note: We can't send email here as we don't have the booking ID due to RLS
+      console.log("Booking created successfully for:", email.trim());
 
       toast({ 
         title: "🎉 Booking submitted!", 
-        description: "Check your email for confirmation. We'll contact you shortly." 
+        description: "We'll contact you shortly to confirm your booking." 
       });
       onClose();
     } catch (error: any) {
