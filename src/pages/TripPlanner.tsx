@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays } from 'date-fns';
 import { Calendar as CalendarIcon, Plane, Sparkles, ArrowRight, Loader2 } from 'lucide-react';
@@ -17,7 +17,9 @@ import TravelStyleSelector from '@/components/trip/TravelStyleSelector';
 import NationalitySelector from '@/components/trip/NationalitySelector';
 import SpecialOccasionSelector from '@/components/trip/SpecialOccasionSelector';
 import CurrencySelector from '@/components/trip/CurrencySelector';
+import ComboSuggestion from '@/components/combo/ComboSuggestion';
 import { useTripPlanner, TripInput } from '@/hooks/useTripPlanner';
+import { useMatchCombo } from '@/hooks/useComboAIRules';
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
@@ -34,6 +36,20 @@ const TripPlanner = () => {
   const [budgetTier, setBudgetTier] = useState<'low' | 'medium' | 'luxury'>('medium');
   const [travelStyle, setTravelStyle] = useState<'family' | 'couple' | 'adventure' | 'relax' | 'luxury'>('relax');
   const [specialOccasion, setSpecialOccasion] = useState<'none' | 'birthday' | 'honeymoon' | 'anniversary'>('none');
+  const [showComboSuggestion, setShowComboSuggestion] = useState(true);
+
+  // Calculate total days for matching
+  const totalDays = arrivalDate && departureDate
+    ? Math.ceil((departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+    : 0;
+
+  // Match combo based on user preferences
+  const { data: matchedCombo, isLoading: isMatchingCombo } = useMatchCombo({
+    tripDays: totalDays,
+    budgetTier,
+    travelStyle,
+    hasChildren: children > 0,
+  });
 
   const canProceed = (): boolean => {
     switch (step) {
@@ -87,10 +103,6 @@ const TripPlanner = () => {
       console.error('Failed to generate trip:', error);
     }
   };
-
-  const totalDays = arrivalDate && departureDate
-    ? Math.ceil((departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
-    : 0;
 
   return (
     <Layout>
@@ -315,6 +327,14 @@ const TripPlanner = () => {
                       />
                     </div>
                   </div>
+
+                  {/* AI Combo Suggestion */}
+                  {matchedCombo && showComboSuggestion && (
+                    <ComboSuggestion
+                      combo={matchedCombo.combo}
+                      onDismiss={() => setShowComboSuggestion(false)}
+                    />
+                  )}
                 </div>
               )}
             </div>
@@ -364,15 +384,15 @@ const TripPlanner = () => {
           {/* Trust badges */}
           <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full" />
+              <span className="w-2 h-2 bg-secondary rounded-full" />
               AI-Powered Planning
             </span>
             <span className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full" />
+              <span className="w-2 h-2 bg-secondary rounded-full" />
               Best Price Guaranteed
             </span>
             <span className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full" />
+              <span className="w-2 h-2 bg-secondary rounded-full" />
               24/7 Support
             </span>
           </div>

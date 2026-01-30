@@ -146,16 +146,22 @@ export const useDeleteComboAIRule = () => {
   });
 };
 
-// Match combo based on trip preferences
-export const useMatchCombo = () => {
-  return useMutation({
-    mutationFn: async (preferences: {
-      trip_days: number;
-      travel_style: string;
-      budget_tier: string;
-      has_children: boolean;
-      nationality?: string;
-    }) => {
+// Match combo based on trip preferences (query-based for automatic matching)
+export interface MatchComboParams {
+  tripDays: number;
+  travelStyle: string;
+  budgetTier: string;
+  hasChildren: boolean;
+  nationality?: string;
+}
+
+export const useMatchCombo = (params: MatchComboParams) => {
+  return useQuery({
+    queryKey: ["combo-match", params],
+    queryFn: async () => {
+      // Only run if we have meaningful params
+      if (params.tripDays <= 0) return null;
+
       // Fetch active rules sorted by priority
       const { data: rules, error } = await supabase
         .from("combo_ai_rules")
@@ -170,19 +176,19 @@ export const useMatchCombo = () => {
         const conditions = rule.conditions as ComboAIRule["conditions"];
         let matches = true;
 
-        if (conditions.trip_days_max && preferences.trip_days > conditions.trip_days_max) {
+        if (conditions.trip_days_max && params.tripDays > conditions.trip_days_max) {
           matches = false;
         }
-        if (conditions.trip_days_min && preferences.trip_days < conditions.trip_days_min) {
+        if (conditions.trip_days_min && params.tripDays < conditions.trip_days_min) {
           matches = false;
         }
-        if (conditions.travel_style && conditions.travel_style !== preferences.travel_style) {
+        if (conditions.travel_style && conditions.travel_style !== params.travelStyle) {
           matches = false;
         }
-        if (conditions.budget_tier && conditions.budget_tier !== preferences.budget_tier) {
+        if (conditions.budget_tier && conditions.budget_tier !== params.budgetTier) {
           matches = false;
         }
-        if (conditions.has_children !== undefined && conditions.has_children !== preferences.has_children) {
+        if (conditions.has_children !== undefined && conditions.has_children !== params.hasChildren) {
           matches = false;
         }
 
@@ -196,5 +202,7 @@ export const useMatchCombo = () => {
 
       return null;
     },
+    enabled: params.tripDays > 0,
+    staleTime: 1000 * 60 * 5, // Cache for 5 mins
   });
 };
