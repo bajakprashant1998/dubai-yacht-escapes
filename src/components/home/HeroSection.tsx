@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 import { memo, useState, useRef, useEffect } from "react";
 import { motion, useScroll, useTransform, type Easing } from "framer-motion";
-import { ArrowRight, Play, Sparkles, Compass } from "lucide-react";
+import { ArrowRight, Play, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 import HeroSearchBar from "./HeroSearchBar";
-import heroBurjKhalifa from "@/assets/hero-burj-khalifa.webp";
+import heroBurjKhalifaEvening from "@/assets/hero-burj-khalifa-evening.webp";
 
 const easeOut: Easing = [0.16, 1, 0.3, 1];
 
@@ -92,10 +92,10 @@ const HeroSection = memo(() => {
             loop
             playsInline
             preload="metadata"
-            poster={heroBurjKhalifa}
+            poster={heroBurjKhalifaEvening}
             onLoadedData={() => setVideoLoaded(true)}
             onError={() => setVideoError(true)}
-            className={`absolute inset-0 w-full h-full object-cover scale-110 transition-opacity duration-1000 ${
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
               videoLoaded ? "opacity-100" : "opacity-0"
             }`}
           >
@@ -103,53 +103,104 @@ const HeroSection = memo(() => {
           </video>
         )}
         
-        {/* Fallback Image (shows while video loads or if video fails) */}
-        <div className={`absolute inset-0 transition-opacity duration-1000 ${
-          showVideo && videoLoaded ? "opacity-0" : "opacity-100"
-        }`}>
+        {/* Fallback Image with Ken Burns effect */}
+        <motion.div 
+          className={`absolute inset-0 transition-opacity duration-1000 ${
+            showVideo && videoLoaded ? "opacity-0" : "opacity-100"
+          }`}
+          initial={{ scale: 1.1 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 20, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+        >
           <OptimizedImage
-            src={heroBurjKhalifa}
-            alt="Dubai experiences and adventures with Burj Khalifa"
+            src={heroBurjKhalifaEvening}
+            alt="Dubai skyline with Burj Khalifa at sunset evening view"
             priority
             objectFit="cover"
             sizes="100vw"
             onLoad={() => setImageLoaded(true)}
-            containerClassName="w-full h-full scale-110"
+            containerClassName="w-full h-full"
           />
-        </div>
+        </motion.div>
         
-        {/* Overlay gradients for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/55 to-primary/25" />
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/55 via-transparent to-transparent" />
+        {/* Evening-themed gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/85 via-primary/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-primary/20 to-transparent" />
+        
+        {/* Animated gradient sweep effect */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-r from-secondary/10 via-transparent to-secondary/5"
+          animate={{
+            opacity: [0.3, 0.6, 0.3],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
       </motion.div>
 
-      {/* Animated Floating Elements */}
+      {/* Animated Floating Light Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Golden orb - top right */}
         <motion.div
-          className="absolute top-20 right-[15%] w-80 h-80 bg-secondary/15 rounded-full blur-3xl"
+          className="absolute top-20 right-[15%] w-96 h-96 bg-gradient-radial from-amber-400/20 via-orange-500/10 to-transparent rounded-full blur-3xl"
           animate={{
-            y: [0, -30, 0],
-            x: [0, 15, 0],
+            y: [0, -40, 0],
+            x: [0, 20, 0],
+            scale: [1, 1.2, 1],
+            opacity: [0.4, 0.7, 0.4],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        />
+        
+        {/* Purple glow - bottom left */}
+        <motion.div
+          className="absolute bottom-32 left-[8%] w-72 h-72 bg-gradient-radial from-purple-500/15 via-violet-600/8 to-transparent rounded-full blur-2xl"
+          animate={{
+            y: [0, 30, 0],
+            x: [0, -15, 0],
             scale: [1, 1.15, 1],
+            opacity: [0.3, 0.6, 0.3],
           }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
         />
+        
+        {/* Warm accent - center right */}
         <motion.div
-          className="absolute bottom-32 left-[8%] w-64 h-64 bg-secondary/10 rounded-full blur-2xl"
+          className="absolute top-1/2 right-[25%] w-48 h-48 bg-gradient-radial from-orange-400/15 via-amber-500/8 to-transparent rounded-full blur-xl"
           animate={{
-            y: [0, 25, 0],
-            x: [0, -10, 0],
-            scale: [1, 1.1, 1],
+            y: [0, -25, 0],
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.5, 0.2],
           }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         />
+        
+        {/* Small floating sparkles */}
         <motion.div
-          className="absolute top-1/2 right-[30%] w-40 h-40 bg-secondary/8 rounded-full blur-xl"
+          className="absolute top-[30%] left-[20%] w-2 h-2 bg-secondary/60 rounded-full"
           animate={{
             y: [0, -20, 0],
-            scale: [1, 1.2, 1],
+            opacity: [0, 1, 0],
+            scale: [0.5, 1, 0.5],
           }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-[60%] right-[35%] w-3 h-3 bg-amber-300/50 rounded-full"
+          animate={{
+            y: [0, -30, 0],
+            opacity: [0, 1, 0],
+            scale: [0.5, 1.2, 0.5],
+          }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+        />
+        <motion.div
+          className="absolute top-[45%] left-[60%] w-2 h-2 bg-white/40 rounded-full"
+          animate={{
+            y: [0, -15, 0],
+            opacity: [0, 0.8, 0],
+            scale: [0.5, 1, 0.5],
+          }}
+          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 2.5 }}
         />
       </div>
 
