@@ -440,115 +440,116 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Mobile Navigation - Full Screen Overlay */}
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="lg:hidden fixed inset-0 top-[65px] bg-background z-50 overflow-y-auto"
-            >
-              <div className="container py-6 flex flex-col min-h-full">
-                {/* Search Bar */}
-                <form onSubmit={handleSearch} className="mb-6">
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                    <Input
-                      type="search"
-                      placeholder="Search activities, tours..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="h-12 pl-12 text-base"
-                    />
-                  </div>
-                </form>
+      </nav>
 
-                {/* Nav Links */}
-                <div className="space-y-1 mb-6">
-                  {navLinks.map((link, index) => (
-                    <motion.div
-                      key={link.path}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
+      {/* Mobile Navigation - Full Screen Overlay - Outside nav for proper fixed positioning */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="lg:hidden fixed inset-0 top-[65px] bg-background z-[60] overflow-y-auto"
+          >
+            <div className="container py-6 flex flex-col min-h-full">
+              {/* Search Bar */}
+              <form onSubmit={handleSearch} className="mb-6">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search activities, tours..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="h-12 pl-12 text-base"
+                  />
+                </div>
+              </form>
+
+              {/* Nav Links */}
+              <div className="space-y-1 mb-6">
+                {navLinks.map((link, index) => (
+                  <motion.div
+                    key={link.path}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <Link
+                      to={link.path}
+                      className={cn(
+                        "flex items-center justify-between text-lg font-medium py-4 px-4 rounded-xl transition-colors",
+                        isActive(link.path) 
+                          ? "text-secondary bg-secondary/10" 
+                          : "text-foreground hover:bg-muted/50"
+                      )}
+                      onClick={() => setIsMenuOpen(false)}
                     >
-                      <Link
-                        to={link.path}
-                        className={cn(
-                          "flex items-center justify-between text-lg font-medium py-4 px-4 rounded-xl transition-colors",
-                          isActive(link.path) 
-                            ? "text-secondary bg-secondary/10" 
-                            : "text-foreground hover:bg-muted/50"
-                        )}
+                      {link.name}
+                      {link.highlight && (
+                        <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
+                          AI Powered
+                        </span>
+                      )}
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+              
+              {/* Mobile Activity Categories */}
+              <div className="border-t border-border pt-6 mb-6">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-4">
+                  Popular Activities
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  {activityCategories.map((category, index) => (
+                    <motion.div
+                      key={category.path}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 + index * 0.05 }}
+                    >
+                      <Link 
+                        to={category.path} 
                         onClick={() => setIsMenuOpen(false)}
+                        className="flex items-center gap-3 p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
                       >
-                        {link.name}
-                        {link.highlight && (
-                          <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
-                            AI Powered
-                          </span>
-                        )}
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                          <category.icon className="w-5 h-5 text-secondary" />
+                        </div>
+                        <span className="text-sm font-medium">{category.name}</span>
                       </Link>
                     </motion.div>
                   ))}
                 </div>
-                
-                {/* Mobile Activity Categories */}
-                <div className="border-t border-border pt-6 mb-6">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-4">
-                    Popular Activities
-                  </p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {activityCategories.map((category, index) => (
-                      <motion.div
-                        key={category.path}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 + index * 0.05 }}
-                      >
-                        <Link 
-                          to={category.path} 
-                          onClick={() => setIsMenuOpen(false)}
-                          className="flex items-center gap-3 p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
-                        >
-                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                            <category.icon className="w-5 h-5 text-secondary" />
-                          </div>
-                          <span className="text-sm font-medium">{category.name}</span>
-                        </Link>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Bottom Actions */}
-                <div className="mt-auto border-t border-border pt-6 space-y-4 pb-safe">
-                  <a 
-                    href={`tel:${phone}`} 
-                    className="flex items-center gap-3 text-muted-foreground hover:text-foreground px-4 py-3"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                      <Phone className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">Call Us</p>
-                      <p className="text-sm">{phoneFormatted}</p>
-                    </div>
-                  </a>
-                  
-                  <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold h-14 text-base">
-                      Book Now
-                    </Button>
-                  </Link>
-                </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
+
+              {/* Bottom Actions */}
+              <div className="mt-auto border-t border-border pt-6 space-y-4 pb-safe">
+                <a 
+                  href={`tel:${phone}`} 
+                  className="flex items-center gap-3 text-muted-foreground hover:text-foreground px-4 py-3"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                    <Phone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Call Us</p>
+                    <p className="text-sm">{phoneFormatted}</p>
+                  </div>
+                </a>
+                
+                <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
+                  <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold h-14 text-base">
+                    Book Now
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };
