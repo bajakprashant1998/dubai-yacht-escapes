@@ -45,6 +45,9 @@ const BlogCategory = lazy(() => import("./pages/BlogCategory"));
 // AI Trip Planner pages
 const TripPlanner = lazy(() => import("./pages/TripPlanner"));
 const TripItinerary = lazy(() => import("./pages/TripItinerary"));
+// Combo Packages
+const ComboPackages = lazy(() => import("./pages/ComboPackages"));
+const ComboPackageDetail = lazy(() => import("./pages/ComboPackageDetail"));
 // Admin pages - lazy load entire admin section
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminBookings = lazy(() => import("./pages/admin/Bookings"));
@@ -87,7 +90,9 @@ const AdminEditBlogPost = lazy(() => import("./pages/admin/EditBlogPost"));
 const AdminBlogCategories = lazy(() => import("./pages/admin/BlogCategories"));
 const AdminNewsletter = lazy(() => import("./pages/admin/Newsletter"));
 const AdminAITripDashboard = lazy(() => import("./pages/admin/AITripDashboard"));
-
+const AdminComboPackages = lazy(() => import("./pages/admin/ComboPackages"));
+const AdminAddComboPackage = lazy(() => import("./pages/admin/AddComboPackage"));
+const AdminEditComboPackage = lazy(() => import("./pages/admin/EditComboPackage"));
 // RequireSession must be loaded synchronously as it's a wrapper component
 import RequireSession from "./components/admin/RequireSession";
 
@@ -165,6 +170,9 @@ const App = () => (
             {/* AI Trip Planner */}
             <Route path="/plan-trip" element={<TripPlanner />} />
             <Route path="/trip/:tripId" element={<TripItinerary />} />
+            {/* Combo Packages */}
+            <Route path="/combo-packages" element={<ComboPackages />} />
+            <Route path="/combo-packages/:slug" element={<ComboPackageDetail />} />
             {/* Admin Routes */}
             <Route
               path="/admin"
@@ -381,6 +389,10 @@ const App = () => (
             <Route path="/admin/newsletter" element={<RequireSession><AdminNewsletter /></RequireSession>} />
             {/* AI Trip Dashboard Admin */}
             <Route path="/admin/ai-trips" element={<RequireSession><AdminAITripDashboard /></RequireSession>} />
+            {/* Combo Packages Admin */}
+            <Route path="/admin/combo-packages" element={<RequireSession><AdminComboPackages /></RequireSession>} />
+            <Route path="/admin/combo-packages/add" element={<RequireSession><AdminAddComboPackage /></RequireSession>} />
+            <Route path="/admin/combo-packages/edit/:slug" element={<RequireSession><AdminEditComboPackage /></RequireSession>} />
             {/* Auth routes */}
             <Route path="/auth/verify-email" element={<VerifyEmail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -44,6 +44,14 @@ interface NavItem {
 const navItems: NavItem[] = [
   { title: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { title: "AI Trip Planner", href: "/admin/ai-trips", icon: Plane },
+  {
+    title: "Combo Packages",
+    icon: Ship,
+    children: [
+      { title: "All Combos", href: "/admin/combo-packages" },
+      { title: "Add Combo", href: "/admin/combo-packages/add" },
+    ],
+  },
   { title: "Bookings", href: "/admin/bookings", icon: Calendar },
   { title: "Live Chat", href: "/admin/live-chat", icon: Headset },
   { title: "Locations", href: "/admin/locations", icon: MapPin },
