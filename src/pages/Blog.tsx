@@ -44,8 +44,13 @@ const Blog = () => {
           ) : null}
           
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Mobile Category Navigation */}
+            <div className="lg:hidden">
+              <BlogSidebar />
+            </div>
+            
             {/* Posts Grid */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-3 order-2 lg:order-1">
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {Array.from({ length: 6 }).map((_, i) => (
@@ -74,8 +79,8 @@ const Blog = () => {
               )}
             </div>
             
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
+            {/* Desktop Sidebar */}
+            <div className="hidden lg:block lg:col-span-1 order-1 lg:order-2">
               <BlogSidebar />
             </div>
           </div>

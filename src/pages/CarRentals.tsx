@@ -5,6 +5,7 @@ import { useCarRentals } from "@/hooks/useCarRentals";
 import { useCarCategories } from "@/hooks/useCarCategories";
 import CarCard from "@/components/car-rentals/CarCard";
 import CarFilters from "@/components/car-rentals/CarFilters";
+import CarFiltersDrawer from "@/components/car-rentals/CarFiltersDrawer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Car, Grid3X3, List, MapPin } from "lucide-react";
 import { SortingTabs } from "@/components/ui/sorting-tabs";
@@ -83,8 +84,21 @@ const CarRentals = () => {
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Filters Sidebar */}
-            <div className="lg:col-span-1">
+            {/* Mobile Filter Drawer */}
+            <div className="lg:hidden mb-4">
+              <CarFiltersDrawer
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+                transmissionFilter={transmissionFilter}
+                onTransmissionChange={setTransmissionFilter}
+                priceRange={priceRange}
+                onPriceRangeChange={setPriceRange}
+                onClearFilters={handleClearFilters}
+              />
+            </div>
+
+            {/* Filters Sidebar - Desktop Only */}
+            <div className="hidden lg:block lg:col-span-1">
               <CarFilters
                 selectedCategory={selectedCategory}
                 onCategoryChange={setSelectedCategory}

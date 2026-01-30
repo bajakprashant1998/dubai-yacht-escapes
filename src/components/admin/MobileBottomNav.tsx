@@ -30,8 +30,8 @@ const MobileBottomNav = ({ onMenuClick, unreadCount = 0 }: MobileBottomNavProps)
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-card border-t border-border pb-safe">
-      <div className="flex items-center justify-around h-16">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-card border-t border-border safe-area-bottom">
+      <div className="flex items-center justify-around h-16 pb-safe">
         {navItems.map((item) => {
           const active = isActive(item.href);
           return (

@@ -27,19 +27,19 @@ const StatCard = ({
   return (
     <div
       className={cn(
-        "bg-card rounded-xl p-4 sm:p-6 border border-border shadow-sm",
+        "bg-card rounded-xl p-3 sm:p-4 lg:p-6 border border-border shadow-sm",
         "transition-all duration-300 hover:shadow-md hover:-translate-y-0.5",
         "animate-fade-in",
         className
       )}
       style={{ animationDelay: `${animationDelay}ms` }}
     >
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-1">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] sm:text-xs lg:text-sm font-medium text-muted-foreground mb-0.5 sm:mb-1 truncate">
             {title}
           </p>
-          <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-1 animate-count-up">
+          <p className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-foreground mb-0.5 sm:mb-1 animate-count-up truncate">
             {value}
           </p>
           {change && (
@@ -63,14 +63,14 @@ const StatCard = ({
           {viewReportLink && (
             <a
               href={viewReportLink}
-              className="text-xs sm:text-sm text-secondary hover:underline mt-2 inline-block"
+              className="text-[10px] sm:text-xs lg:text-sm text-secondary hover:underline mt-1 sm:mt-2 inline-block"
             >
               View Report →
             </a>
           )}
         </div>
-        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-secondary/20 to-secondary/10 rounded-xl flex items-center justify-center transition-transform hover:scale-105">
-          <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
+        <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-secondary/20 to-secondary/10 rounded-lg lg:rounded-xl flex items-center justify-center transition-transform hover:scale-105 flex-shrink-0">
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-secondary" />
         </div>
       </div>
     </div>

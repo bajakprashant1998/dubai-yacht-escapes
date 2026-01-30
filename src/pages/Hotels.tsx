@@ -4,6 +4,7 @@ import Layout from "@/components/layout/Layout";
 import { useHotels } from "@/hooks/useHotels";
 import HotelCard from "@/components/hotels/HotelCard";
 import HotelFilters from "@/components/hotels/HotelFilters";
+import HotelFiltersDrawer from "@/components/hotels/HotelFiltersDrawer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Building, Grid3X3, List, MapPin } from "lucide-react";
 import { SortingTabs } from "@/components/ui/sorting-tabs";
@@ -82,8 +83,21 @@ const Hotels = () => {
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Filters Sidebar */}
-            <div className="lg:col-span-1">
+            {/* Mobile Filter Drawer */}
+            <div className="lg:hidden mb-4">
+              <HotelFiltersDrawer
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+                starRatingFilter={starRatingFilter}
+                onStarRatingChange={setStarRatingFilter}
+                priceRange={priceRange}
+                onPriceRangeChange={setPriceRange}
+                onClearFilters={handleClearFilters}
+              />
+            </div>
+
+            {/* Filters Sidebar - Desktop Only */}
+            <div className="hidden lg:block lg:col-span-1">
               <HotelFilters
                 selectedCategory={selectedCategory}
                 onCategoryChange={setSelectedCategory}

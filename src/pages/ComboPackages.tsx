@@ -31,17 +31,17 @@ const ComboPackages = () => {
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
               Save up to 25% with our curated combo packages. Hotel, transport, activities — all included in one seamless experience.
             </p>
-            <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-secondary" />
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-secondary" />
                 <span>AI-Customizable</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2">
                 <span className="w-2 h-2 bg-secondary rounded-full" />
                 <span>Best Price Guaranteed</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-secondary rounded-full" />
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-secondary rounded-full" />
                 <span>24/7 Support</span>
               </div>
             </div>

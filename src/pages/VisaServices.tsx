@@ -145,26 +145,28 @@ const VisaServices = () => {
           {/* Filter Tabs & Sorting */}
           <div className="mb-8">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
-              {/* Visa Type Filter Tabs */}
-              <div className="flex flex-wrap gap-2">
-                {visaTypeFilters.map((filter) => {
-                  const Icon = filter.icon;
-                  return (
-                    <Button
-                      key={filter.value}
-                      variant={activeFilter === filter.value ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setActiveFilter(filter.value)}
-                      className={cn(
-                        "gap-1.5",
-                        activeFilter === filter.value && "bg-secondary text-secondary-foreground"
-                      )}
-                    >
-                      {Icon && <Icon className="w-3.5 h-3.5" />}
-                      {filter.label}
-                    </Button>
-                  );
-                })}
+              {/* Visa Type Filter Tabs - Horizontal scroll on mobile */}
+              <div className="overflow-x-auto scrollbar-hide -mx-4 px-4 lg:mx-0 lg:px-0">
+                <div className="flex gap-2 min-w-max">
+                  {visaTypeFilters.map((filter) => {
+                    const Icon = filter.icon;
+                    return (
+                      <Button
+                        key={filter.value}
+                        variant={activeFilter === filter.value ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setActiveFilter(filter.value)}
+                        className={cn(
+                          "gap-1.5 whitespace-nowrap",
+                          activeFilter === filter.value && "bg-secondary text-secondary-foreground"
+                        )}
+                      >
+                        {Icon && <Icon className="w-3.5 h-3.5" />}
+                        {filter.label}
+                      </Button>
+                    );
+                  })}
+                </div>
               </div>
               
               {/* Results Count & Sorting */}
