@@ -1,264 +1,387 @@
 
 # Comprehensive Enhancement Plan
 
-This plan covers 6 major enhancements to transform the platform into a polished, professional experiences marketplace.
+This plan covers 8 major enhancements to transform the platform with improved content, navigation, and admin functionality.
 
 ---
 
-## Task 1: Add High-Quality Images for New Categories
+## Overview
+
+| Task | Description | Priority |
+|------|-------------|----------|
+| 1 | Update Hero Section with Relevant Content | High |
+| 2 | Add Search Bar with Category Suggestions | High |
+| 3 | Test Mobile Filter Drawer | Medium |
+| 4 | Add Recently Viewed Section | Medium |
+| 5 | Add Remaining Frontend Pages | Medium |
+| 6 | Create Admin Pages & Fields | Medium |
+| 7 | Add Featured Tours Section | High |
+| 8 | Create Dhow Cruises & Yacht Charters Page | High |
+
+---
+
+## Task 1: Update Hero Section Content
 
 ### Current State
-The `/experiences` page currently uses placeholder images. Several categories reuse the same images:
-- Museums & Attractions → `/assets/services/city-tours.jpg`
-- Zoos & Aquariums → `/assets/services/water-sports.jpg`
-- Water Parks → `/assets/services/water-sports.jpg`
-- Parks & Gardens → `/assets/services/city-tours.jpg`
-- Sightseeing Cruises → `/assets/services/city-tours.jpg`
-- Attraction Passes → `/assets/services/theme-parks.jpg`
+The hero section in `src/components/home/HeroSection.tsx` focuses on cruise-only content:
+- Badge: "Dubai's #1 Rated Cruise Experience"
+- Title: "Experience Dubai From The Water"
+- Description: Mentions dhow cruises and yacht charters only
+
+### Proposed Changes
+Update content to reflect the full marketplace (106 services across 14 categories):
+
+**New Content:**
+- Badge: "Dubai's Premier Experiences Marketplace"
+- Title: "Discover Dubai's Best Adventures"
+- Subtitle: "From Desert Safaris to Luxury Yachts"
+- Description: "Book unforgettable experiences including desert safaris, theme parks, water sports, dhow cruises, and 100+ activities across Dubai."
+
+**CTA Updates:**
+- Primary: "Explore Experiences" (link to /experiences)
+- Secondary: "View Cruises" (link to new cruises page)
+
+**Right Side Card Updates:**
+- Title: "Find Your Adventure"
+- Subtext: "100+ experiences available"
+- Features: Desert safaris, Theme parks, Water sports, Yacht cruises
+
+### Files to Modify
+- `src/components/home/HeroSection.tsx`
+
+---
+
+## Task 2: Add Search Bar with Category Suggestions
+
+### Design
+Add an inline search bar below the hero subtitle with:
+1. Search input with icon
+2. Category quick-access pills (top 6 categories)
+3. Popular searches dropdown on focus
+4. Typeahead suggestions
+
+### Implementation
+1. Create `src/components/home/HeroSearchBar.tsx`
+   - Search input with glass-morphism styling
+   - Category pills: Desert Safari, Theme Parks, Water Sports, City Tours, Observation Decks, Adventure
+   - Navigate to `/dubai/services/{category}` or `/services?q={query}`
+
+2. Update `src/components/home/HeroSection.tsx`
+   - Import and add HeroSearchBar below description
+   - Position between description and CTAs
+
+### UI Details
+```
+[Search icon] What do you want to do in Dubai? [Search button]
+
+Popular: Desert Safari | Theme Parks | Water Sports | Burj Khalifa | Jet Ski
+```
+
+### Files to Create/Modify
+- Create: `src/components/home/HeroSearchBar.tsx`
+- Modify: `src/components/home/HeroSection.tsx`
+- Modify: `src/pages/Services.tsx` (handle query param search)
+
+---
+
+## Task 3: Test Mobile Filter Drawer
+
+### Testing Approach
+Use browser tool to:
+1. Open browser at mobile viewport (390x844)
+2. Navigate to `/dubai/services/desert-safari`
+3. Click the "Filters" button
+4. Verify drawer opens from left side
+5. Test price slider interaction
+6. Test duration checkboxes
+7. Click "Apply Filters" and verify drawer closes
+8. Verify services are filtered correctly
+
+### Expected Behavior
+- Filter drawer slides in from left
+- All filter controls are touch-friendly (44px min tap targets)
+- Apply button closes drawer and updates results
+- Active filter count shows on button badge
+
+---
+
+## Task 4: Add Recently Viewed Section
+
+### Overview
+Track user browsing history using localStorage and display recently viewed tours/services.
+
+### Implementation
+
+**1. Create `src/hooks/useRecentlyViewed.ts`**
+- Store viewed items in localStorage
+- Structure: `{ type: 'tour' | 'service', id, slug, title, image, price, viewedAt }`
+- Max 10 items, LIFO order
+- Expose: `addRecentlyViewed()`, `getRecentlyViewed()`, `clearRecentlyViewed()`
+
+**2. Create `src/components/home/RecentlyViewedSection.tsx`**
+- Horizontal scroll carousel
+- Shows last 4-6 viewed items
+- "Clear History" option
+- Only renders if items exist
+
+**3. Add tracking to detail pages**
+- `src/pages/TourDetail.tsx` - Call `addRecentlyViewed()` on mount
+- `src/pages/ServiceDetail.tsx` - Call `addRecentlyViewed()` on mount
+
+**4. Display on Homepage**
+- Add to `src/pages/Home.tsx` above FeaturedTours section
+- Personalized section header: "Continue Exploring"
+
+### Data Structure
+```typescript
+interface RecentlyViewedItem {
+  type: 'tour' | 'service';
+  id: string;
+  slug: string;
+  categorySlug?: string;
+  title: string;
+  image: string;
+  price: number;
+  viewedAt: number;
+}
+```
+
+### Files to Create/Modify
+- Create: `src/hooks/useRecentlyViewed.ts`
+- Create: `src/components/home/RecentlyViewedSection.tsx`
+- Modify: `src/pages/TourDetail.tsx`
+- Modify: `src/pages/ServiceDetail.tsx`
+- Modify: `src/pages/Home.tsx`
+
+---
+
+## Task 5: Add Remaining Frontend Pages
+
+### Missing Pages Identified
+
+**1. FAQ Page (`/faq`)**
+- Accordion-style frequently asked questions
+- Categories: Booking, Payment, Cancellation, Tours, Contact
+
+**2. Blog/Travel Tips Page (`/blog` or `/travel-tips`)**
+- Grid of articles about Dubai travel
+- Can be static initially, later CMS-managed
+
+### Implementation
+
+**FAQ Page:**
+- Create `src/pages/FAQ.tsx`
+- Use Accordion component from shadcn
+- Group FAQs by category
+- Add route in `App.tsx`
+
+**Travel Tips Page:**
+- Create `src/pages/TravelTips.tsx`
+- Static content cards with Dubai travel advice
+- Link to relevant services/tours
+
+### Files to Create/Modify
+- Create: `src/pages/FAQ.tsx`
+- Create: `src/pages/TravelTips.tsx`
+- Modify: `src/App.tsx` (add routes)
+- Modify: `src/components/layout/Footer.tsx` (add links)
+- Modify: `src/components/layout/Header.tsx` (optional nav link)
+
+---
+
+## Task 6: Create Admin Pages & Fields
+
+### Required Admin Enhancements
+
+**1. Homepage Settings Enhancement**
+Current `src/pages/admin/Settings.tsx` has limited homepage fields:
+- heroTitle, heroSubtitle, featuredToursCount
+
+**Add fields for:**
+- Hero badge text
+- Hero description
+- Hero background image URL
+- Stats section (editable values/labels)
+- Category showcase toggle
+- Featured section titles
+
+**2. FAQ Management Page**
+- Create `src/pages/admin/FAQ.tsx`
+- CRUD for FAQ items
+- Category assignment
+- Sort order management
+
+**3. Admin Navigation Update**
+- Add FAQ to sidebar in `src/components/admin/AdminSidebar.tsx`
+
+### Database Changes
+Create `faqs` table:
+```sql
+CREATE TABLE faqs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  question TEXT NOT NULL,
+  answer TEXT NOT NULL,
+  category VARCHAR(100) DEFAULT 'general',
+  sort_order INT DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+### Files to Create/Modify
+- Create: `src/pages/admin/FAQ.tsx`
+- Create: `src/hooks/useFAQs.ts`
+- Modify: `src/pages/admin/Settings.tsx` (expand homepage tab)
+- Modify: `src/components/admin/AdminSidebar.tsx`
+- Modify: `src/App.tsx` (add admin route)
+- Database: Create faqs table
+
+---
+
+## Task 7: Add Featured Tours Section
+
+### Current State
+- `src/components/home/FeaturedTours.tsx` exists and uses `useFeaturedTours()`
+- The tours table is currently empty
+- FeaturedTours is already in Home.tsx component list
 
 ### Solution
-Create 6 new category-specific images in `public/assets/services/`:
-- `museums-attractions.jpg` - Museum of the Future or AYA Universe
-- `zoos-aquariums.jpg` - Dubai Aquarium or underwater theme
-- `water-parks.jpg` - Water slides/splash imagery
-- `parks-gardens.jpg` - Miracle Garden flowers
-- `sightseeing-cruises.jpg` - Dhow cruise on water
-- `attraction-passes.jpg` - Dubai landmarks collage
+Since tours table is empty but services have data, we have two options:
 
-### Implementation
-1. Update `src/pages/Experiences.tsx` - Update the `experienceCategories` array with correct image paths
-2. Add placeholder images or use stock photos for the new categories
+**Option A: Populate Tours Table (Recommended)**
+Add sample dhow cruise and yacht tour data to the tours table:
+- 4-6 featured tours (dhow cruises, yacht charters)
+- Set `featured = true` for homepage display
 
----
+**Option B: Rename to Featured Experiences**
+Keep using FeaturedExperiences (which shows services) and remove FeaturedTours
 
-## Task 2: Test Category Navigation Flow
+### Recommended: Option A with Tour Data
 
-### What to Verify
-- All 14 category cards on `/experiences` link correctly to `/dubai/services/{category-slug}`
-- Services load properly for each category
-- Search and filter functionality works on the services listing page
+Create tours for:
+1. Marina Dhow Cruise Dinner (dhow-cruise)
+2. Dubai Creek Heritage Cruise (dhow-cruise)
+3. Luxury Yacht Charter 55ft (yacht-private)
+4. Shared Yacht BBQ Experience (yacht-shared)
+5. Megayacht Dinner Cruise (megayacht)
+6. Sunset Yacht Tour (yacht-shared)
 
-### Current Category Coverage (106 services across 14 categories)
-| Category | Slug | Service Count |
-|----------|------|---------------|
-| Adventure Sports | adventure-sports | 11 |
-| Airport Transfers | airport-transfers | 3 |
-| Attraction Passes | attraction-passes | 3 |
-| City Tours | city-tours | 9 |
-| Desert Safari | desert-safari | 9 |
-| Dining Experiences | dining-experiences | 8 |
-| Museums & Attractions | museums-attractions | 8 |
-| Observation Decks | observation-decks | 9 |
-| Parks & Gardens | parks-gardens | 5 |
-| Sightseeing Cruises | sightseeing-cruises | 8 |
-| Theme Parks | theme-parks | 11 |
-| Water Parks | water-parks | 5 |
-| Water Sports | water-sports | 11 |
-| Zoos & Aquariums | zoos-aquariums | 6 |
+Also need to populate the `categories` table with tour categories:
+- dhow-cruise
+- yacht-shared
+- yacht-private
+- megayacht
+
+### Database Changes
+1. Insert tour categories into `categories` table
+2. Insert sample tours into `tours` table
 
 ---
 
-## Task 3: Mark More Services as Featured
+## Task 8: Create Dhow Cruises & Yacht Charters Page
 
-### Current Featured Services
-Several services are already featured, but we should ensure balanced representation across all categories on the homepage and experiences page.
+### Overview
+Create a dedicated landing page for cruise experiences and update navigation.
 
-### Recommendation
-Mark 1-2 top services as featured per category:
-- Desert Safari: Evening Safari with BBQ, VIP Safari
-- Water Sports: Jet Ski Marina Tour, Flyboard Experience
-- City Tours: Hop-On-Hop-Off Bus, Abu Dhabi Day Trip
-- Parks & Gardens: Dubai Miracle Garden, Butterfly Garden
-- Zoos & Aquariums: Dubai Aquarium, The Green Planet
-- Sightseeing Cruises: Marina Dhow Cruise, Speed Boat Tour
-- Dining Experiences: At.mosphere Burj Khalifa, Burj Al Arab High Tea
+### New Page: `/cruises`
+Create `src/pages/Cruises.tsx`:
+- Hero section with cruise imagery
+- Category cards: Dhow Cruises, Shared Yachts, Private Charters, Megayachts
+- Featured cruise tours
+- Why choose our cruises section
+- Booking CTA
 
-### Implementation
-Database update to set `is_featured = true` for the recommended services.
+### Navigation Updates
 
----
+**1. Header Navigation (`src/components/layout/Header.tsx`)**
+- Add "Cruises" as main nav item (replaces current Tours behavior)
+- Keep "Tours" dropdown for yacht categories
+- Update mobile nav
 
-## Task 4: Add Service Filtering by Price, Duration, and Rating
+**2. Experiences Page (`src/pages/Experiences.tsx`)**
+- Add "Sightseeing Cruises" category card (already exists)
+- Ensure it links to cruise-related services
 
-### Current State
-`src/pages/Services.tsx` has basic search and sort functionality but lacks advanced filters.
-
-### New Filter Components
-1. **Price Range Filter**
-   - Slider or preset ranges: Under 100 AED, 100-250 AED, 250-500 AED, 500+ AED
-   
-2. **Duration Filter**
-   - Checkboxes: 1-2 hours, 2-4 hours, Half day, Full day
-   
-3. **Rating Filter**
-   - Star rating threshold: 4+ stars, 4.5+ stars
-
-4. **Additional Filters**
-   - Hotel Pickup available
-   - Instant Confirmation
-   - Free Cancellation
-
-### Implementation
-1. Create `src/components/services/ServiceFilters.tsx` - Collapsible filter sidebar
-2. Update `src/pages/Services.tsx` - Add filter state and apply filtering logic
-3. Add mobile-friendly filter drawer with "Apply Filters" button
-
----
-
-## Task 5: Redesign Home Page
-
-### Current Structure
-```
-HeroSection
-ExperienceCategories (4 tour types)
-HighlightsSection
-FeaturedTours (yacht tours only)
-PopularServices (activities)
-WhyChooseUs
-TestimonialsCarousel
-CTASection
+**3. Update navLinks array:**
+```javascript
+{ name: "Cruises", path: "/cruises" },
+{ name: "Experiences", path: "/experiences", hasDropdown: true },
 ```
 
-### Proposed New Structure
-```
-1. HeroSection - Enhanced with search bar and quick category access
-2. TrustBadges - Compact trust indicators strip
-3. ExperienceCategories - Expanded to show 6-8 top categories (not just 4)
-4. FeaturedExperiences - Combined featured tours + services in one carousel
-5. CategoryShowcase - Visual category grid with service counts
-6. SocialProof - Testimonials + partner logos + stats
-7. CTASection - Enhanced with urgency messaging
-```
-
-### Key Enhancements
-
-**a) Hero Section Redesign**
-- Add inline search bar with category suggestions
-- Display "Popular searches" below the hero
-- Show category quick-access pills
-- Animated background with subtle parallax
-
-**b) New Trust Strip**
-- Horizontal strip: "Trusted by 50,000+ travelers | 4.9★ Rating | Best Price Guaranteed | 24/7 Support"
-
-**c) Category Showcase Section**
-- 2x4 or 3x3 grid showing all major categories
-- Each card shows image + name + service count + starting price
-- Hover effect with "View X experiences" CTA
-
-**d) Featured Experiences Carousel**
-- Combined carousel of top-rated tours AND services
-- "What's trending" / "Most Booked This Week" badge
-- Horizontal scroll on mobile, grid on desktop
-
-**e) Social Proof Section**
-- Partner/media logos (TripAdvisor, Viator, etc.)
-- Real-time booking notifications animation
-- Customer count and review stats
-
-### Files to Modify
-1. `src/pages/Home.tsx` - Reorganize section order
-2. `src/components/home/HeroSection.tsx` - Add search bar and category pills
-3. Create `src/components/home/TrustStrip.tsx` - New trust badges strip
-4. Create `src/components/home/CategoryShowcase.tsx` - Visual category grid
-5. Create `src/components/home/FeaturedExperiences.tsx` - Combined featured carousel
-6. Update `src/components/home/ExperienceCategories.tsx` - Expand to 8 categories
-
----
-
-## Task 6: Redesign Service Card
-
-### Current Card Layout (`src/components/ServiceCard.tsx`)
-- Vertical card with 4:3 image
-- Category badge, discount badge
-- Duration and instant confirmation overlays
-- Title, rating, description
-- Feature badges (Hotel Pickup, Max participants)
-- Price and CTA
-
-### Proposed New Design Options
-
-**Option A: Compact Horizontal Card**
-- Image on left (1:1 square), content on right
-- More compact for list views
-- Better information density
-
-**Option B: Enhanced Vertical Card (Recommended)**
-- Larger hero image with gradient overlay
-- Price badge in top-right corner
-- Category pill below image
-- Cleaner typography hierarchy
-- Subtle hover animations
-- Quick action buttons (Save, Share)
-
-**Option C: Premium Magazine Style**
-- Full-bleed image background
-- Text overlay at bottom
-- Glassmorphism effect
-- Best for featured/highlight sections
-
-### Recommended Implementation (Option B Enhanced)
-1. **Image Section**
-   - Aspect ratio: 16:10 for better visual appeal
-   - Gradient overlay for text readability
-   - Price tag positioned top-right
-   - "Popular" or "Best Seller" badges
-
-2. **Content Section**
-   - Category pill with icon
-   - Larger, bolder title
-   - Star rating inline with review count
-   - 1-line description truncation
-   - Duration + key feature icons
-   - Prominent CTA button
-
-3. **Interactive Elements**
-   - Heart icon for save/wishlist
-   - Subtle scale on hover
-   - Loading skeleton state
-
-### Files to Modify
-1. `src/components/ServiceCard.tsx` - Complete redesign
-2. Consider creating `src/components/ServiceCardCompact.tsx` for list view
-3. Update CSS utilities if needed
+### Files to Create/Modify
+- Create: `src/pages/Cruises.tsx`
+- Modify: `src/components/layout/Header.tsx`
+- Modify: `src/App.tsx` (add route)
 
 ---
 
 ## Technical Considerations
 
 ### Performance
-- Lazy load images with placeholder blur
-- Use WebP format for new images
-- Implement skeleton loading states
+- Lazy load new pages
+- Use localStorage for recently viewed (no API calls)
+- Memoize search suggestions
 
 ### Mobile Responsiveness
-- Filter drawer instead of sidebar on mobile
-- Touch-friendly tap targets (min 44px)
-- Horizontal scroll for carousels
+- Hero search bar responsive design
+- Category pills horizontal scroll on mobile
+- Touch-friendly filter controls
 
-### Accessibility
-- ARIA labels for interactive elements
-- Focus states for keyboard navigation
-- Color contrast compliance
+### SEO
+- Meta tags for new pages
+- Structured data for FAQ page
+- Proper heading hierarchy
 
 ---
 
-## Implementation Priority
+## Implementation Order
 
-1. **Phase 1 (Quick Wins)**
-   - Update category images in Experiences.tsx
-   - Mark more services as featured (database update)
+### Phase 1: Core Content Updates
+1. Update Hero Section content
+2. Create Cruises page
+3. Update navigation
 
-2. **Phase 2 (Core Features)**
-   - Add service filtering
-   - Redesign ServiceCard component
+### Phase 2: Search & Discovery
+4. Add Hero Search Bar
+5. Add Recently Viewed Section
 
-3. **Phase 3 (Homepage Redesign)**
-   - Create new home sections
-   - Update HeroSection with search
-   - Add CategoryShowcase and TrustStrip
+### Phase 3: Data & Admin
+6. Populate tours & categories tables
+7. Create FAQ management admin page
+8. Expand homepage admin settings
 
-4. **Phase 4 (Testing)**
-   - Test all category navigation flows
-   - Verify filtering works correctly
-   - Test on mobile devices
+### Phase 4: Testing
+9. Test mobile filter drawer
+10. End-to-end navigation testing
+11. Mobile responsiveness verification
+
+---
+
+## Summary of Files
+
+### New Files
+- `src/components/home/HeroSearchBar.tsx`
+- `src/components/home/RecentlyViewedSection.tsx`
+- `src/hooks/useRecentlyViewed.ts`
+- `src/pages/Cruises.tsx`
+- `src/pages/FAQ.tsx`
+- `src/pages/TravelTips.tsx`
+- `src/pages/admin/FAQ.tsx`
+- `src/hooks/useFAQs.ts`
+
+### Modified Files
+- `src/components/home/HeroSection.tsx`
+- `src/components/layout/Header.tsx`
+- `src/pages/Home.tsx`
+- `src/pages/TourDetail.tsx`
+- `src/pages/ServiceDetail.tsx`
+- `src/pages/Services.tsx`
+- `src/pages/admin/Settings.tsx`
+- `src/components/admin/AdminSidebar.tsx`
+- `src/App.tsx`
+
+### Database Changes
+- Create `faqs` table
+- Insert tour categories
+- Insert sample tour data
