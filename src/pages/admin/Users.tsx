@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useUserManagement, ManagedUser } from "@/hooks/useUserManagement";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useInvitations } from "@/hooks/useInvitations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -30,8 +31,11 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatCard from "@/components/admin/StatCard";
 import TablePagination from "@/components/admin/TablePagination";
+import InviteUserDialog from "@/components/admin/InviteUserDialog";
+import InvitationsTable from "@/components/admin/InvitationsTable";
 import { usePagination } from "@/hooks/usePagination";
 import {
   Users,
@@ -43,6 +47,8 @@ import {
   Edit,
   Ban,
   CheckCircle,
+  Mail,
+  UserPlus,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -67,6 +73,7 @@ const ROLE_COLORS: Record<AppRole, string> = {
 const AdminUsers = () => {
   const { users, stats, isLoading, updateStatus, addRole, removeRole } = useUserManagement();
   const { isAdmin, userId } = usePermissions();
+  const { stats: invitationStats } = useInvitations();
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -139,17 +146,20 @@ const AdminUsers = () => {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
-            User Management
-          </h1>
-          <p className="text-muted-foreground">
-            Manage users, roles, and account status
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">
+              User Management
+            </h1>
+            <p className="text-muted-foreground">
+              Manage users, roles, and account status
+            </p>
+          </div>
+          <InviteUserDialog />
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <StatCard
             title="Total Users"
             value={stats.total}
@@ -173,46 +183,71 @@ const AdminUsers = () => {
             title="Admins"
             value={stats.byRole.admin}
             icon={Shield}
-            subtitle={`${stats.byRole.manager} managers, ${stats.byRole.editor} editors`}
+            subtitle={`${stats.byRole.manager} managers`}
+          />
+          <StatCard
+            title="Pending Invites"
+            value={invitationStats.pending}
+            icon={Mail}
+            subtitle={`${invitationStats.accepted} accepted`}
           />
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Search users..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Filter by role" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Roles</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
-              <SelectItem value="manager">Manager</SelectItem>
-              <SelectItem value="editor">Editor</SelectItem>
-              <SelectItem value="moderator">Moderator</SelectItem>
-              <SelectItem value="user">User</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-              <SelectItem value="suspended">Suspended</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Tabs for Users and Invitations */}
+        <Tabs defaultValue="users" className="space-y-6">
+          <TabsList className="bg-muted">
+            <TabsTrigger value="users" className="gap-2">
+              <Users className="w-4 h-4" />
+              Users
+            </TabsTrigger>
+            <TabsTrigger value="invitations" className="gap-2">
+              <Mail className="w-4 h-4" />
+              Invitations
+              {invitationStats.pending > 0 && (
+                <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                  {invitationStats.pending}
+                </Badge>
+              )}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="users" className="space-y-6">
+            {/* Filters */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search users..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Filter by role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Roles</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                  <SelectItem value="editor">Editor</SelectItem>
+                  <SelectItem value="moderator">Moderator</SelectItem>
+                  <SelectItem value="user">User</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="suspended">Suspended</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
         {/* Users Table */}
         <div className="bg-card rounded-xl border border-border overflow-hidden">
@@ -340,6 +375,12 @@ const AdminUsers = () => {
             onPageSizeChange={pagination.setPageSize}
           />
         </div>
+          </TabsContent>
+
+          <TabsContent value="invitations">
+            <InvitationsTable />
+          </TabsContent>
+        </Tabs>
 
         {/* Role Management Dialog */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
