@@ -38,6 +38,7 @@ import MobileBookingBar from "@/components/tour-detail/MobileBookingBar";
 import BookingModal from "@/components/tour-detail/BookingModal";
 import { useTour, useRelatedTours } from "@/hooks/useTours";
 import { getTourUrl, getCategoryFromPath } from "@/lib/seoUtils";
+import { addToRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 const TourDetail = () => {
   const { slug, categoryPath } = useParams<{ slug: string; categoryPath?: string }>();
@@ -66,8 +67,18 @@ const TourDetail = () => {
     if (tour?.id) {
       const saved = localStorage.getItem(`saved-tour-${tour.id}`);
       setIsSaved(!!saved);
+
+      // Track recently viewed
+      addToRecentlyViewed({
+        type: "tour",
+        id: tour.id,
+        slug: tour.slug,
+        title: tour.title,
+        image: tour.image || "/placeholder.svg",
+        price: tour.price,
+      });
     }
-  }, [tour?.id]);
+  }, [tour?.id, tour?.slug, tour?.title, tour?.image, tour?.price]);
 
   const handleSave = () => {
     if (!tour) return;
