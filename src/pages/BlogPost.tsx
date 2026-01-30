@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import Layout from "@/components/layout/Layout";
 import { useBlogPost } from "@/hooks/useBlogPosts";
@@ -11,9 +11,78 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, ChevronRight, Home, Eye } from "lucide-react";
 
+// Transform plain HTML content into card-style sections
+const transformContentToCards = (html: string): string => {
+  if (!html) return "";
+  
+  // Create a temporary DOM element to parse HTML
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  const body = doc.body;
+  
+  // Get all child elements
+  const children = Array.from(body.children);
+  if (children.length === 0) return html;
+  
+  let result = "";
+  let currentCard: string[] = [];
+  let cardIndex = 0;
+  
+  const flushCard = () => {
+    if (currentCard.length > 0) {
+      const cardColors = [
+        "border-l-secondary",
+        "border-l-primary",
+        "border-l-amber-500",
+        "border-l-emerald-500",
+        "border-l-blue-500",
+        "border-l-purple-500",
+      ];
+      const colorClass = cardColors[cardIndex % cardColors.length];
+      result += `<div class="content-card ${colorClass}">${currentCard.join("")}</div>`;
+      currentCard = [];
+      cardIndex++;
+    }
+  };
+  
+  children.forEach((child) => {
+    const tagName = child.tagName.toLowerCase();
+    
+    // H2 starts a new major card section
+    if (tagName === "h2") {
+      flushCard();
+      currentCard.push(child.outerHTML);
+    }
+    // H3 starts a sub-card within the section
+    else if (tagName === "h3") {
+      flushCard();
+      currentCard.push(child.outerHTML);
+    }
+    // Regular content goes into current card
+    else {
+      if (currentCard.length === 0) {
+        // Start a new card for orphan content
+        currentCard.push(child.outerHTML);
+      } else {
+        currentCard.push(child.outerHTML);
+      }
+    }
+  });
+  
+  // Flush remaining content
+  flushCard();
+  
+  return result;
+};
+
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: post, isLoading, error } = useBlogPost(slug || "");
+
+  // Transform content to card layout
+  const cardContent = useMemo(() => {
+    return post?.content ? transformContentToCards(post.content) : "";
+  }, [post?.content]);
 
   // Add IDs to headings in content for TOC navigation
   useEffect(() => {
@@ -205,33 +274,67 @@ const BlogPost = () => {
               <div
                 className="blog-content prose prose-lg max-w-none 
                   prose-headings:font-display prose-headings:font-bold prose-headings:text-foreground
-                  prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:border-b prose-h2:border-border prose-h2:pb-4
-                  prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-4
-                  prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-6
                   prose-a:text-secondary prose-a:no-underline hover:prose-a:underline
                   prose-strong:text-foreground prose-strong:font-semibold
-                  prose-ul:my-6 prose-li:text-muted-foreground prose-li:mb-2
-                  prose-ol:my-6
-                  prose-blockquote:border-l-4 prose-blockquote:border-secondary prose-blockquote:bg-muted/30 
-                  prose-blockquote:rounded-r-lg prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:not-italic
-                  prose-blockquote:text-foreground prose-blockquote:font-medium
                   prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
                   prose-pre:bg-primary prose-pre:text-primary-foreground prose-pre:rounded-xl prose-pre:p-6
-                  prose-img:rounded-xl prose-img:shadow-lg prose-img:my-8
+                  prose-img:rounded-xl prose-img:shadow-lg prose-img:my-4
                   
-                  [&_.blog-card]:bg-card [&_.blog-card]:rounded-xl [&_.blog-card]:border [&_.blog-card]:border-border 
+                  [&_.content-card]:relative [&_.content-card]:bg-card [&_.content-card]:rounded-xl 
+                  [&_.content-card]:border [&_.content-card]:border-border [&_.content-card]:border-l-4
+                  [&_.content-card]:p-6 [&_.content-card]:mb-6 [&_.content-card]:shadow-sm
+                  [&_.content-card]:hover:shadow-md [&_.content-card]:transition-all [&_.content-card]:duration-300
+                  [&_.content-card]:hover:translate-y-[-2px]
+                  
+                  [&_.content-card_h2]:text-xl [&_.content-card_h2]:md:text-2xl [&_.content-card_h2]:font-bold 
+                  [&_.content-card_h2]:text-foreground [&_.content-card_h2]:mb-4 [&_.content-card_h2]:mt-0
+                  [&_.content-card_h2]:flex [&_.content-card_h2]:items-center [&_.content-card_h2]:gap-3
+                  [&_.content-card_h2]:pb-3 [&_.content-card_h2]:border-b [&_.content-card_h2]:border-border/50
+                  
+                  [&_.content-card_h3]:text-lg [&_.content-card_h3]:font-semibold [&_.content-card_h3]:text-foreground 
+                  [&_.content-card_h3]:mb-3 [&_.content-card_h3]:mt-0 [&_.content-card_h3]:flex [&_.content-card_h3]:items-center [&_.content-card_h3]:gap-2
+                  
+                  [&_.content-card_p]:text-muted-foreground [&_.content-card_p]:leading-relaxed 
+                  [&_.content-card_p]:mb-4 [&_.content-card_p]:last:mb-0 [&_.content-card_p]:text-[15px]
+                  
+                  [&_.content-card_ul]:my-4 [&_.content-card_ul]:space-y-2 [&_.content-card_ul]:pl-0 [&_.content-card_ul]:list-none
+                  [&_.content-card_li]:flex [&_.content-card_li]:items-start [&_.content-card_li]:gap-3 
+                  [&_.content-card_li]:text-muted-foreground [&_.content-card_li]:text-[15px]
+                  [&_.content-card_li]:before:content-['→'] [&_.content-card_li]:before:text-secondary 
+                  [&_.content-card_li]:before:font-bold [&_.content-card_li]:before:mt-0.5
+                  
+                  [&_.content-card_ol]:my-4 [&_.content-card_ol]:space-y-2 [&_.content-card_ol]:list-decimal [&_.content-card_ol]:pl-5
+                  [&_.content-card_ol_li]:text-muted-foreground [&_.content-card_ol_li]:text-[15px] [&_.content-card_ol_li]:pl-2
+                  
+                  [&_.content-card_blockquote]:bg-muted/50 [&_.content-card_blockquote]:border-l-4 
+                  [&_.content-card_blockquote]:border-secondary [&_.content-card_blockquote]:rounded-r-lg 
+                  [&_.content-card_blockquote]:py-3 [&_.content-card_blockquote]:px-4 [&_.content-card_blockquote]:my-4
+                  [&_.content-card_blockquote]:not-italic [&_.content-card_blockquote]:text-foreground/90
+                  
+                  [&_.border-l-secondary]:border-l-secondary
+                  [&_.border-l-primary]:border-l-primary
+                  [&_.border-l-amber-500]:border-l-amber-500
+                  [&_.border-l-emerald-500]:border-l-emerald-500
+                  [&_.border-l-blue-500]:border-l-blue-500
+                  [&_.border-l-purple-500]:border-l-purple-500
+                  
+                  [&_.blog-card]:bg-gradient-to-br [&_.blog-card]:from-card [&_.blog-card]:to-muted/30 
+                  [&_.blog-card]:rounded-xl [&_.blog-card]:border [&_.blog-card]:border-border 
                   [&_.blog-card]:p-6 [&_.blog-card]:mb-6 [&_.blog-card]:shadow-sm
-                  [&_.card-heading]:text-xl [&_.card-heading]:font-bold [&_.card-heading]:text-foreground [&_.card-heading]:mb-4 [&_.card-heading]:flex [&_.card-heading]:items-center [&_.card-heading]:gap-2
+                  [&_.card-heading]:text-xl [&_.card-heading]:font-bold [&_.card-heading]:text-foreground 
+                  [&_.card-heading]:mb-4 [&_.card-heading]:flex [&_.card-heading]:items-center [&_.card-heading]:gap-2
                   [&_.card-bullets]:list-none [&_.card-bullets]:pl-0 [&_.card-bullets]:space-y-2
-                  [&_.card-bullets_li]:flex [&_.card-bullets_li]:items-start [&_.card-bullets_li]:gap-2 [&_.card-bullets_li]:text-muted-foreground
-                  [&_.card-bullets_li]:before:content-['✓'] [&_.card-bullets_li]:before:text-secondary [&_.card-bullets_li]:before:font-bold
+                  [&_.card-bullets_li]:flex [&_.card-bullets_li]:items-start [&_.card-bullets_li]:gap-2 
+                  [&_.card-bullets_li]:text-muted-foreground
+                  [&_.card-bullets_li]:before:content-['✓'] [&_.card-bullets_li]:before:text-secondary 
+                  [&_.card-bullets_li]:before:font-bold
                   [&_.card-highlight]:bg-secondary/10 [&_.card-highlight]:border-l-4 [&_.card-highlight]:border-secondary 
                   [&_.card-highlight]:rounded-r-lg [&_.card-highlight]:p-4 [&_.card-highlight]:mt-4 
                   [&_.card-highlight]:text-foreground [&_.card-highlight]:font-medium [&_.card-highlight]:text-sm
                   [&_.card-takeaway]:bg-muted [&_.card-takeaway]:rounded-lg [&_.card-takeaway]:p-3 [&_.card-takeaway]:mt-3
                   [&_.card-takeaway]:text-sm [&_.card-takeaway]:text-muted-foreground [&_.card-takeaway]:italic
                 "
-                dangerouslySetInnerHTML={{ __html: post.content || "" }}
+                dangerouslySetInnerHTML={{ __html: cardContent }}
               />
 
               {/* Tags */}
