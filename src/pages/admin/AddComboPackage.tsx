@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import ComboItineraryBuilder from "@/components/admin/ComboItineraryBuilder";
+import { useCreateComboPackageItem } from "@/hooks/useComboPackages";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -54,10 +56,28 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+interface ItineraryItem {
+  id?: string;
+  tempId?: string;
+  day_number: number;
+  item_type: string;
+  item_id?: string | null;
+  title: string;
+  description?: string | null;
+  start_time?: string | null;
+  end_time?: string | null;
+  price_aed: number;
+  is_mandatory?: boolean;
+  is_flexible?: boolean;
+  sort_order?: number;
+}
+
 const AddComboPackage = () => {
   const navigate = useNavigate();
   const createCombo = useCreateComboPackage();
+  const createItem = useCreateComboPackageItem();
   const [finalPrice, setFinalPrice] = useState(0);
+  const [itineraryItems, setItineraryItems] = useState<ItineraryItem[]>([]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -88,6 +108,11 @@ const AddComboPackage = () => {
   const watchName = form.watch("name");
   const watchBasePrice = form.watch("base_price_aed");
   const watchDiscount = form.watch("discount_percent");
+  const watchDurationDays = form.watch("duration_days");
+
+  const handleItineraryChange = useCallback((items: ItineraryItem[]) => {
+    setItineraryItems(items);
+  }, []);
 
   useEffect(() => {
     if (watchName) {
@@ -132,7 +157,27 @@ const AddComboPackage = () => {
         is_active: values.is_active,
       },
       {
-        onSuccess: () => {
+        onSuccess: async (createdCombo) => {
+          // Create itinerary items
+          if (itineraryItems.length > 0) {
+            for (const item of itineraryItems) {
+              await createItem.mutateAsync({
+                combo_id: createdCombo.id,
+                day_number: item.day_number,
+                item_type: item.item_type,
+                item_id: item.item_id || null,
+                title: item.title,
+                description: item.description || null,
+                start_time: item.start_time || null,
+                end_time: item.end_time || null,
+                price_aed: item.price_aed || 0,
+                is_mandatory: item.is_mandatory ?? true,
+                is_flexible: item.is_flexible ?? false,
+                sort_order: item.sort_order || 0,
+                metadata: {},
+              });
+            }
+          }
           navigate("/admin/combo-packages");
         },
       }
@@ -517,6 +562,12 @@ const AddComboPackage = () => {
                   />
                 </CardContent>
               </Card>
+
+              {/* Day-by-Day Itinerary Builder */}
+              <ComboItineraryBuilder
+                totalDays={watchDurationDays || 3}
+                onChange={handleItineraryChange}
+              />
             </div>
 
             {/* Sidebar */}
