@@ -1,260 +1,295 @@
 
+# Enhancement Plan
 
-# Implementation Plan
-
-## Summary
-This plan covers 4 key tasks:
-1. Adding sample data for car rentals, hotels, and visa services (some already exist)
-2. Updating the hero section with a Burj Khalifa evening view background with enhanced motion effects
-3. Testing Car Rentals and Hotels pages end-to-end
-4. Creating 3 blog posts for the blog page
-
----
-
-## Current State
-
-### Existing Data
-| Table | Active Records |
-|-------|---------------|
-| Car Rentals | 9 vehicles |
-| Hotels | 7 properties |
-| Visa Services | 8 options |
-| Blog Posts | 2 posts |
-| Blog Categories | 4 categories |
-
-**Verdict**: Sample data already exists. Will add a few more diverse entries to ensure robust testing.
+## Overview
+This plan covers 5 key enhancement areas:
+1. Homepage improvements with new sections and visual enhancements
+2. Featured Tours section visibility and design
+3. Contact page redesign matching website style
+4. Blog post page redesign inspired by DiBull's modern layout
+5. Navigation menu enhancement with improved UX
 
 ---
 
-## Task 1: Add Sample Data
+## Task 1: Enhance Home Page
 
-### 1.1 Car Rentals
-Add 2 more cars to diversify the fleet:
-- **Porsche 911 Carrera** - Sports category, AED 2,500/day
-- **Range Rover Vogue** - SUV category, AED 800/day
+### Current State
+The homepage has a solid foundation with:
+- Hero section with video/image background
+- Experience categories grid
+- Featured experiences carousel
+- Featured tours section
+- Why Choose Us section
+- Testimonials carousel
+- Partners strip
+- CTA section
 
-### 1.2 Hotels  
-Add 2 more hotels:
-- **Four Seasons DIFC** - 5-star, Business district
-- **Premier Inn Dubai** - Budget-friendly 3-star option
+### Proposed Enhancements
 
-### 1.3 Visa Services
-Current selection is comprehensive. No additions needed.
+**1.1 Add "Popular Destinations" Section**
+- Create a visually appealing grid of Dubai's iconic destinations
+- Cards with hover animations revealing destination details
+- Links to filtered activities by location
+
+**1.2 Add "How It Works" Section**
+- 3-step process with icons and animations
+- Steps: Search -> Book -> Experience
+- Simple, clean design with numbered indicators
+
+**1.3 Enhance Stats Display in Hero**
+- Add animated counters that count up on scroll
+- More prominent visual treatment
+
+**1.4 Add Newsletter Section**
+- Email capture with modern design
+- Trust indicators and value proposition
+- Positioned before CTA section
+
+### Files to Modify/Create
+| File | Action |
+|------|--------|
+| `src/components/home/PopularDestinations.tsx` | Create new |
+| `src/components/home/HowItWorks.tsx` | Create new |
+| `src/components/home/NewsletterSection.tsx` | Create new |
+| `src/pages/Home.tsx` | Add new sections |
 
 ---
 
-## Task 2: Hero Section - Burj Khalifa Evening Background
+## Task 2: Add/Enhance Featured Tours
 
-### Visual Enhancement
-Replace the current hero background with a stunning evening/sunset view of Burj Khalifa featuring:
+### Current State
+The Featured Tours component exists but may not be displaying if no tours are marked as featured in the database.
 
-**Image Options**:
-- Use an existing asset or fetch a high-quality evening Burj Khalifa image
-- Top-down aerial perspective with city lights
-- Golden hour/sunset timing for warm, inviting atmosphere
+### Proposed Solution
 
-### Motion Effects to Add
+**2.1 Verify Featured Tours Display**
+- Ensure featured tours are properly flagged in database
+- Add fallback to show recent tours if no featured ones exist
 
+**2.2 Enhanced Tour Card Design**
+- Larger, more prominent cards
+- Better image aspect ratio
+- Improved hover effects
+- Quick-book button overlay
+
+**2.3 Add "Tour Categories" Quick Access**
+- Small category pills above the tours grid
+- Filter tours by category inline
+
+### Files to Modify
+| File | Action |
+|------|--------|
+| `src/components/home/FeaturedTours.tsx` | Enhance design |
+| `src/components/TourCard.tsx` | Update card styling |
+
+---
+
+## Task 3: Redesign Contact Page
+
+### Current State
+The Contact page is a full booking form with multi-step wizard, which is quite heavy for a contact page.
+
+### Proposed Redesign
+Transform into a cleaner contact-focused page with:
+
+**3.1 New Layout Structure**
 ```text
-+------------------------------------------+
-|  Enhanced Motion Features                |
-+------------------------------------------+
-|  1. Ken Burns Effect (subtle zoom)       |
-|  2. Gradient overlay animation           |
-|  3. Floating particle effects            |
-|  4. Parallax depth on scroll             |
-|  5. Smooth image fade-in transition      |
-+------------------------------------------+
++----------------------------------------------------+
+|  Hero Section (smaller, focused)                    |
+|  "Get in Touch" with office image background        |
++----------------------------------------------------+
+|                                                      |
+|  Contact Info Cards     |  Contact Form              |
+|  - Phone               |  - Name, Email, Phone      |
+|  - Email               |  - Subject dropdown         |
+|  - WhatsApp            |  - Message                  |
+|  - Office Address      |  - Submit button            |
+|                        |                             |
++------------------------|-----------------------------+
+|                                                      |
+|  Google Maps Embed (Full Width)                     |
+|                                                      |
++----------------------------------------------------+
+|  FAQ Section (Keep existing)                        |
++----------------------------------------------------+
 ```
 
-### Technical Changes
+**3.2 Contact Cards Design**
+- Icon-based cards with hover effects
+- Click-to-call/email functionality
+- WhatsApp quick chat button
+- Office hours display
 
-**File: `src/components/home/HeroSection.tsx`**
+**3.3 Simplified Form**
+- Remove tour booking logic (keep it on tour detail pages)
+- Simple inquiry form
+- Subject dropdown (General, Booking, Support, Partnership)
+- Clean validation and success states
 
-1. **Background Image Update**
-   - Replace `hero-burj-khalifa.webp` with evening view image
-   - Add Ken Burns zoom animation (subtle 1.05 to 1.0 scale over 20s)
-
-2. **Enhanced Motion Effects**
-   ```text
-   - Add animate={{ scale: [1.05, 1] }} with 20s duration
-   - Implement gradient shimmer animation
-   - Add floating light particles using motion.div
-   - Enhance parallax scrolling effect
-   ```
-
-3. **Overlay Adjustments**
-   - Update gradient colors for evening aesthetic
-   - Add animated gradient sweep effect
+### Files to Modify
+| File | Action |
+|------|--------|
+| `src/pages/Contact.tsx` | Complete redesign |
 
 ---
 
-## Task 3: End-to-End Testing
+## Task 4: Enhance Blog Post Page (DiBull Style)
 
-### Car Rentals Page Testing Checklist
+### Reference Analysis (DiBull Design)
+Key elements from the reference:
+1. **Clean header** with category badge and breadcrumbs
+2. **Large title** with excerpt/description below
+3. **Author info** with avatar, name, date, and read time in pills
+4. **Featured image** with premium badge and overlay badges
+5. **Floating social share** sidebar on the left
+6. **Table of Contents** sticky sidebar on the right
+7. **Clean typography** with well-spaced content
+8. **Read count** and category badges on image
 
+### Proposed Blog Post Redesign
+
+**4.1 New Blog Post Layout**
 ```text
-Test Scenarios:
-+-----------------------------------+--------+
-| Test Case                         | Status |
-+-----------------------------------+--------+
-| Page loads with car listings      | Verify |
-| Category filter works             | Verify |
-| Transmission filter works         | Verify |
-| Price range slider works          | Verify |
-| Clear filters button works        | Verify |
-| Car cards display correctly       | Verify |
-| Click card -> Detail page         | Verify |
-| Booking modal opens               | Verify |
-| Form validation works             | Verify |
-| WhatsApp button works             | Verify |
-+-----------------------------------+--------+
++----------------------------------------------------+
+|  Breadcrumb: Home > Blog > Category                 |
++----------------------------------------------------+
+|                                                      |
+|  Category Badge (pill)                              |
+|                                                      |
+|  Large Title (2-3 lines max)                        |
+|                                                      |
+|  Excerpt/Meta description                           |
+|                                                      |
+|  Author | Date | Read Time (in styled pills)       |
+|                                                      |
++----------------------------------------------------+
+|                                                      |
+|  Featured Image (full width, rounded)               |
+|  - Category badge overlay                           |
+|  - Read count badge                                 |
+|                                                      |
++----------------------------------------------------+
+|                                                      |
+|  [Share]  |  Main Content   |  Table of Contents   |
+|  Sidebar  |  (prose)        |  (sticky)            |
+|           |                 |                       |
++----------------------------------------------------+
 ```
 
-### Hotels Page Testing Checklist
+**4.2 Floating Share Sidebar**
+- Fixed position on left (desktop only)
+- Icons: Twitter/X, Facebook, LinkedIn, Copy Link
+- Vertical stack with hover effects
 
-```text
-Test Scenarios:
-+-----------------------------------+--------+
-| Test Case                         | Status |
-+-----------------------------------+--------+
-| Page loads with hotel listings    | Verify |
-| Star rating filter works          | Verify |
-| Location filter works             | Verify |
-| Price sort works                  | Verify |
-| Hotel cards display correctly     | Verify |
-| Click card -> Detail page         | Verify |
-| Room cards display                | Verify |
-| Enquiry modal opens               | Verify |
-| Form submission works             | Verify |
-| WhatsApp button works             | Verify |
-+-----------------------------------+--------+
-```
+**4.3 Table of Contents**
+- Auto-generated from H2/H3 headings
+- Sticky sidebar on right
+- Active state highlighting on scroll
+- Smooth scroll to section
 
-### Testing Method
-Use browser automation to navigate through pages and verify functionality.
+**4.4 Enhanced Typography**
+- Larger headings in content
+- Better spacing between sections
+- Pull quotes styling
+- Code block styling
+- List styling improvements
 
----
+**4.5 Author Section**
+- Avatar with initials or image
+- Author name and role
+- Publication date formatted nicely
+- Styled as horizontal pills/badges
 
-## Task 4: Create 3 Blog Posts
-
-### Blog Post 1: "Top 10 Things to Do in Dubai 2024"
-
-| Field | Value |
-|-------|-------|
-| Category | Top Attractions |
-| Slug | `top-10-things-to-do-dubai-2024` |
-| Reading Time | 8 min |
-| Featured | Yes |
-
-**Content Topics**:
-1. Visit Burj Khalifa At The Top
-2. Desert Safari Adventure
-3. Dubai Mall & Aquarium
-4. Palm Jumeirah Beach Day
-5. Dubai Marina Walk
-6. Global Village (seasonal)
-7. Miracle Garden
-8. Museum of the Future
-9. Old Dubai Creek Tour
-10. Dhow Cruise Dinner
+### Files to Modify/Create
+| File | Action |
+|------|--------|
+| `src/pages/BlogPost.tsx` | Complete redesign |
+| `src/components/blog/FloatingShareBar.tsx` | Create new |
+| `src/components/blog/TableOfContents.tsx` | Create new |
+| `src/components/blog/AuthorBadge.tsx` | Create new |
+| `src/index.css` | Add blog prose styles |
 
 ---
 
-### Blog Post 2: "Dubai Desert Safari Guide: Everything You Need to Know"
+## Task 5: Enhance Navigation Menu
 
-| Field | Value |
-|-------|-------|
-| Category | Dubai Travel Guides |
-| Slug | `dubai-desert-safari-complete-guide` |
-| Reading Time | 6 min |
-| Featured | No |
+### Current State
+The header has:
+- Top bar with phone/email
+- Logo + navigation links
+- Activities dropdown with categories
+- Book Now CTA
 
-**Content Topics**:
-- Types of safaris (morning, evening, overnight)
-- What to expect and wear
-- Activities included (dune bashing, camel rides, BBQ)
-- Best time to book
-- Tips for photographers
+### Proposed Enhancements
+
+**5.1 Mega Menu for Activities**
+- Expand to full-width dropdown
+- Show featured activities with images
+- Quick links to popular categories
+- "View All" prominent button
+
+**5.2 Improved Mobile Menu**
+- Full-screen overlay on mobile
+- Animated accordion for sub-menus
+- Better visual hierarchy
+- Quick contact buttons at bottom
+
+**5.3 Search in Header**
+- Add search icon in header
+- Click expands to search input
+- Quick search suggestions
+
+**5.4 Sticky Header Improvements**
+- Shrink logo slightly on scroll
+- Add subtle shadow animation
+- Better contrast on scroll
+
+### Files to Modify
+| File | Action |
+|------|--------|
+| `src/components/layout/Header.tsx` | Enhance with mega menu |
 
 ---
 
-### Blog Post 3: "UAE Visa Requirements for Tourists: Complete 2024 Guide"
+## Implementation Priority
 
-| Field | Value |
-|-------|-------|
-| Category | Visa & Travel Tips |
-| Slug | `uae-visa-requirements-tourists-2024` |
-| Reading Time | 5 min |
-| Featured | No |
-
-**Content Topics**:
-- Visa-free nationalities
-- Tourist visa types (14, 30, 90 days)
-- Application process
-- Required documents
-- Express visa options
-- Common FAQs
-
----
-
-## Implementation Steps
-
-### Phase 1: Sample Data
-1. Insert additional car rentals (2 records)
-2. Insert additional hotels (2 records)
-3. Create 3 blog posts with full content
-
-### Phase 2: Hero Section Update
-1. Add/update Burj Khalifa evening image asset
-2. Modify HeroSection.tsx with enhanced motion effects
-3. Implement Ken Burns zoom animation
-4. Add floating particle effects
-5. Adjust overlay gradients for evening aesthetic
-
-### Phase 3: Testing
-1. Open browser and navigate to Car Rentals page
-2. Test all filters and navigation
-3. Test booking modal
-4. Navigate to Hotels page
-5. Test filters and room booking
-6. Verify all CTAs and WhatsApp links
+| Priority | Task | Complexity |
+|----------|------|------------|
+| 1 | Blog Post Redesign | High |
+| 2 | Contact Page Redesign | Medium |
+| 3 | Featured Tours Fix | Low |
+| 4 | Home Page Enhancements | Medium |
+| 5 | Navigation Improvements | Medium |
 
 ---
 
 ## Technical Details
 
-### Hero Motion Effects Code Structure
+### New Components Summary
 
-```text
-Motion Elements:
-+-- Background Layer (parallax)
-|   +-- Evening Burj Khalifa Image
-|   +-- Ken Burns zoom animation
-|   +-- Gradient overlay (animated)
-|
-+-- Particle Layer (decorative)
-|   +-- Floating orbs (3-4 elements)
-|   +-- Subtle glow effects
-|
-+-- Content Layer (parallax offset)
-    +-- Badge, Title, Search, CTAs
-    +-- Stats with hover effects
-```
+**Homepage:**
+- `PopularDestinations.tsx` - Grid of Dubai location cards
+- `HowItWorks.tsx` - 3-step process section
+- `NewsletterSection.tsx` - Email subscription form
+
+**Blog:**
+- `FloatingShareBar.tsx` - Social share sidebar
+- `TableOfContents.tsx` - Auto-generated TOC
+- `AuthorBadge.tsx` - Styled author info
+
+### CSS/Styling Updates
+- Enhanced prose styles for blog content
+- Table of Contents active states
+- Floating share bar positioning
+- Mega menu styling
+- Mobile overlay menu animations
+
+### Database Considerations
+- No database changes required
+- Featured tours already have `featured` flag
+- Blog posts already have all necessary fields
 
 ### Dependencies
-- framer-motion (already installed)
-- No new packages required
-
-### Files to Modify
-1. `src/components/home/HeroSection.tsx` - Hero background and motion
-2. Database inserts for sample data and blog posts
-
----
-
-## Expected Outcome
-- Diverse sample data across all service categories
-- Stunning evening Burj Khalifa hero with smooth motion effects
-- Verified working Car Rentals and Hotels pages
-- 3 SEO-optimized blog posts ready for visitors
-
+- No new dependencies needed
+- Uses existing framer-motion for animations
+- Uses existing Radix components
