@@ -1,296 +1,439 @@
 
-# Implementation Plan: Admin CRUD Pages & Sample Data
 
-This plan covers creating admin pages for Car Rentals, Hotels, Visa Services, and Blog sections, plus adding demo data to populate the frontend.
+# AI-Powered Dubai Tour Planner - Implementation Plan
 
----
+## Executive Summary
 
-## Testing Summary (Completed)
-
-The frontend pages have been tested and are working correctly:
-
-| Page | Status | Notes |
-|------|--------|-------|
-| /car-rentals | Working | Shows filters sidebar with categories (Economy, Sedan, SUV, Luxury, Supercar), transmission, and price range. Empty state displays correctly. |
-| /hotels | Working | Shows filters for category, star rating, and price range. Empty state displays correctly. |
-| /visa-services | Working | Shows "How It Works" section with 4-step process. Empty state displays correctly. |
-| /blog | Working | Shows sidebar with categories (Dubai Travel Guides, Best Time to Visit, etc.). Empty state displays correctly. |
-
-All navigation links are functional and the header correctly shows Car Rentals, Hotels, Visa, Blog, and Contact.
+This plan creates a comprehensive AI-powered travel assistant that automatically generates complete Dubai tour packages from minimal user input. The system leverages the existing database (hotels, cars, visa services, tours/activities) and integrates with Lovable AI to provide intelligent trip planning, real-time customization, and seamless booking.
 
 ---
 
-## Phase 1: Admin CRUD Pages
+## System Architecture Overview
 
-### Car Rentals Admin (3 pages)
-
-**1. `src/pages/admin/CarRentals.tsx`** - Car listing management
-- Table with columns: Car (image + title), Category, Daily Price, Transmission, Status, Actions
-- Stats cards: Total Cars, Featured, Active, Average Price
-- Search and category filter
-- Quick toggle for featured/active status
-- Delete confirmation dialog
-
-**2. `src/pages/admin/AddCarRental.tsx`** - Add new car form wrapper
-- Back button to /admin/car-rentals
-- Renders CarForm component in create mode
-
-**3. `src/pages/admin/EditCarRental.tsx`** - Edit car form wrapper
-- Fetch car by slug
-- Loading and not-found states
-- Renders CarForm in edit mode
-
-**4. `src/pages/admin/CarCategories.tsx`** - Car category management
-- Similar to ServiceCategories page
-- Create/Edit/Delete categories with icon selection
-
-**5. `src/components/admin/CarForm.tsx`** - Comprehensive car form
-- Basic info: Title, Brand, Model, Year, Slug
-- Pricing: Daily, Weekly, Monthly rates, Deposit
-- Specifications: Seats, Transmission, Fuel Type
-- Options: Driver available, Self-drive
-- Features array with add/remove
-- Requirements array (license, age, etc.)
-- Image upload + Gallery
-- SEO fields: Meta title, description
-- Status toggles: Featured, Active
+```text
++------------------+     +-------------------+     +------------------+
+|   Frontend UI    |     |   Edge Functions  |     |    Database      |
+|                  |     |                   |     |                  |
+| - Trip Planner   |<--->| - ai-trip-planner |<--->| - trip_plans     |
+| - Itinerary View |     | - generate-pdf    |     | - trip_items     |
+| - Chat Interface |     | - currency-rates  |     | - visa_rules     |
+| - Admin Panel    |     +-------------------+     | - currency_rates |
++------------------+            |                  | - ai_config      |
+        |                       v                  +------------------+
+        |              +-------------------+
+        +------------->|   Lovable AI      |
+                       | (Gemini 3 Flash)  |
+                       +-------------------+
+```
 
 ---
 
-### Hotels Admin (4 pages)
+## Phase 1: Database Schema
 
-**1. `src/pages/admin/Hotels.tsx`** - Hotel listing management
-- Table: Hotel (image + name + location), Star Rating, Category, Price From, Status, Actions
-- Stats: Total Hotels, Featured, 5-Star, Average Price
-- Search and category/star rating filters
+### New Tables Required
 
-**2. `src/pages/admin/AddHotel.tsx`** - Add new hotel wrapper
-- Renders HotelForm in create mode
+**1. `trip_plans` - Stores generated trip itineraries**
 
-**3. `src/pages/admin/EditHotel.tsx`** - Edit hotel wrapper
-- Fetch by slug, loading/error states
-- Renders HotelForm in edit mode
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| visitor_id | text | Anonymous visitor identifier |
+| user_id | uuid | Optional logged-in user |
+| status | text | draft, confirmed, booked, cancelled |
+| destination | text | Dubai (default) |
+| arrival_date | date | Trip start date |
+| departure_date | date | Trip end date |
+| total_days | integer | Trip duration |
+| travelers_adults | integer | Number of adults |
+| travelers_children | integer | Number of children |
+| nationality | text | Visitor's nationality |
+| budget_tier | text | low, medium, luxury |
+| travel_style | text | family, couple, adventure, relax, luxury |
+| special_occasion | text | birthday, honeymoon, anniversary, none |
+| hotel_preference | text | Optional hotel star preference |
+| total_price_aed | numeric | Base price in AED |
+| display_currency | text | User's display currency |
+| display_price | numeric | Converted price |
+| metadata | jsonb | AI generation details, version info |
+| pdf_url | text | Generated PDF storage URL |
+| created_at | timestamp | Creation time |
+| updated_at | timestamp | Last modification |
 
-**4. `src/components/admin/HotelForm.tsx`** - Comprehensive hotel form
-- Basic: Name, Slug, Category, Star Rating
-- Location: Address, Latitude, Longitude
-- Details: Description, Long Description
-- Amenities array (Pool, WiFi, Gym, etc.)
-- Highlights array
-- Contact: Phone, Email
-- Check-in/Check-out times
-- Pricing: Price From
-- Images: Main image + Gallery
-- SEO fields
-- Room management section (inline add rooms)
+**2. `trip_items` - Individual items in a trip plan**
 
----
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| trip_id | uuid | FK to trip_plans |
+| day_number | integer | Day 1, 2, 3, etc. |
+| item_type | text | hotel, car, activity, visa, transfer, upsell |
+| item_id | uuid | FK to source table (hotels, car_rentals, etc.) |
+| title | text | Display title |
+| description | text | Brief description |
+| start_time | time | Scheduled start |
+| end_time | time | Scheduled end |
+| price_aed | numeric | Item price |
+| quantity | integer | Count (nights, hours, people) |
+| is_optional | boolean | Upsell/optional item |
+| is_included | boolean | Currently in itinerary |
+| sort_order | integer | Order within day |
+| metadata | jsonb | Extra details (room type, car class, etc.) |
 
-### Visa Services Admin (3 pages)
+**3. `visa_nationality_rules` - Visa requirements by country**
 
-**1. `src/pages/admin/VisaServices.tsx`** - Visa listing management
-- Table: Visa Type, Duration, Processing Time, Price, Status, Actions
-- Stats: Total Visas, Express Visas, Active
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| country_code | text | ISO country code |
+| country_name | text | Full country name |
+| visa_required | boolean | Whether visa needed |
+| visa_on_arrival | boolean | VOA available |
+| recommended_visa_id | uuid | FK to visa_services |
+| notes | text | Special requirements |
+| documents_required | text[] | Required documents |
 
-**2. `src/pages/admin/AddVisaService.tsx`** - Add visa wrapper
-- Renders VisaForm in create mode
+**4. `currency_rates` - Exchange rate management**
 
-**3. `src/pages/admin/EditVisaService.tsx`** - Edit visa wrapper
-- Fetch by slug, renders VisaForm
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| currency_code | text | USD, EUR, GBP, INR, etc. |
+| currency_name | text | US Dollar, Euro, etc. |
+| rate_to_aed | numeric | Exchange rate |
+| margin_percent | numeric | Conversion margin |
+| is_enabled | boolean | Available for display |
+| updated_at | timestamp | Last rate update |
 
-**4. `src/components/admin/VisaForm.tsx`** - Comprehensive visa form
-- Basic: Title, Slug, Visa Type
-- Duration: Days, Validity period
-- Processing: Processing time, Express option
-- Pricing: Price, Original price
-- Details: Description, Long description
-- Requirements array (documents needed)
-- Included/Excluded arrays
-- FAQs editor
-- Image upload
-- SEO fields
-- Status toggles
+**5. `ai_trip_config` - Admin AI behavior controls**
 
----
-
-### Blog Admin (5 pages)
-
-**1. `src/pages/admin/Blog.tsx`** - Post listing management
-- Tabs: All Posts, Published, Drafts
-- Table: Post (image + title + excerpt), Category, Author, Published Date, Status, Actions
-- Stats: Total Posts, Published, Featured, Total Views
-
-**2. `src/pages/admin/AddBlogPost.tsx`** - Add post wrapper
-- Renders BlogPostForm in create mode
-
-**3. `src/pages/admin/EditBlogPost.tsx`** - Edit post wrapper
-- Fetch by slug, renders BlogPostForm
-
-**4. `src/pages/admin/BlogCategories.tsx`** - Category management
-- Table with CRUD for blog categories
-- Similar to ServiceCategories pattern
-
-**5. `src/components/admin/BlogPostForm.tsx`** - Comprehensive post form
-- Basic: Title, Slug, Excerpt
-- Content: Rich text editor for full content
-- Category selection
-- Tags input (multi-select/create)
-- Featured image upload
-- Publishing: Published/Draft toggle, Publish date
-- SEO fields: Meta title, description, keywords
-- Reading time (auto-calculated or manual)
-- Featured toggle
-
----
-
-## Phase 2: Sample/Demo Data
-
-Insert realistic sample data to demonstrate the platform capabilities.
-
-### Car Rentals Sample Data (6 cars)
-
-| Car | Category | Daily Price | Transmission |
-|-----|----------|-------------|--------------|
-| Toyota Corolla 2024 | Economy | AED 99 | Automatic |
-| Honda Accord 2024 | Sedan | AED 149 | Automatic |
-| Toyota Land Cruiser 2024 | SUV | AED 299 | Automatic |
-| BMW 7 Series 2024 | Luxury | AED 599 | Automatic |
-| Mercedes S-Class 2024 | Luxury | AED 699 | Automatic |
-| Lamborghini Urus 2024 | Supercar | AED 2,500 | Automatic |
-
-### Hotels Sample Data (6 hotels)
-
-| Hotel | Category | Star Rating | Price From |
-|-------|----------|-------------|------------|
-| Rove Dubai Marina | Budget | 3 | AED 350 |
-| Hilton Dubai Creek | 4-Star | 4 | AED 550 |
-| JW Marriott Marquis | 5-Star | 5 | AED 850 |
-| Atlantis The Palm | Luxury | 5 | AED 1,800 |
-| Burj Al Arab | Luxury | 5 | AED 5,000 |
-| Address Downtown | 5-Star | 5 | AED 1,200 |
-
-### Visa Services Sample Data (6 visas)
-
-| Visa Type | Duration | Processing | Price |
-|-----------|----------|------------|-------|
-| 14-Day Tourist Visa | 14 days | 2-3 days | AED 350 |
-| 30-Day Tourist Visa | 30 days | 2-3 days | AED 450 |
-| 60-Day Tourist Visa | 60 days | 3-5 days | AED 650 |
-| 96-Hour Transit Visa | 4 days | 24 hours | AED 150 |
-| Express 30-Day Visa | 30 days | 24 hours | AED 750 |
-| Multiple Entry Visa | 90 days | 5-7 days | AED 1,200 |
-
-### Blog Posts Sample Data (4 posts)
-
-| Title | Category | Status |
-|-------|----------|--------|
-| Ultimate Guide to Dubai Marina | Dubai Travel Guides | Published |
-| Best Time to Visit Dubai in 2024 | Best Time to Visit | Published |
-| Top 10 Must-See Attractions in Dubai | Top Attractions | Published |
-| Complete UAE Visa Guide for Tourists | Visa & Travel Tips | Published |
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| config_key | text | Unique config identifier |
+| config_value | jsonb | Configuration data |
+| description | text | Admin description |
 
 ---
 
-## Files to Create
+## Phase 2: AI Trip Planner Edge Function
 
-### Admin Pages (12 files)
+### `supabase/functions/ai-trip-planner/index.ts`
 
-| File | Purpose |
-|------|---------|
-| `src/pages/admin/CarRentals.tsx` | Car listing with CRUD |
-| `src/pages/admin/AddCarRental.tsx` | Add car wrapper |
-| `src/pages/admin/EditCarRental.tsx` | Edit car wrapper |
-| `src/pages/admin/CarCategories.tsx` | Car category management |
-| `src/pages/admin/Hotels.tsx` | Hotel listing with CRUD |
-| `src/pages/admin/AddHotel.tsx` | Add hotel wrapper |
-| `src/pages/admin/EditHotel.tsx` | Edit hotel wrapper |
-| `src/pages/admin/VisaServices.tsx` | Visa listing with CRUD |
-| `src/pages/admin/AddVisaService.tsx` | Add visa wrapper |
-| `src/pages/admin/EditVisaService.tsx` | Edit visa wrapper |
-| `src/pages/admin/Blog.tsx` | Blog post listing |
-| `src/pages/admin/AddBlogPost.tsx` | Add post wrapper |
-| `src/pages/admin/EditBlogPost.tsx` | Edit post wrapper |
-| `src/pages/admin/BlogCategories.tsx` | Blog category management |
+The core AI engine that generates complete trip plans.
 
-### Admin Form Components (4 files)
+**Request Payload:**
+```typescript
+{
+  action: "generate" | "modify" | "recalculate",
+  tripId?: string,
+  input: {
+    arrivalDate: string,
+    departureDate: string,
+    adults: number,
+    children: number,
+    nationality: string,
+    budgetTier: "low" | "medium" | "luxury",
+    travelStyle: "family" | "couple" | "adventure" | "relax" | "luxury",
+    specialOccasion?: string,
+    hotelPreference?: number,
+    modifications?: string // For chat-based modifications
+  }
+}
+```
 
-| File | Purpose |
-|------|---------|
-| `src/components/admin/CarForm.tsx` | Comprehensive car rental form |
-| `src/components/admin/HotelForm.tsx` | Comprehensive hotel form |
-| `src/components/admin/VisaForm.tsx` | Comprehensive visa form |
-| `src/components/admin/BlogPostForm.tsx` | Blog post editor with rich text |
+**AI System Prompt Logic:**
 
----
+The edge function will:
+1. Fetch all available data (hotels, cars, activities, visa rules) from database
+2. Build a comprehensive system prompt with pricing rules and availability
+3. Use structured output (tool calling) to get a valid JSON trip plan
+4. Apply business rules (max 2 activities/day, buffer times, logical ordering)
+5. Calculate total pricing with proper margins
+6. Store the generated plan in database
+7. Return the complete itinerary
 
-## Files to Modify
-
-| File | Changes |
-|------|---------|
-| `src/App.tsx` | Add routes for all new admin pages |
-
----
-
-## Implementation Order
-
-### Step 1: Car Rentals Admin
-1. Create CarForm component with all fields
-2. Create CarRentals listing page
-3. Create Add/Edit wrapper pages
-4. Create CarCategories management page
-5. Add routes to App.tsx
-
-### Step 2: Hotels Admin
-6. Create HotelForm component
-7. Create Hotels listing page
-8. Create Add/Edit wrapper pages
-9. Add routes to App.tsx
-
-### Step 3: Visa Services Admin
-10. Create VisaForm component
-11. Create VisaServices listing page
-12. Create Add/Edit wrapper pages
-13. Add routes to App.tsx
-
-### Step 4: Blog Admin
-14. Create BlogPostForm component with rich text
-15. Create Blog listing page with tabs
-16. Create Add/Edit wrapper pages
-17. Create BlogCategories management
-18. Add routes to App.tsx
-
-### Step 5: Sample Data
-19. Insert car rentals demo data
-20. Insert hotels demo data with sample rooms
-21. Insert visa services demo data
-22. Insert blog posts demo data
+**Key AI Rules (Embedded in System Prompt):**
+- Day 1: Arrival + light activity (1 max)
+- Last Day: Free time + departure transfer
+- Middle days: 2 major activities maximum
+- Hotel selection based on budget tier and travel style
+- Transport based on traveler count
+- Auto-suggest visa if required by nationality
+- Include upsell recommendations (max 25% of trip cost)
 
 ---
 
-## Technical Notes
+## Phase 3: Frontend Components
 
-### Form Patterns
+### 3.1 Trip Planner Page (`src/pages/TripPlanner.tsx`)
 
-All forms follow the existing ServiceForm pattern:
-- useState for form data with comprehensive initial state
-- Image upload to appropriate storage bucket
-- Array field management (add/remove items)
-- Rich text editor for long descriptions
-- SEO preview component
-- Save/Cancel buttons with loading state
+**Features:**
+- Step-by-step wizard for trip inputs
+- Minimal required fields (dates, travelers, nationality, budget)
+- Auto-detect user location for currency
+- "Plan My Trip" CTA triggers AI generation
 
-### Hooks Already Exist
+**Steps:**
+1. When are you traveling? (Date picker)
+2. How many travelers? (Adults/Children counters)
+3. What's your nationality? (Dropdown with flag icons)
+4. Budget preference (Low/Medium/Luxury cards)
+5. Travel style (Family/Couple/Adventure/Relax icons)
+6. Special occasion? (Optional - Birthday/Honeymoon/etc.)
 
-All necessary hooks are already created:
-- `useCarRentals`, `useCarCategories`, `useAdminCarRentals`, `useCreateCarRental`, etc.
-- `useHotels`, `useAdminHotels`, `useCreateHotel`, etc.
-- `useVisaServices`, `useAdminVisaServices`, `useCreateVisaService`, etc.
-- `useBlogPosts`, `useAdminBlogPosts`, `useCreateBlogPost`, etc.
+### 3.2 Trip Itinerary View (`src/pages/TripItinerary.tsx`)
 
-### Storage Buckets
+**Features:**
+- Visual day-by-day timeline
+- Each day shows:
+  - Hotel (if overnight)
+  - Activities with times
+  - Transport details
+  - Meals included
+- Drag-and-drop capability using @hello-pangea/dnd
+- Real-time price recalculation on changes
+- "Recommended for You" upsell section
+- Total cost breakdown panel
+- "Book Now" and "Save Trip" CTAs
+- WhatsApp share button
+- PDF download option
 
-Already created:
-- `car-images` - For car photos
-- `hotel-images` - For hotel photos
-- `visa-images` - For visa banners
-- `blog-images` - For blog post images
+### 3.3 Trip Chat Interface (`src/components/trip/TripChatModifier.tsx`)
+
+**Conversational AI Integration:**
+- Floating chat panel on itinerary page
+- Natural language commands:
+  - "Change hotel to 5-star"
+  - "Add Ferrari World on Day 3"
+  - "Remove Desert Safari"
+  - "Make this trip more luxury"
+  - "Reduce the budget"
+- AI processes command, updates itinerary, shows changes
+- Animated diff view showing what changed
+
+### 3.4 Currency Selector (`src/components/trip/CurrencySelector.tsx`)
+
+- Dropdown in header/trip view
+- Auto-detect from browser locale
+- Persist preference in localStorage
+- Real-time conversion on all prices
+
+### 3.5 Visa Suggestion Banner (`src/components/trip/VisaSuggestion.tsx`)
+
+- Appears after nationality selection
+- Shows visa requirement status
+- "Add Visa to Trip" one-click button
+- Processing time and document checklist
+
+---
+
+## Phase 4: Admin Panel Extensions
+
+### 4.1 AI Trip Settings (`src/pages/admin/AITripSettings.tsx`)
+
+**Configurable Options:**
+- Budget tier hotel mappings (Low→3★, Medium→4★, Luxury→5★)
+- Travel style location preferences
+- Max activities per day
+- Travel time buffers
+- Cost margin percentages
+- Upsell priority and limits
+- Enable/disable AI features
+
+### 4.2 Visa Rules Management (`src/pages/admin/VisaRules.tsx`)
+
+- Table of countries with visa requirements
+- Toggle visa_required per country
+- Link recommended visa product
+- Manage required documents per country
+
+### 4.3 Currency Management (`src/pages/admin/CurrencyRates.tsx`)
+
+- Currency list with rates
+- Set conversion margins
+- Enable/disable currencies
+- Manual rate override option
+
+### 4.4 AI Trip Dashboard (`src/pages/admin/AITripDashboard.tsx`)
+
+- Total AI-generated trips
+- Conversion rate (generated → booked)
+- Most popular activities in AI plans
+- Average trip value
+- Trip approval queue (optional manual review)
+
+---
+
+## Phase 5: PDF Generation & WhatsApp
+
+### 5.1 PDF Edge Function (`supabase/functions/generate-trip-pdf/index.ts`)
+
+**PDF Contents:**
+- Company branding header
+- Trip summary (dates, travelers, total cost)
+- Day-by-day detailed itinerary
+- Hotel details with images
+- Activity descriptions
+- Transport information
+- Emergency contacts
+- QR code linking to online itinerary
+- Booking reference number
+
+### 5.2 WhatsApp Integration
+
+Using existing WhatsApp pattern:
+- "Share via WhatsApp" button
+- Pre-formatted message with trip highlights
+- Deep link to PDF or online itinerary
+- Follow-up message template for admins
+
+---
+
+## Phase 6: Upsell & Recommendations
+
+### AI-Driven Upsell Logic
+
+**Trigger Conditions (configured in admin):**
+| Profile | Recommendation |
+|---------|----------------|
+| Couple + Honeymoon | Yacht dinner, helicopter tour |
+| Luxury budget | Private transfers, premium experiences |
+| Family + Kids | Theme park VIP, private tours |
+| Adventure style | ATV, skydiving, jet ski |
+| Evening free | Dhow cruise, Marina dinner |
+
+**Display:**
+- "Recommended for You" section below itinerary
+- "Most travelers add this" social proof badge
+- One-click "Add to Trip" button
+- Show price difference clearly
+
+---
+
+## Implementation Phases
+
+### Phase 1: Database & Core Backend (Week 1)
+1. Create all new database tables with RLS
+2. Seed visa nationality rules (50+ countries)
+3. Seed initial currency rates
+4. Create ai_trip_config with default values
+5. Build `ai-trip-planner` edge function
+
+### Phase 2: Trip Planner Frontend (Week 2)
+6. Create TripPlanner wizard page
+7. Create TripItinerary view component
+8. Implement day timeline with drag-and-drop
+9. Build price calculation engine (client-side)
+10. Add currency conversion
+
+### Phase 3: AI Chat Modifier (Week 3)
+11. Create TripChatModifier component
+12. Extend edge function for modifications
+13. Implement diff view for changes
+14. Add visa suggestion flow
+
+### Phase 4: Admin Panel (Week 4)
+15. AI Trip Settings page
+16. Visa Rules management
+17. Currency Rates management
+18. AI Trip Dashboard with analytics
+
+### Phase 5: PDF & WhatsApp (Week 5)
+19. PDF generation edge function
+20. WhatsApp share integration
+21. Email itinerary feature
+22. Storage bucket for PDFs
+
+### Phase 6: Polish & Testing (Week 6)
+23. Mobile responsive optimization
+24. Performance tuning
+25. Error handling improvements
+26. End-to-end testing
+
+---
+
+## Technical Implementation Details
+
+### Files to Create
+
+**Edge Functions (4 files):**
+- `supabase/functions/ai-trip-planner/index.ts`
+- `supabase/functions/generate-trip-pdf/index.ts`
+- `supabase/functions/update-currency-rates/index.ts`
+- `supabase/functions/whatsapp-share/index.ts`
+
+**Frontend Pages (6 files):**
+- `src/pages/TripPlanner.tsx`
+- `src/pages/TripItinerary.tsx`
+- `src/pages/admin/AITripSettings.tsx`
+- `src/pages/admin/AITripDashboard.tsx`
+- `src/pages/admin/VisaRules.tsx`
+- `src/pages/admin/CurrencyRates.tsx`
+
+**Frontend Components (15+ files):**
+- `src/components/trip/TripWizard.tsx`
+- `src/components/trip/DateSelector.tsx`
+- `src/components/trip/TravelerCounter.tsx`
+- `src/components/trip/NationalitySelector.tsx`
+- `src/components/trip/BudgetSelector.tsx`
+- `src/components/trip/TravelStyleSelector.tsx`
+- `src/components/trip/DayTimeline.tsx`
+- `src/components/trip/TripItemCard.tsx`
+- `src/components/trip/TripChatModifier.tsx`
+- `src/components/trip/CurrencySelector.tsx`
+- `src/components/trip/VisaSuggestion.tsx`
+- `src/components/trip/PriceBreakdown.tsx`
+- `src/components/trip/UpsellSection.tsx`
+- `src/components/trip/TripActions.tsx`
+- `src/components/trip/TripSkeleton.tsx`
+
+**Hooks (5 files):**
+- `src/hooks/useTripPlanner.ts`
+- `src/hooks/useTripModifier.ts`
+- `src/hooks/useCurrency.ts`
+- `src/hooks/useVisaRules.ts`
+- `src/hooks/useAITripConfig.ts`
+
+### Files to Modify
+
+- `src/App.tsx` - Add trip planner routes
+- `src/components/layout/Header.tsx` - Add "Plan My Trip" CTA
+- `src/components/admin/AdminSidebar.tsx` - Add AI Trip settings section
+
+---
+
+## Existing Resources to Leverage
+
+The system will integrate with existing database tables:
+- `hotels` (3 properties with rooms)
+- `car_rentals` (4 vehicles)
+- `visa_services` (3 visa types)
+- `services` (5+ activities)
+- `tours` (yacht cruises, dhow cruises)
+- `site_settings` (contact info, WhatsApp number)
+
+---
+
+## AI Model Configuration
+
+Using Lovable AI with `google/gemini-3-flash-preview`:
+- Fast response times for real-time planning
+- Structured output via tool calling for reliable JSON
+- Context window sufficient for inventory data
+- Cost-effective for high-volume usage
+
+**Note:** The Gemini API key provided in the request will NOT be used. The system uses the pre-configured LOVABLE_API_KEY which provides access to supported AI models without additional setup.
+
+---
+
+## Success Metrics
+
+The implementation achieves the stated goal:
+> "Mujhe sirf Dubai bolna pada, baaki sab automatically ho gaya."
+
+- **Minimal Input**: Only 5-6 fields required
+- **Maximum Automation**: Complete itinerary generated in seconds
+- **Luxury Feel**: Premium UI with animations and polish
+- **Fast Decisions**: Clear pricing, easy modifications
+- **Trust Building**: Professional PDF, WhatsApp follow-up
+
