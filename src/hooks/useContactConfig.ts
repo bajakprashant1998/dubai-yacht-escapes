@@ -13,12 +13,12 @@ export interface ContactConfig {
 const DEFAULT_CONFIG: ContactConfig = {
   phone: "+971585725692",
   phoneFormatted: "+971 58 572 5692",
-  email: "info@rentalyachtdubai.com",
+  email: "contact@betterviewtourism.com",
   whatsapp: "+971585725692",
   whatsappLink: "https://wa.me/971585725692",
-  whatsappLinkWithGreeting: (greeting = "Hi! I'm interested in your yacht and dhow cruise experiences. Can you help me with booking?") => 
+  whatsappLinkWithGreeting: (greeting = "Hi! I'm interested in your Dubai experiences. Can you help me with booking?") => 
     `https://wa.me/971585725692?text=${encodeURIComponent(greeting)}`,
-  address: "Dubai Marina Walk, Dubai, United Arab Emirates",
+  address: "Al Abbas Building - 2, 3rd Floor, Office No-328 - Khalid Bin Al Waleed Rd - Al Mankhool - Dubai",
 };
 
 export function useContactConfig(): ContactConfig & { isLoading: boolean } {
