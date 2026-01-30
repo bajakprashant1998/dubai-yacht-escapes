@@ -70,6 +70,8 @@ const StatCard = ({
 const RoleBadge = ({ role }: { role: AppRole }) => {
   const colors: Record<AppRole, string> = {
     admin: "bg-destructive/10 text-destructive border-destructive/20",
+    manager: "bg-purple-500/10 text-purple-500 border-purple-500/20",
+    editor: "bg-blue-500/10 text-blue-500 border-blue-500/20",
     moderator: "bg-secondary/50 text-secondary-foreground border-secondary",
     user: "bg-primary/10 text-primary border-primary/20",
   };

@@ -18,6 +18,8 @@ export interface UserWithRoles {
 interface RoleStats {
   total: number;
   admins: number;
+  managers: number;
+  editors: number;
   moderators: number;
   users: number;
 }
@@ -80,6 +82,8 @@ export const useUserRoles = () => {
   const stats: RoleStats = {
     total: users.length,
     admins: users.filter((u) => u.roles.includes("admin")).length,
+    managers: users.filter((u) => u.roles.includes("manager")).length,
+    editors: users.filter((u) => u.roles.includes("editor")).length,
     moderators: users.filter((u) => u.roles.includes("moderator")).length,
     users: users.filter((u) => u.roles.includes("user")).length,
   };

@@ -68,6 +68,7 @@ const navItems: NavItem[] = [
   { title: "Discounts", href: "/admin/discounts", icon: Percent },
   { title: "FAQs", href: "/admin/faqs", icon: HelpCircle },
   { title: "Activity Log", href: "/admin/activity-log", icon: History },
+  { title: "User Management", href: "/admin/users", icon: Users },
   { title: "User Roles", href: "/admin/roles", icon: Shield },
   { title: "Legal Pages", href: "/admin/legal-pages", icon: Scale },
   {
