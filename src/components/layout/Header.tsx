@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Menu, 
-  X, 
-  Phone, 
-  Mail, 
-  ChevronDown, 
-  Ship, 
-  Sparkles, 
-  Sun, 
-  FerrisWheel, 
-  Waves, 
+import {
+  Menu,
+  X,
+  Phone,
+  Mail,
+  ChevronDown,
+  Ship,
+  Sparkles,
+  Sun,
+  FerrisWheel,
+  Waves,
   MapPin,
   Search,
   ArrowRight,
@@ -64,44 +65,44 @@ const Header = () => {
   ];
 
   const activityCategories = [
-    { 
-      name: "Desert Safari", 
-      path: "/dubai/services/desert-safari", 
+    {
+      name: "Desert Safari",
+      path: "/dubai/services/desert-safari",
       icon: Sun,
       description: "Thrilling desert adventures with BBQ dinner",
       image: "https://images.unsplash.com/photo-1451337516015-6b6e9a44a8a3?w=200&q=80"
     },
-    { 
-      name: "Theme Parks", 
-      path: "/dubai/services/theme-parks", 
+    {
+      name: "Theme Parks",
+      path: "/dubai/services/theme-parks",
       icon: FerrisWheel,
       description: "World-class theme parks and attractions",
       image: "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=200&q=80"
     },
-    { 
-      name: "Water Sports", 
-      path: "/dubai/services/water-sports", 
+    {
+      name: "Water Sports",
+      path: "/dubai/services/water-sports",
       icon: Waves,
       description: "Exciting water activities and adventures",
       image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=200&q=80"
     },
-    { 
-      name: "City Tours", 
-      path: "/dubai/services/city-tours", 
+    {
+      name: "City Tours",
+      path: "/dubai/services/city-tours",
       icon: MapPin,
       description: "Explore Dubai's landmarks and hidden gems",
       image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=200&q=80"
     },
-    { 
-      name: "Sightseeing Cruises", 
-      path: "/dubai/services/sightseeing-cruises", 
+    {
+      name: "Sightseeing Cruises",
+      path: "/dubai/services/sightseeing-cruises",
       icon: Ship,
       description: "Dhow cruises, yacht tours & marina experiences",
       image: "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13?w=200&q=80"
     },
-    { 
-      name: "Adventure Sports", 
-      path: "/dubai/services/adventure-sports", 
+    {
+      name: "Adventure Sports",
+      path: "/dubai/services/adventure-sports",
       icon: Sparkles,
       description: "Skydiving, hot air balloons & more",
       image: "https://images.unsplash.com/photo-1521673461164-de300ebcfb17?w=200&q=80"
@@ -170,8 +171,8 @@ const Header = () => {
                     className="block group"
                   >
                     <div className="relative aspect-[16/9] rounded-lg overflow-hidden mb-2">
-                      <img 
-                        src={activity.image} 
+                      <img
+                        src={activity.image}
                         alt={activity.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
@@ -182,7 +183,7 @@ const Header = () => {
                   </Link>
                 ))}
               </div>
-              <Link 
+              <Link
                 to="/experiences"
                 className="flex items-center gap-2 text-sm font-semibold text-secondary mt-4 hover:underline"
               >
@@ -217,7 +218,7 @@ const Header = () => {
               </Link>
             ))}
           </div>
-          <Link 
+          <Link
             to="/hotels"
             className="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-secondary text-secondary-foreground rounded-lg text-sm font-semibold hover:bg-secondary/90 transition-colors"
           >
@@ -250,7 +251,7 @@ const Header = () => {
               </Link>
             ))}
           </div>
-          <Link 
+          <Link
             to="/car-rentals"
             className="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-secondary text-secondary-foreground rounded-lg text-sm font-semibold hover:bg-secondary/90 transition-colors"
           >
@@ -265,11 +266,10 @@ const Header = () => {
   };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled 
-        ? "bg-background/98 backdrop-blur-lg shadow-lg" 
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+        ? "bg-background/98 backdrop-blur-lg shadow-lg"
         : "bg-background/95 backdrop-blur-md"
-    } border-b border-border`}>
+      } border-b border-border`}>
       {/* Top bar */}
       <div className="hidden md:block bg-primary text-primary-foreground py-2">
         <div className="container flex justify-between items-center text-sm">
@@ -299,9 +299,9 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center group">
-            <motion.img 
-              src={betterviewLogo} 
-              alt="Betterview Tourism" 
+            <motion.img
+              src={betterviewLogo}
+              alt="Betterview Tourism"
               className={cn(
                 "object-contain rounded-lg transition-all duration-300",
                 isScrolled ? "h-12 w-auto" : "h-14 w-auto"
@@ -313,7 +313,7 @@ const Header = () => {
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               link.dropdown ? (
-                <div 
+                <div
                   key={link.path}
                   className="relative"
                   onMouseEnter={() => setActiveDropdown(link.dropdown)}
@@ -353,11 +353,11 @@ const Header = () => {
                   to={link.path}
                   className={cn(
                     'text-sm font-medium transition-all px-4 py-2 rounded-lg',
-                    link.highlight 
+                    link.highlight
                       ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-md'
                       : 'hover:bg-muted/50',
                     isActive(link.path) && !link.highlight
-                      ? 'text-secondary bg-secondary/10' 
+                      ? 'text-secondary bg-secondary/10'
                       : link.highlight ? '' : 'text-foreground hover:text-secondary'
                   )}
                 >
@@ -443,113 +443,117 @@ const Header = () => {
       </nav>
 
       {/* Mobile Navigation - Full Screen Overlay - Outside nav for proper fixed positioning */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="lg:hidden fixed inset-0 top-[65px] bg-background z-[60] overflow-y-auto"
-          >
-            <div className="container py-6 flex flex-col min-h-full">
-              {/* Search Bar */}
-              <form onSubmit={handleSearch} className="mb-6">
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="Search activities, tours..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-12 pl-12 text-base"
-                  />
-                </div>
-              </form>
+      {/* Mobile Navigation - Full Screen Overlay - Outside nav for proper fixed positioning */}
+      {createPortal(
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="lg:hidden fixed inset-0 top-[88px] bg-background z-[60] overflow-y-auto"
+            >
+              <div className="container py-6 flex flex-col min-h-full">
+                {/* Search Bar */}
+                <form onSubmit={handleSearch} className="mb-6">
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      type="search"
+                      placeholder="Search activities, tours..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="h-12 pl-12 text-base"
+                    />
+                  </div>
+                </form>
 
-              {/* Nav Links */}
-              <div className="space-y-1 mb-6">
-                {navLinks.map((link, index) => (
-                  <motion.div
-                    key={link.path}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Link
-                      to={link.path}
-                      className={cn(
-                        "flex items-center justify-between text-lg font-medium py-4 px-4 rounded-xl transition-colors",
-                        isActive(link.path) 
-                          ? "text-secondary bg-secondary/10" 
-                          : "text-foreground hover:bg-muted/50"
-                      )}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {link.name}
-                      {link.highlight && (
-                        <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
-                          AI Powered
-                        </span>
-                      )}
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-              
-              {/* Mobile Activity Categories */}
-              <div className="border-t border-border pt-6 mb-6">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-4">
-                  Popular Activities
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  {activityCategories.map((category, index) => (
+                {/* Nav Links */}
+                <div className="space-y-1 mb-6">
+                  {navLinks.map((link, index) => (
                     <motion.div
-                      key={category.path}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 + index * 0.05 }}
+                      key={link.path}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
                     >
-                      <Link 
-                        to={category.path} 
+                      <Link
+                        to={link.path}
+                        className={cn(
+                          "flex items-center justify-between text-lg font-medium py-4 px-4 rounded-xl transition-colors",
+                          isActive(link.path)
+                            ? "text-secondary bg-secondary/10"
+                            : "text-foreground hover:bg-muted/50"
+                        )}
                         onClick={() => setIsMenuOpen(false)}
-                        className="flex items-center gap-3 p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                          <category.icon className="w-5 h-5 text-secondary" />
-                        </div>
-                        <span className="text-sm font-medium">{category.name}</span>
+                        {link.name}
+                        {link.highlight && (
+                          <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
+                            AI Powered
+                          </span>
+                        )}
                       </Link>
                     </motion.div>
                   ))}
                 </div>
-              </div>
 
-              {/* Bottom Actions */}
-              <div className="mt-auto border-t border-border pt-6 space-y-4 pb-safe">
-                <a 
-                  href={`tel:${phone}`} 
-                  className="flex items-center gap-3 text-muted-foreground hover:text-foreground px-4 py-3"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                    <Phone className="w-5 h-5" />
+                {/* Mobile Activity Categories */}
+                <div className="border-t border-border pt-6 mb-6">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-4">
+                    Popular Activities
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {activityCategories.map((category, index) => (
+                      <motion.div
+                        key={category.path}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 + index * 0.05 }}
+                      >
+                        <Link
+                          to={category.path}
+                          onClick={() => setIsMenuOpen(false)}
+                          className="flex items-center gap-3 p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                            <category.icon className="w-5 h-5 text-secondary" />
+                          </div>
+                          <span className="text-sm font-medium">{category.name}</span>
+                        </Link>
+                      </motion.div>
+                    ))}
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">Call Us</p>
-                    <p className="text-sm">{phoneFormatted}</p>
-                  </div>
-                </a>
-                
-                <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold h-14 text-base">
-                    Book Now
-                  </Button>
-                </Link>
+                </div>
+
+                {/* Bottom Actions */}
+                <div className="mt-auto border-t border-border pt-6 space-y-4 pb-safe">
+                  <a
+                    href={`tel:${phone}`}
+                    className="flex items-center gap-3 text-muted-foreground hover:text-foreground px-4 py-3"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                      <Phone className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Call Us</p>
+                      <p className="text-sm">{phoneFormatted}</p>
+                    </div>
+                  </a>
+
+                  <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
+                    <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold h-14 text-base">
+                      Book Now
+                    </Button>
+                  </Link>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </header>
   );
 };
