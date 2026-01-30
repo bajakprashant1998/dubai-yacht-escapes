@@ -28,7 +28,8 @@ import {
 } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useComboPackage, useUpdateComboPackage, calculateComboPrice } from "@/hooks/useComboPackages";
+import { useComboPackage, useUpdateComboPackage, calculateComboPrice, useComboPackageItems, useCreateComboPackageItem, useUpdateComboPackageItem, useDeleteComboPackageItem } from "@/hooks/useComboPackages";
+import ComboItineraryBuilder, { ItineraryItem } from "@/components/admin/ComboItineraryBuilder";
 
 const formSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
@@ -61,6 +62,31 @@ const EditComboPackage = () => {
   const { data: combo, isLoading } = useComboPackage(slug || "");
   const updateCombo = useUpdateComboPackage();
   const [finalPrice, setFinalPrice] = useState(0);
+  const [itineraryItems, setItineraryItems] = useState<ItineraryItem[]>([]);
+  
+  // Fetch existing items
+  const { data: existingItems = [] } = useComboPackageItems(combo?.id || "");
+  const createItem = useCreateComboPackageItem();
+  const updateItem = useUpdateComboPackageItem();
+  const deleteItem = useDeleteComboPackageItem();
+  
+  // Load existing items into state
+  useEffect(() => {
+    if (existingItems.length > 0) {
+      setItineraryItems(existingItems.map(item => ({
+        id: item.id,
+        day_number: item.day_number,
+        title: item.title,
+        description: item.description || "",
+        item_type: item.item_type as ItineraryItem["item_type"],
+        start_time: item.start_time || "",
+        end_time: item.end_time || "",
+        price_aed: item.price_aed,
+        is_mandatory: item.is_mandatory || true,
+        sort_order: item.sort_order || 0,
+      })));
+    }
+  }, [existingItems]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -125,7 +151,7 @@ const EditComboPackage = () => {
     setFinalPrice(fp);
   }, [watchBasePrice, watchDiscount]);
 
-  const onSubmit = (values: FormValues) => {
+  const onSubmit = async (values: FormValues) => {
     if (!combo) return;
 
     const highlightsArray = values.highlights
@@ -134,6 +160,7 @@ const EditComboPackage = () => {
 
     const { finalPrice: fp } = calculateComboPrice(values.base_price_aed, values.discount_percent);
 
+    // Update combo package
     updateCombo.mutate(
       {
         id: combo.id,
@@ -160,7 +187,57 @@ const EditComboPackage = () => {
         is_active: values.is_active,
       },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
+          // Handle itinerary items - delete removed, update existing, create new
+          const existingIds = existingItems.map(item => item.id);
+          const currentIds = itineraryItems.filter(item => item.id && !item.id.startsWith("temp-")).map(item => item.id!);
+          
+          // Delete removed items
+          const toDelete = existingIds.filter(id => !currentIds.includes(id));
+          for (const id of toDelete) {
+            await deleteItem.mutateAsync({ id, combo_id: combo.id });
+          }
+          
+          // Update or create items
+          for (const item of itineraryItems) {
+            if (!item.id || item.id.startsWith("temp-") || item.tempId) {
+              // Create new
+              await createItem.mutateAsync({
+                combo_id: combo.id,
+                day_number: item.day_number,
+                title: item.title,
+                description: item.description || null,
+                item_type: item.item_type,
+                item_id: item.item_id || null,
+                start_time: item.start_time || null,
+                end_time: item.end_time || null,
+                price_aed: item.price_aed,
+                is_mandatory: item.is_mandatory ?? true,
+                is_flexible: item.is_flexible ?? false,
+                sort_order: item.sort_order || 0,
+                metadata: item.metadata || null,
+              });
+            } else {
+              // Update existing
+              await updateItem.mutateAsync({
+                id: item.id,
+                combo_id: combo.id,
+                day_number: item.day_number,
+                title: item.title,
+                description: item.description || null,
+                item_type: item.item_type,
+                item_id: item.item_id || null,
+                start_time: item.start_time || null,
+                end_time: item.end_time || null,
+                price_aed: item.price_aed,
+                is_mandatory: item.is_mandatory ?? true,
+                is_flexible: item.is_flexible ?? false,
+                sort_order: item.sort_order || 0,
+                metadata: item.metadata || null,
+              });
+            }
+          }
+          
           navigate("/admin/combo-packages");
         },
       }
@@ -564,6 +641,20 @@ const EditComboPackage = () => {
                         <FormMessage />
                       </FormItem>
                     )}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Itinerary Builder */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Day-by-Day Itinerary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ComboItineraryBuilder
+                    totalDays={form.watch("duration_days") || 1}
+                    initialItems={existingItems}
+                    onChange={setItineraryItems}
                   />
                 </CardContent>
               </Card>

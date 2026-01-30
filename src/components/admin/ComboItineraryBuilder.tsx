@@ -25,12 +25,12 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { ComboPackageItem, ComboPackageItemInput } from "@/hooks/useComboPackages";
 
-interface ItineraryItem extends Omit<ComboPackageItemInput, 'combo_id'> {
+export interface ItineraryItem extends Omit<ComboPackageItemInput, 'combo_id'> {
   id?: string;
   tempId?: string;
 }
 
-interface ComboItineraryBuilderProps {
+export interface ComboItineraryBuilderProps {
   comboId?: string;
   totalDays: number;
   initialItems?: ComboPackageItem[];
