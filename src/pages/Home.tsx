@@ -14,10 +14,17 @@ import NewsletterSection from "@/components/home/NewsletterSection";
 import PartnersStrip from "@/components/home/PartnersStrip";
 import CTASection from "@/components/home/CTASection";
 import QuickServices from "@/components/home/QuickServices";
+import SEOHead, { createLocalBusinessSchema } from "@/components/SEOHead";
 
 const Home = () => {
+  const structuredData = createLocalBusinessSchema();
   return (
     <Layout>
+      <SEOHead
+        canonical="/"
+        structuredData={structuredData}
+        keywords={["Dubai tours", "yacht charter Dubai", "desert safari", "theme parks Dubai", "Dubai experiences"]}
+      />
       <HeroSection />
       <TrustStrip />
       <ExperienceCategories />

@@ -42,6 +42,7 @@ import {
 import Layout from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { useContactConfig } from "@/hooks/useContactConfig";
+import SEOHead from "@/components/SEOHead";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -166,6 +167,12 @@ const Contact = () => {
 
   return (
     <Layout>
+      <SEOHead
+        title="Contact Us"
+        description="Get in touch with Betterview Tourism for Dubai tour bookings, inquiries, and support. We're here to help plan your perfect Dubai adventure."
+        canonical="/contact"
+        keywords={["contact Betterview", "Dubai tour booking", "Dubai tourism support"]}
+      />
       {/* Hero Section */}
       <section className="relative py-20 md:py-28 overflow-hidden bg-primary">
         <div className="absolute inset-0 opacity-10">
