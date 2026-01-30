@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Layout from "@/components/layout/Layout";
 import { useCarRental, useCarRentals } from "@/hooks/useCarRentals";
 import CarBookingModal from "@/components/car-rentals/CarBookingModal";
-import CarPricingTable from "@/components/car-rentals/CarPricingTable";
+import CarBookingCard from "@/components/car-rentals/CarBookingCard";
 import CarSpecifications from "@/components/car-rentals/CarSpecifications";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,13 +14,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { 
   ChevronLeft, 
   Check, 
-  MessageCircle, 
   Users, 
   Fuel, 
   Gauge, 
   Calendar,
-  Shield,
-  Clock,
   Star,
   ChevronRight
 } from "lucide-react";
@@ -244,61 +241,12 @@ const CarRentalDetail = () => {
             </div>
             
             {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Pricing Card */}
-              <Card className="sticky top-24">
-                <CardContent className="p-6 space-y-6">
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground mb-1">Starting from</p>
-                    <div className="text-4xl font-bold text-secondary">
-                      AED {car.daily_price}
-                    </div>
-                    <p className="text-muted-foreground">per day</p>
-                  </div>
-                  
-                  {/* Pricing Table */}
-                  <CarPricingTable car={car} />
-                  
-                  {/* Trust Badges */}
-                  <div className="space-y-2 pt-4 border-t">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Shield className="w-4 h-4 text-secondary" />
-                      <span>Insurance included</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="w-4 h-4 text-secondary" />
-                      <span>24/7 roadside assistance</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Check className="w-4 h-4 text-secondary" />
-                      <span>Free cancellation (24h)</span>
-                    </div>
-                  </div>
-                  
-                  {/* CTA Buttons */}
-                  <div className="space-y-3">
-                    <Button
-                      size="lg"
-                      className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90"
-                      onClick={() => setBookingOpen(true)}
-                    >
-                      Book This Car
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="w-full border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white"
-                      onClick={() => {
-                        const message = encodeURIComponent(`Hi! I'm interested in renting the ${car.title}`);
-                        window.open(`https://wa.me/${whatsapp}?text=${message}`, "_blank");
-                      }}
-                    >
-                      <MessageCircle className="w-5 h-5 mr-2" />
-                      WhatsApp Enquiry
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+            <div>
+              <CarBookingCard 
+                car={car} 
+                whatsapp={whatsapp} 
+                onBook={() => setBookingOpen(true)} 
+              />
             </div>
           </div>
           
