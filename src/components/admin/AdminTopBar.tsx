@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import {
   Menu,
   Search,
@@ -12,6 +13,9 @@ import {
   MessageSquare,
   Star,
   CheckCheck,
+  LayoutDashboard,
+  Users,
+  Ticket,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +31,7 @@ import { toast } from "sonner";
 import { useNotifications, Notification } from "@/hooks/useNotifications";
 import { formatDistanceToNow } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 
 interface AdminTopBarProps {
   onMenuClick: () => void;
@@ -38,6 +43,27 @@ const AdminTopBar = ({ onMenuClick, onSearchClick, user }: AdminTopBarProps) => 
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const { notifications, unreadCount, markAsRead, markAllAsRead, loading } = useNotifications();
+
+  // Fetch user profile and roles
+  const { data: profile } = useQuery({
+    queryKey: ["admin-profile", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      
+      const [profileRes, rolesRes] = await Promise.all([
+        supabase.from("profiles").select("*").eq("user_id", user.id).single(),
+        supabase.from("user_roles").select("role").eq("user_id", user.id)
+      ]);
+      
+      return {
+        fullName: profileRes.data?.full_name || user.email?.split("@")[0] || "Admin",
+        avatarUrl: profileRes.data?.avatar_url,
+        email: user.email,
+        roles: rolesRes.data?.map(r => r.role) || ["user"]
+      };
+    },
+    enabled: !!user?.id
+  });
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -213,25 +239,99 @@ const AdminTopBar = ({ onMenuClick, onSearchClick, user }: AdminTopBarProps) => 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="gap-1 sm:gap-2 px-2 sm:px-3 h-9">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-full flex items-center justify-center">
-                  <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
-                </div>
+                {profile?.avatarUrl ? (
+                  <img 
+                    src={profile.avatarUrl} 
+                    alt={profile.fullName}
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary rounded-full flex items-center justify-center">
+                    <span className="text-xs sm:text-sm font-semibold text-primary-foreground">
+                      {profile?.fullName?.charAt(0).toUpperCase() || "A"}
+                    </span>
+                  </div>
+                )}
                 <span className="hidden lg:inline text-sm font-medium max-w-[120px] truncate">
-                  {user?.email?.split("@")[0] || "Admin"}
+                  {profile?.fullName || "Admin"}
                 </span>
                 <ChevronDown className="w-4 h-4 text-muted-foreground hidden sm:block" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => navigate("/admin/settings/site")}>
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
-              </DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-64">
+              {/* Profile Header */}
+              <div className="px-3 py-3 border-b border-border">
+                <div className="flex items-center gap-3">
+                  {profile?.avatarUrl ? (
+                    <img 
+                      src={profile.avatarUrl} 
+                      alt={profile.fullName}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                      <span className="text-sm font-semibold text-primary-foreground">
+                        {profile?.fullName?.charAt(0).toUpperCase() || "A"}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{profile?.fullName || "Admin"}</p>
+                    <p className="text-xs text-muted-foreground truncate">{profile?.email}</p>
+                  </div>
+                </div>
+                <div className="flex gap-1.5 mt-2 flex-wrap">
+                  {profile?.roles?.map((role) => (
+                    <Badge 
+                      key={role} 
+                      variant={role === "admin" ? "default" : "secondary"}
+                      className="text-[10px] px-1.5 py-0"
+                    >
+                      {role}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick Navigation */}
+              <div className="py-1">
+                <DropdownMenuItem onClick={() => navigate("/admin/dashboard")}>
+                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/admin/users")}>
+                  <Users className="w-4 h-4 mr-2" />
+                  User Management
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/admin/bookings")}>
+                  <Ticket className="w-4 h-4 mr-2" />
+                  Bookings
+                </DropdownMenuItem>
+              </div>
+
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </DropdownMenuItem>
+
+              {/* Settings */}
+              <div className="py-1">
+                <DropdownMenuItem onClick={() => navigate("/admin/settings/site")}>
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/admin/settings/notifications")}>
+                  <Bell className="w-4 h-4 mr-2" />
+                  Notification Preferences
+                </DropdownMenuItem>
+              </div>
+
+              <DropdownMenuSeparator />
+
+              {/* Logout */}
+              <div className="py-1">
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { memo, useState } from "react";
+import { memo, useState, useRef, useEffect } from "react";
 import { motion, useScroll, useTransform, type Easing } from "framer-motion";
 import { ArrowRight, Play, Sparkles, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,9 +30,47 @@ const itemVariants = {
 const HeroSection = memo(() => {
   const { stats } = useHomepageContent();
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { scrollY } = useScroll();
   const backgroundY = useTransform(scrollY, [0, 500], [0, 150]);
   const contentY = useTransform(scrollY, [0, 500], [0, 50]);
+
+  // Check for reduced motion preference
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mediaQuery.matches);
+    
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
+  }, []);
+
+  // Intersection Observer to pause video when not visible
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, [videoLoaded]);
+
+  const showVideo = !prefersReducedMotion && !videoError;
 
   const statsDisplay = [
     { value: stats.guests, label: stats.guestsLabel },
@@ -43,20 +81,46 @@ const HeroSection = memo(() => {
 
   return (
     <section className="relative min-h-[95vh] flex items-center overflow-hidden">
-      {/* Background Image with Parallax */}
+      {/* Background Video/Image with Parallax */}
       <motion.div className="absolute inset-0" style={{ y: backgroundY }}>
-        <OptimizedImage
-          src={heroBurjKhalifa}
-          alt="Dubai experiences and adventures with Burj Khalifa"
-          priority
-          objectFit="cover"
-          sizes="100vw"
-          onLoad={() => setImageLoaded(true)}
-          containerClassName="w-full h-full scale-110"
-        />
-        {/* Lighter overlays to show more of the image */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/75 via-primary/50 to-primary/20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/50 via-transparent to-transparent" />
+        {/* Video Background */}
+        {showVideo && (
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster={heroBurjKhalifa}
+            onLoadedData={() => setVideoLoaded(true)}
+            onError={() => setVideoError(true)}
+            className={`absolute inset-0 w-full h-full object-cover scale-110 transition-opacity duration-1000 ${
+              videoLoaded ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <source src="/assets/dubai-hero-video.mp4" type="video/mp4" />
+          </video>
+        )}
+        
+        {/* Fallback Image (shows while video loads or if video fails) */}
+        <div className={`absolute inset-0 transition-opacity duration-1000 ${
+          showVideo && videoLoaded ? "opacity-0" : "opacity-100"
+        }`}>
+          <OptimizedImage
+            src={heroBurjKhalifa}
+            alt="Dubai experiences and adventures with Burj Khalifa"
+            priority
+            objectFit="cover"
+            sizes="100vw"
+            onLoad={() => setImageLoaded(true)}
+            containerClassName="w-full h-full scale-110"
+          />
+        </div>
+        
+        {/* Overlay gradients for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/55 to-primary/25" />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/55 via-transparent to-transparent" />
       </motion.div>
 
       {/* Animated Floating Elements */}
