@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Mail, Send, CheckCircle, Gift, Bell, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { useSubscribeNewsletter } from "@/hooks/useNewsletterSubscribers";
 
 const benefits = [
   { icon: Gift, text: "Exclusive deals & discounts" },
@@ -13,25 +13,19 @@ const benefits = [
 
 const NewsletterSection = memo(() => {
   const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const { toast } = useToast();
+  const subscribe = useSubscribeNewsletter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
 
-    setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    setIsSubscribed(true);
-    toast({
-      title: "Welcome aboard! 🎉",
-      description: "You've successfully subscribed to our newsletter.",
+    subscribe.mutate(email, {
+      onSuccess: () => {
+        setIsSubscribed(true);
+        setEmail("");
+      },
     });
-    setEmail("");
-    setIsSubmitting(false);
   };
 
   return (
@@ -97,21 +91,21 @@ const NewsletterSection = memo(() => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-14 pl-12 pr-4 text-base rounded-xl border-2 border-border focus:border-secondary"
-                disabled={isSubmitting || isSubscribed}
+                disabled={subscribe.isPending || isSubscribed}
               />
             </div>
             <Button
               type="submit"
               size="lg"
               className="h-14 px-8 rounded-xl bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold shadow-lg shadow-secondary/20"
-              disabled={isSubmitting || isSubscribed || !email}
+              disabled={subscribe.isPending || isSubscribed || !email}
             >
               {isSubscribed ? (
                 <>
                   <CheckCircle className="w-5 h-5 mr-2" />
                   Subscribed!
                 </>
-              ) : isSubmitting ? (
+              ) : subscribe.isPending ? (
                 <span className="animate-pulse">Subscribing...</span>
               ) : (
                 <>
