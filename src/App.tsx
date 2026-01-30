@@ -93,6 +93,7 @@ const AdminAITripDashboard = lazy(() => import("./pages/admin/AITripDashboard"))
 const AdminComboPackages = lazy(() => import("./pages/admin/ComboPackages"));
 const AdminAddComboPackage = lazy(() => import("./pages/admin/AddComboPackage"));
 const AdminEditComboPackage = lazy(() => import("./pages/admin/EditComboPackage"));
+const AdminComboAIRules = lazy(() => import("./pages/admin/ComboAIRules"));
 // RequireSession must be loaded synchronously as it's a wrapper component
 import RequireSession from "./components/admin/RequireSession";
 
@@ -393,6 +394,7 @@ const App = () => (
             <Route path="/admin/combo-packages" element={<RequireSession><AdminComboPackages /></RequireSession>} />
             <Route path="/admin/combo-packages/add" element={<RequireSession><AdminAddComboPackage /></RequireSession>} />
             <Route path="/admin/combo-packages/edit/:slug" element={<RequireSession><AdminEditComboPackage /></RequireSession>} />
+            <Route path="/admin/combo-packages/ai-rules" element={<RequireSession><AdminComboAIRules /></RequireSession>} />
             {/* Auth routes */}
             <Route path="/auth/verify-email" element={<VerifyEmail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
