@@ -290,3 +290,17 @@
 .animate-marquee {
   animation: marquee 30s linear infinite;
 }
+
+/* Blog prose styles - enhanced typography for article content */
+.blog-content h2 {
+  scroll-margin-top: 100px;
+}
+
+.blog-content h3 {
+  scroll-margin-top: 100px;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
