@@ -1,296 +1,164 @@
 
-# Extra Booking Services Enhancement Plan
+# Services Feature Enhancement Plan
 
-This plan adds a comprehensive "Extra Services" feature inspired by Klook's Dubai offerings. This will allow the business to expand beyond yacht charters to offer additional Dubai experiences as add-ons or standalone bookings.
-
----
-
-## Overview
-
-The enhancement creates a new service type system that allows the admin to manage additional tourism services (Desert Safari, Airport Transfers, Theme Park Tickets, etc.) that customers can book alongside or instead of yacht tours.
+This plan covers testing the services feature, adding sample data, integrating booking functionality, and generating category images.
 
 ---
 
-## Database Schema Changes
+## Current Status
 
-### New Table: `services`
+The services feature infrastructure is complete:
+- Database tables (`services`, `service_categories`) created with RLS policies
+- 8 service categories exist in the database (Desert Safari, Theme Parks, etc.)
+- Bookings table extended with `booking_source` and `service_id` columns
+- Frontend pages created (Services listing, ServiceDetail, Admin pages)
+- Hooks and data layer implemented
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| slug | text | URL-friendly identifier |
-| title | text | Service name |
-| subtitle | text | Short tagline |
-| description | text | Brief description |
-| long_description | text | Full details (markdown) |
-| price | numeric | Base price in AED |
-| original_price | numeric | Original price for discount display |
-| duration | text | Duration (e.g., "6 Hours") |
-| image_url | text | Main image |
-| gallery | text[] | Additional images |
-| category_id | uuid | FK to service_categories |
-| highlights | text[] | Key features |
-| included | text[] | What's included |
-| excluded | text[] | What's not included |
-| meeting_point | text | Pickup/meeting location |
-| rating | numeric | Average rating (default 4.5) |
-| review_count | integer | Number of reviews |
-| is_featured | boolean | Show on homepage |
-| is_active | boolean | Published status |
-| booking_type | text | 'per_person', 'per_group', 'per_vehicle' |
-| min_participants | integer | Minimum guests required |
-| max_participants | integer | Maximum capacity |
-| cancellation_policy | text | Free cancellation details |
-| instant_confirmation | boolean | Instant booking |
-| hotel_pickup | boolean | Includes hotel pickup |
-| sort_order | integer | Display order |
-| meta_title | text | SEO title |
-| meta_description | text | SEO description |
-| created_at | timestamp | Creation date |
-| updated_at | timestamp | Last update |
-
-### New Table: `service_categories`
-
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| name | text | Category name |
-| slug | text | URL-friendly identifier |
-| description | text | Category description |
-| icon | text | Lucide icon name |
-| image_url | text | Category banner image |
-| is_active | boolean | Published status |
-| sort_order | integer | Display order |
-| created_at | timestamp | Creation date |
-
-### Service Categories (Initial Data)
-
-| Name | Slug | Icon |
-|------|------|------|
-| Desert Safari | desert-safari | sun |
-| Theme Parks | theme-parks | ferris-wheel |
-| Observation Decks | observation-decks | binoculars |
-| Water Sports | water-sports | waves |
-| Airport Transfers | airport-transfers | plane |
-| City Tours | city-tours | map-pin |
-| Adventure Sports | adventure-sports | mountain |
-| Dining Experiences | dining-experiences | utensils |
+The services table is currently empty, so the listing pages show "No experiences found."
 
 ---
 
-## Frontend Components
+## Implementation Plan
 
-### New Pages
+### Phase 1: Add Service Booking Modal Integration
 
-**1. Services Listing Page (`src/pages/Services.tsx`)**
-- Hero section with Dubai skyline
-- Category filter tabs (similar to Tours page)
-- Grid of service cards with filtering and sorting
-- SEO-friendly URLs: `/dubai/services/:category/:slug`
+Create a new `ServiceBookingModal` component that adapts the existing `BookingModal` for services with different booking types (per_person, per_group, per_vehicle).
 
-**2. Service Detail Page (`src/pages/ServiceDetail.tsx`)**
-- Image gallery with lightbox
-- Key info badges (duration, pickup, cancellation)
-- Description with highlights
-- Booking sidebar with date picker
-- Reviews section
-- Related services carousel
+**Files to create:**
+- `src/components/service-detail/ServiceBookingModal.tsx` - Booking modal adapted for services
 
-### New Components
+**Files to modify:**
+- `src/pages/ServiceDetail.tsx` - Add state and button to open booking modal
 
-**1. `src/components/ServiceCard.tsx`**
-- Image with category badge
-- Title, rating, and review count
-- Duration and key features
-- Price with discount display
-- "Book Now" and "Details" buttons
+**Key differences from tour booking:**
+| Feature | Tours | Services |
+|---------|-------|----------|
+| Booking types | per_person, full_yacht | per_person, per_group, per_vehicle |
+| Guest counters | Adults, Children, Infants | Varies by booking type |
+| Database field | tour_id | service_id |
+| Source tracking | 'tour' | 'service' |
 
-**2. `src/components/service-detail/ServiceBookingSidebar.tsx`**
-- Date selection
-- Guest count (if per_person)
-- Price calculator
-- Instant confirmation badge
-- WhatsApp inquiry button
+---
 
-**3. `src/components/home/PopularServices.tsx`**
-- Homepage section showcasing featured services
-- Horizontal scrolling carousel on mobile
-- "View All" link to services page
+### Phase 2: Add Sample Services via Database
 
-### Header Navigation Update
+Insert sample services directly into the database to test the complete flow. Each service will be associated with a category.
 
-Add "Experiences" dropdown in Header.tsx:
+**Sample services to add:**
+
+| Title | Category | Price (AED) | Booking Type |
+|-------|----------|-------------|--------------|
+| Evening Desert Safari with BBQ Dinner | Desert Safari | 250 | per_person |
+| Ferrari World Abu Dhabi | Theme Parks | 345 | per_person |
+| Burj Khalifa At The Top (Levels 124+125) | Observation Decks | 189 | per_person |
+| Jet Ski Adventure | Water Sports | 450 | per_person |
+| Dubai City Tour - Half Day | City Tours | 150 | per_person |
+| Private Airport Transfer - Sedan | Airport Transfers | 180 | per_vehicle |
+| Dinner in the Sky Dubai | Dining Experiences | 699 | per_person |
+| Skydiving Dubai | Adventure Sports | 2,199 | per_person |
+
+---
+
+### Phase 3: Generate Category Hero Images
+
+Use AI image generation to create premium hero images for each service category. Images will be generated with a luxury Dubai tourism aesthetic.
+
+**Categories needing images:**
+1. Desert Safari - Golden dunes with 4x4 vehicles at sunset
+2. Theme Parks - Colorful roller coasters and attractions
+3. Observation Decks - Panoramic Dubai skyline view
+4. Water Sports - Jet ski or parasailing on blue waters
+5. Airport Transfers - Luxury car at Dubai airport
+6. City Tours - Dubai landmarks collage
+7. Adventure Sports - Skydiving over Palm Jumeirah
+8. Dining Experiences - Luxury rooftop dining setup
+
+---
+
+## Technical Details
+
+### ServiceBookingModal Component
 
 ```text
-Tours (existing)
-  |-- Dhow Cruises
-  |-- Shared Yacht
-  |-- Private Charter
-  |-- Megayacht
+Props:
+- isOpen: boolean
+- onClose: () => void
+- service: Service (from useService hook)
 
-Experiences (new)
-  |-- Desert Safari
-  |-- Theme Parks
-  |-- Water Sports
-  |-- City Tours
-  |-- View All
+Key adaptations:
+1. Dynamic guest counter based on bookingType:
+   - per_person: Show Adults, Children, Infants
+   - per_group: Show single "Group Size" counter
+   - per_vehicle: No guest counter, fixed price
+
+2. Price calculation:
+   - per_person: price * adults + (price * 0.5 * children)
+   - per_group: Fixed price regardless of group size
+   - per_vehicle: Fixed price
+
+3. Database insert:
+   - booking_source: 'service'
+   - service_id: service.id
+   - tour_id: service.slug (for backward compatibility)
+   - tour_name: service.title
 ```
 
----
-
-## Admin Panel Updates
-
-### New Admin Pages
-
-**1. `src/pages/admin/Services.tsx`**
-- List all services with search and filter
-- Status toggle (active/inactive)
-- Featured toggle
-- Quick edit actions
-- Bulk actions toolbar
-
-**2. `src/pages/admin/AddService.tsx`**
-- Form similar to TourForm
-- Rich text editor for descriptions
-- Image upload for main image and gallery
-- Category dropdown
-- Pricing and availability settings
-- SEO fields
-
-**3. `src/pages/admin/EditService.tsx`**
-- Pre-populated edit form
-- Version history (optional)
-
-**4. `src/pages/admin/ServiceCategories.tsx`**
-- Manage service categories
-- Drag-to-reorder
-- Icon picker
-
-### Admin Sidebar Update
-
-Add "Services" section in AdminSidebar.tsx:
+### ServiceDetail Page Changes
 
 ```text
-Services (new section)
-  |-- All Services
-  |-- Add Service
-  |-- Service Categories
+Add:
+1. Import ServiceBookingModal
+2. State: const [isBookingOpen, setIsBookingOpen] = useState(false)
+3. Update "Check Availability" button to open modal
+4. Render ServiceBookingModal at bottom of component
 ```
 
----
+### Database Insert for Sample Services
 
-## Hooks and Data Layer
-
-### New Hooks
-
-**`src/hooks/useServices.ts`**
-- `useServices()` - Fetch all active services
-- `useFeaturedServices()` - Fetch featured services
-- `useService(slug)` - Fetch single service
-- `useServicesByCategory(category)` - Filter by category
-- `useCreateService()` - Admin mutation
-- `useUpdateService()` - Admin mutation
-- `useDeleteService()` - Admin mutation
-
-**`src/hooks/useServiceCategories.ts`**
-- `useServiceCategories()` - Fetch all categories
-- `useActiveServiceCategories()` - Public categories
-- CRUD mutations for admin
-
-### Service Mapper
-
-**`src/lib/serviceMapper.ts`**
-- Map database records to frontend interface
-- Handle image path normalization
-- Default values for optional fields
+Each service record will include:
+- Full details (description, highlights, included/excluded)
+- SEO metadata
+- Realistic pricing
+- Proper category assignment
+- Active and featured flags
 
 ---
 
-## Booking Flow Integration
+## File Changes Summary
 
-### Option A: Separate Booking System
-- New `service_bookings` table
-- Similar structure to `bookings` table
-- Separate admin view for service bookings
-
-### Option B: Unified Booking System (Recommended)
-- Add `booking_source` column to existing `bookings` table ('tour' or 'service')
-- Add `service_id` nullable foreign key
-- Reuse existing booking modal with minor adaptations
-- Single admin bookings view with source filter
+| File | Action | Purpose |
+|------|--------|---------|
+| `src/components/service-detail/ServiceBookingModal.tsx` | Create | Booking modal for services |
+| `src/pages/ServiceDetail.tsx` | Modify | Integrate booking modal |
+| Database migration | Create | Insert sample services |
+| `src/hooks/useServices.ts` | Modify | Add booking_source to service bookings (optional) |
 
 ---
 
-## SEO and Routing
+## Testing Checklist
 
-### New Routes in App.tsx
+After implementation:
 
-```typescript
-// Service listing with category
-<Route path="/dubai/services/:categoryPath" element={<Services />} />
-// Individual service detail
-<Route path="/dubai/services/:categoryPath/:slug" element={<ServiceDetail />} />
-// General services page
-<Route path="/services" element={<Services />} />
+1. Navigate to `/services` - Should show sample services
+2. Navigate to `/dubai/services/desert-safari` - Should show Desert Safari services
+3. Click on a service card - Should open service detail page
+4. Click "Check Availability" - Should open booking modal
+5. Complete booking flow - Should create booking with `booking_source: 'service'`
+6. Check `/admin/services` - Should show all services
+7. Edit a service via admin - Should update successfully
+8. Check `/admin/bookings` - Should show service bookings with proper source
+
+---
+
+## Image Generation Prompts
+
+For AI image generation, each category will use prompts like:
+
+```text
+"Luxury desert safari experience in Dubai at golden hour, 
+premium 4x4 vehicles on pristine sand dunes, 
+dramatic sunset sky, 
+cinematic quality, ultra-realistic photography style"
 ```
 
-### URL Structure
-
-| Page | URL |
-|------|-----|
-| All Services | `/services` |
-| Desert Safari Category | `/dubai/services/desert-safari` |
-| Specific Safari Tour | `/dubai/services/desert-safari/evening-desert-safari-bbq` |
-
----
-
-## Files to Create
-
-| File | Purpose |
-|------|---------|
-| `src/pages/Services.tsx` | Services listing page |
-| `src/pages/ServiceDetail.tsx` | Service detail page |
-| `src/components/ServiceCard.tsx` | Service card component |
-| `src/components/service-detail/ServiceBookingSidebar.tsx` | Booking sidebar |
-| `src/components/service-detail/ServiceImageGallery.tsx` | Image gallery |
-| `src/components/home/PopularServices.tsx` | Homepage featured services |
-| `src/pages/admin/Services.tsx` | Admin services list |
-| `src/pages/admin/AddService.tsx` | Add service form |
-| `src/pages/admin/EditService.tsx` | Edit service form |
-| `src/pages/admin/ServiceCategories.tsx` | Service categories management |
-| `src/components/admin/ServiceForm.tsx` | Reusable service form |
-| `src/components/admin/ServicesTable.tsx` | Services table component |
-| `src/components/admin/ServiceCategoryDialog.tsx` | Category create/edit dialog |
-| `src/hooks/useServices.ts` | Services data hooks |
-| `src/hooks/useServiceCategories.ts` | Service categories hooks |
-| `src/lib/serviceMapper.ts` | Database to frontend mapping |
-
-## Files to Modify
-
-| File | Changes |
-|------|---------|
-| `src/App.tsx` | Add service routes |
-| `src/components/layout/Header.tsx` | Add Experiences dropdown |
-| `src/components/admin/AdminSidebar.tsx` | Add Services section |
-| `src/pages/Home.tsx` | Add PopularServices section |
-| `supabase/migrations/` | New tables and RLS policies |
-
----
-
-## Implementation Priority
-
-**Phase 1: Foundation**
-1. Create database tables with RLS policies
-2. Create service categories with initial data
-3. Build admin CRUD for services
-
-**Phase 2: Public Frontend**
-4. Services listing page
-5. Service detail page with booking
-6. Header navigation update
-7. Homepage integration
-
-**Phase 3: Polish**
-8. Search and advanced filtering
-9. Related services recommendations
-10. Analytics and reporting
+Images will be stored in Supabase Storage and URLs updated in the `service_categories` table.
