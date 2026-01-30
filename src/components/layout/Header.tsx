@@ -30,7 +30,7 @@ const Header = () => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Tours", path: "/tours", hasDropdown: true },
-    { name: "Experiences", path: "/services", hasDropdown: true, isExperiences: true },
+    { name: "Experiences", path: "/experiences", hasDropdown: true, isExperiences: true },
     { name: "Gallery", path: "/gallery" },
     { name: "About Us", path: "/about" },
     { name: "Contact", path: "/contact" },
@@ -173,7 +173,7 @@ const Header = () => {
                             </NavigationMenuLink>
                           ))}
                           <div className="mt-2 pt-3 border-t border-border">
-                            <Link to={link.isExperiences ? "/services" : "/tours"} className="flex items-center justify-center gap-2 text-sm font-medium text-secondary hover:underline">
+                            <Link to={link.isExperiences ? "/experiences" : "/tours"} className="flex items-center justify-center gap-2 text-sm font-medium text-secondary hover:underline">
                               {link.isExperiences ? "View All Experiences →" : "View All Tours →"}
                             </Link>
                           </div>
