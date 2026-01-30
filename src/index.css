@@ -315,12 +315,11 @@ html {
   }
   
   /* Hide interactive elements except those marked as print-visible */
-  button:not(.print-visible),
-  .sticky {
+  button:not(.print-visible) {
     display: none !important;
   }
   
-  /* Reset sticky positioning */
+  /* Reset sticky positioning but keep visible */
   .sticky {
     position: static !important;
   }
@@ -336,5 +335,10 @@ html {
   .container {
     max-width: 100% !important;
     padding: 0 1rem !important;
+  }
+  
+  /* Ensure grid layouts print properly */
+  .lg\:col-span-2 {
+    grid-column: span 2 / span 2 !important;
   }
 }
