@@ -8,7 +8,7 @@ interface RequireSessionProps {
  * Development mode: Authentication bypassed.
  * Set BYPASS_AUTH to false for production.
  */
-const BYPASS_AUTH = true;
+const BYPASS_AUTH = import.meta.env.DEV;
 
 export default function RequireSession({ children }: RequireSessionProps) {
   // Bypass authentication for development

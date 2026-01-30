@@ -18,6 +18,9 @@ import {
   clearAdminCache,
 } from "@/lib/adminAuth";
 
+// Dev-only bypass: show admin UI without session/role checks in preview/development.
+const BYPASS_ADMIN_GUARD = import.meta.env.DEV;
+
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
@@ -26,8 +29,8 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(BYPASS_ADMIN_GUARD);
+  const [loading, setLoading] = useState(!BYPASS_ADMIN_GUARD);
   const [adminGateError, setAdminGateError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
@@ -49,6 +52,14 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   }, []);
 
   useEffect(() => {
+    if (BYPASS_ADMIN_GUARD) {
+      // Ensure the admin shell renders immediately in dev mode
+      setLoading(false);
+      setIsAdmin(true);
+      setAdminGateError(null);
+      return;
+    }
+
     let cancelled = false;
 
     const checkAdminRole = async (userId: string, background: boolean = false) => {
