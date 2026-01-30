@@ -42,6 +42,9 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const BlogCategory = lazy(() => import("./pages/BlogCategory"));
 
+// AI Trip Planner pages
+const TripPlanner = lazy(() => import("./pages/TripPlanner"));
+const TripItinerary = lazy(() => import("./pages/TripItinerary"));
 // Admin pages - lazy load entire admin section
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminBookings = lazy(() => import("./pages/admin/Bookings"));
@@ -82,6 +85,7 @@ const AdminBlog = lazy(() => import("./pages/admin/Blog"));
 const AdminAddBlogPost = lazy(() => import("./pages/admin/AddBlogPost"));
 const AdminEditBlogPost = lazy(() => import("./pages/admin/EditBlogPost"));
 const AdminBlogCategories = lazy(() => import("./pages/admin/BlogCategories"));
+const AdminAITripDashboard = lazy(() => import("./pages/admin/AITripDashboard"));
 
 // RequireSession must be loaded synchronously as it's a wrapper component
 import RequireSession from "./components/admin/RequireSession";
@@ -157,6 +161,9 @@ const App = () => (
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/category/:categorySlug" element={<BlogCategory />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
+            {/* AI Trip Planner */}
+            <Route path="/plan-trip" element={<TripPlanner />} />
+            <Route path="/trip/:tripId" element={<TripItinerary />} />
             {/* Admin Routes */}
             <Route
               path="/admin"
@@ -369,6 +376,8 @@ const App = () => (
             <Route path="/admin/blog/add" element={<RequireSession><AdminAddBlogPost /></RequireSession>} />
             <Route path="/admin/blog/edit/:slug" element={<RequireSession><AdminEditBlogPost /></RequireSession>} />
             <Route path="/admin/blog/categories" element={<RequireSession><AdminBlogCategories /></RequireSession>} />
+            {/* AI Trip Dashboard Admin */}
+            <Route path="/admin/ai-trips" element={<RequireSession><AdminAITripDashboard /></RequireSession>} />
             {/* Auth routes */}
             <Route path="/auth/verify-email" element={<VerifyEmail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
