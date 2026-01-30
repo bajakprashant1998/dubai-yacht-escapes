@@ -23,6 +23,7 @@ import {
   Sparkles,
   HelpCircle,
   LogOut,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -67,6 +68,7 @@ const navItems: NavItem[] = [
   { title: "Discounts", href: "/admin/discounts", icon: Percent },
   { title: "FAQs", href: "/admin/faqs", icon: HelpCircle },
   { title: "Activity Log", href: "/admin/activity-log", icon: History },
+  { title: "User Roles", href: "/admin/roles", icon: Shield },
   { title: "Legal Pages", href: "/admin/legal-pages", icon: Scale },
   {
     title: "Settings",
