@@ -87,12 +87,14 @@ export interface AdminPresence {
   last_seen: string;
 }
 
-// Quick reply options
+// Quick reply options - tourism-specific for Dubai experiences
 export const quickReplies = [
-  { id: "tours", label: "View Tours", message: "I'd like to know about your tours and packages" },
-  { id: "pricing", label: "Pricing", message: "What are your prices?" },
-  { id: "booking", label: "Book Now", message: "I want to make a booking" },
-  { id: "contact", label: "Contact", message: "How can I contact you?" },
+  { id: "safari", label: "Desert Safari", message: "Tell me about your desert safari packages and pricing" },
+  { id: "yacht", label: "Yacht Cruises", message: "What yacht and cruise options do you have?" },
+  { id: "theme-parks", label: "Theme Parks", message: "What theme park tickets can I book?" },
+  { id: "booking", label: "Make Booking", message: "I want to make a booking for my trip to Dubai" },
+  { id: "pricing", label: "Pricing & Offers", message: "What are your prices and any ongoing offers?" },
+  { id: "contact", label: "Talk to Agent", message: "I'd like to speak with a human agent" },
 ];
 
 // Detect if visitor wants human support

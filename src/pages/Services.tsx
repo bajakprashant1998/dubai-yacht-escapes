@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Search, Grid3X3, List, Star, MapPin } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import ServiceCardRedesigned from "@/components/ServiceCardRedesigned";
@@ -58,10 +58,19 @@ const isDurationInRange = (duration: string | null, range: string): boolean => {
 const Services = () => {
   const { categoryPath } = useParams();
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [sortBy, setSortBy] = useState("popular");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
+
+  // Update search when URL param changes
+  useEffect(() => {
+    const urlQuery = searchParams.get("q");
+    if (urlQuery && urlQuery !== searchQuery) {
+      setSearchQuery(urlQuery);
+    }
+  }, [searchParams]);
 
   const { data: categories, isLoading: loadingCategories } = useActiveServiceCategories();
   const { data: allServices, isLoading: loadingAll } = useServices();
