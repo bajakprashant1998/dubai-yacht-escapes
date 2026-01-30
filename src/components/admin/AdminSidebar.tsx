@@ -20,6 +20,10 @@ import {
   HelpCircle,
   LogOut,
   Shield,
+  Car,
+  Building,
+  FileText,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -65,6 +69,40 @@ const navItems: NavItem[] = [
   { title: "Discounts", href: "/admin/discounts", icon: Percent },
   { title: "FAQs", href: "/admin/faqs", icon: HelpCircle },
   { title: "Activity Log", href: "/admin/activity-log", icon: History },
+  {
+    title: "Car Rentals",
+    icon: Car,
+    children: [
+      { title: "All Cars", href: "/admin/car-rentals" },
+      { title: "Add Car", href: "/admin/car-rentals/add" },
+      { title: "Categories", href: "/admin/car-rentals/categories" },
+    ],
+  },
+  {
+    title: "Hotels",
+    icon: Building,
+    children: [
+      { title: "All Hotels", href: "/admin/hotels" },
+      { title: "Add Hotel", href: "/admin/hotels/add" },
+    ],
+  },
+  {
+    title: "Visa Services",
+    icon: FileText,
+    children: [
+      { title: "All Visas", href: "/admin/visa-services" },
+      { title: "Add Visa", href: "/admin/visa-services/add" },
+    ],
+  },
+  {
+    title: "Blog",
+    icon: BookOpen,
+    children: [
+      { title: "All Posts", href: "/admin/blog" },
+      { title: "Add Post", href: "/admin/blog/add" },
+      { title: "Categories", href: "/admin/blog/categories" },
+    ],
+  },
   { title: "User Management", href: "/admin/users", icon: Users },
   { title: "User Roles", href: "/admin/roles", icon: Shield },
   { title: "Legal Pages", href: "/admin/legal-pages", icon: Scale },
@@ -88,7 +126,7 @@ interface AdminSidebarProps {
 const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [expandedItems, setExpandedItems] = useState<string[]>(["Tours", "Settings", "Activities"]);
+  const [expandedItems, setExpandedItems] = useState<string[]>(["Tours", "Settings", "Activities", "Car Rentals", "Hotels", "Visa Services", "Blog"]);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
