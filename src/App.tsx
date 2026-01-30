@@ -68,6 +68,20 @@ const AdminServiceCategories = lazy(() => import("./pages/admin/ServiceCategorie
 const AdminRoles = lazy(() => import("./pages/admin/Roles"));
 const AdminUsers = lazy(() => import("./pages/admin/Users"));
 const VerifyEmail = lazy(() => import("./pages/auth/VerifyEmail"));
+const AdminCarRentals = lazy(() => import("./pages/admin/CarRentals"));
+const AdminAddCarRental = lazy(() => import("./pages/admin/AddCarRental"));
+const AdminEditCarRental = lazy(() => import("./pages/admin/EditCarRental"));
+const AdminCarCategories = lazy(() => import("./pages/admin/CarCategories"));
+const AdminHotels = lazy(() => import("./pages/admin/Hotels"));
+const AdminAddHotel = lazy(() => import("./pages/admin/AddHotel"));
+const AdminEditHotel = lazy(() => import("./pages/admin/EditHotel"));
+const AdminVisaServices = lazy(() => import("./pages/admin/VisaServices"));
+const AdminAddVisaService = lazy(() => import("./pages/admin/AddVisaService"));
+const AdminEditVisaService = lazy(() => import("./pages/admin/EditVisaService"));
+const AdminBlog = lazy(() => import("./pages/admin/Blog"));
+const AdminAddBlogPost = lazy(() => import("./pages/admin/AddBlogPost"));
+const AdminEditBlogPost = lazy(() => import("./pages/admin/EditBlogPost"));
+const AdminBlogCategories = lazy(() => import("./pages/admin/BlogCategories"));
 
 // RequireSession must be loaded synchronously as it's a wrapper component
 import RequireSession from "./components/admin/RequireSession";
@@ -337,6 +351,24 @@ const App = () => (
                 </RequireSession>
               }
             />
+            {/* Car Rentals Admin */}
+            <Route path="/admin/car-rentals" element={<RequireSession><AdminCarRentals /></RequireSession>} />
+            <Route path="/admin/car-rentals/add" element={<RequireSession><AdminAddCarRental /></RequireSession>} />
+            <Route path="/admin/car-rentals/edit/:slug" element={<RequireSession><AdminEditCarRental /></RequireSession>} />
+            <Route path="/admin/car-rentals/categories" element={<RequireSession><AdminCarCategories /></RequireSession>} />
+            {/* Hotels Admin */}
+            <Route path="/admin/hotels" element={<RequireSession><AdminHotels /></RequireSession>} />
+            <Route path="/admin/hotels/add" element={<RequireSession><AdminAddHotel /></RequireSession>} />
+            <Route path="/admin/hotels/edit/:slug" element={<RequireSession><AdminEditHotel /></RequireSession>} />
+            {/* Visa Services Admin */}
+            <Route path="/admin/visa-services" element={<RequireSession><AdminVisaServices /></RequireSession>} />
+            <Route path="/admin/visa-services/add" element={<RequireSession><AdminAddVisaService /></RequireSession>} />
+            <Route path="/admin/visa-services/edit/:slug" element={<RequireSession><AdminEditVisaService /></RequireSession>} />
+            {/* Blog Admin */}
+            <Route path="/admin/blog" element={<RequireSession><AdminBlog /></RequireSession>} />
+            <Route path="/admin/blog/add" element={<RequireSession><AdminAddBlogPost /></RequireSession>} />
+            <Route path="/admin/blog/edit/:slug" element={<RequireSession><AdminEditBlogPost /></RequireSession>} />
+            <Route path="/admin/blog/categories" element={<RequireSession><AdminBlogCategories /></RequireSession>} />
             {/* Auth routes */}
             <Route path="/auth/verify-email" element={<VerifyEmail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
