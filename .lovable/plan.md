@@ -1,259 +1,256 @@
 
+# Add TourForm Features to Service Add/Edit Pages
 
-# Homepage Enhancement Plan
-
-This plan addresses all 5 requested changes: hero visibility enhancement with motion, redesigned sections, CTA update, Partners/Brands strip, and temporary admin auth bypass.
+This plan will enhance the `/admin/services/add` page to match the functionality and UX of the `/admin/tours/add` page by creating a reusable `ServiceForm` component with all the advanced features.
 
 ---
 
 ## Overview
 
-| Task | Description | Priority |
-|------|-------------|----------|
-| 1 | Verify Why Choose Us & Testimonials sections | Verification |
-| 2 | Enhance Hero Section (lighter overlay + motion) | High |
-| 3 | Update CTA Section to match new branding | High |
-| 4 | Add Partners/Brands Logo Strip | Medium |
-| 5 | Bypass Admin Authentication (development mode) | High |
+The current AddService page has basic functionality with tabs, but it's missing several key features from TourForm:
+
+| Feature | TourForm | Current AddService | To Add |
+|---------|----------|-------------------|--------|
+| Image Upload (file) | Yes | URL input only | Yes |
+| Gallery Upload (multiple) | Yes | Not present | Yes |
+| Itinerary Editor | Yes | Not present | Yes |
+| FAQ Editor | Yes | Not present | Yes |
+| RichTextEditor | Yes | Plain textarea | Yes |
+| SEO Preview | Yes | Not present | Yes |
+| Character Counter | Yes | Not present | Yes |
+| Auto-suggest SEO | Yes | Not present | Yes |
+| Location Selector | Yes | Not present | Yes |
+| Sidebar Layout | Yes | Tabs only | Yes |
 
 ---
 
-## Task 1: Section Verification (Completed)
+## Implementation Approach
 
-### Visual Inspection Results
+### Strategy: Create ServiceForm Component
 
-**Why Choose Us Section**
-- 4 icon cards with blue circular backgrounds
-- Trust indicators row with checkmarks (Free Cancellation, Secure Payment, Verified Reviews, Local Expertise)
-- Dark blue background with "Betterview Tourism" branding
-- Status: Looks correct as per reference screenshots
-
-**Testimonials Section**
-- "Guest Reviews" badge at top
-- Star rating display (4.9 rating)
-- Blue floating quote icon above card
-- Carousel with navigation dots and arrows
-- Status: Looks correct as per reference screenshots
+Similar to TourForm, create a dedicated `ServiceForm` component that can be used for both create and edit modes. This follows the existing pattern in the codebase.
 
 ---
 
-## Task 2: Enhance Hero Section
+## Technical Details
 
-### Current Issues
-The hero has very dark overlays that hide the Burj Khalifa image:
-- `from-primary/95` (95% opacity)
-- `via-primary/85` (85% opacity)
-- `to-primary/50` (50% opacity)
+### 1. Create ServiceForm Component
 
-### Proposed Changes
+**File:** `src/components/admin/ServiceForm.tsx`
 
-**1. Reduce overlay opacity to show image**
-```css
-/* Change from */
-from-primary/95 via-primary/85 to-primary/50
+**Features to include:**
 
-/* Change to */
-from-primary/70 via-primary/50 to-transparent
+```text
++---------------------------------------------------+
+|                 ServiceForm Layout                 |
++---------------------------------------------------+
+|                                                   |
+|  ┌─────────────────────────┐  ┌───────────────┐  |
+|  │    Main Content (2/3)   │  │ Sidebar (1/3) │  |
+|  │                         │  │               │  |
+|  │  ┌───────────────────┐  │  │ ┌───────────┐ │  |
+|  │  │ Basic Information │  │  │ │  Publish  │ │  |
+|  │  │ - Title / Slug    │  │  │ │ - Active  │ │  |
+|  │  │ - Subtitle        │  │  │ │ - Featured│ │  |
+|  │  │ - RichText Desc.  │  │  │ │ - Buttons │ │  |
+|  │  └───────────────────┘  │  │ └───────────┘ │  |
+|  │                         │  │               │  |
+|  │  ┌───────────────────┐  │  │ ┌───────────┐ │  |
+|  │  │ Pricing & Details │  │  │ │Main Image │ │  |
+|  │  │ - Price/Original  │  │  │ │ (Upload)  │ │  |
+|  │  │ - Pricing Type    │  │  │ │ - Preview │ │  |
+|  │  │ - Duration        │  │  │ │ - Alt Text│ │  |
+|  │  │ - Category        │  │  │ └───────────┘ │  |
+|  │  │ - Location        │  │  │               │  |
+|  │  │ - Participants    │  │  │ ┌───────────┐ │  |
+|  │  └───────────────────┘  │  │ │  Gallery  │ │  |
+|  │                         │  │ │ (Upload)  │ │  |
+|  │  ┌───────────────────┐  │  │ │ - Grid    │ │  |
+|  │  │    Highlights     │  │  │ └───────────┘ │  |
+|  │  └───────────────────┘  │  │               │  |
+|  │                         │  └───────────────┘  |
+|  │  ┌───────────────────┐  │                     |
+|  │  │ Included/Excluded │  │                     |
+|  │  │ (2 column grid)   │  │                     |
+|  │  └───────────────────┘  │                     |
+|  │                         │                     |
+|  │  ┌───────────────────┐  │                     |
+|  │  │    Itinerary      │  │                     |
+|  │  │  (ItineraryEditor)│  │                     |
+|  │  └───────────────────┘  │                     |
+|  │                         │                     |
+|  │  ┌───────────────────┐  │                     |
+|  │  │      FAQs         │  │                     |
+|  │  │   (FAQEditor)     │  │                     |
+|  │  └───────────────────┘  │                     |
+|  │                         │                     |
+|  │  ┌───────────────────┐  │                     |
+|  │  │   SEO Settings    │  │                     |
+|  │  │ - Meta Title      │  │                     |
+|  │  │ - Meta Desc       │  │                     |
+|  │  │ - Keywords        │  │                     |
+|  │  │ - SEOPreview      │  │                     |
+|  │  └───────────────────┘  │                     |
+|  └─────────────────────────┘                     |
++---------------------------------------------------+
 ```
 
-**2. Add motion effects using Framer Motion**
-- Parallax effect on background image (subtle vertical movement on scroll)
-- Floating animated decorative elements
-- Staggered text entrance animations
-- Animated gradient orbs in background
-- Subtle pulsing glow on CTA buttons
-- Hover animations on stats cards
+**Key features:**
 
-**3. Enhanced floating card animation**
-- Add subtle rotation + scale on hover
-- Glassmorphism enhancement
+1. **Image Upload System**
+   - Hidden file input with ref
+   - Upload to Supabase Storage bucket `service-images`
+   - Main image with preview, change, remove buttons
+   - Gallery with multi-file upload
+   - Image alt text with auto-suggest
 
-### Files to Modify
-- `src/components/home/HeroSection.tsx`
+2. **RichTextEditor Integration**
+   - Replace plain Textarea with RichTextEditor for descriptions
+   - Markdown toolbar with formatting buttons
+   - Preview mode toggle
+   - Content templates (can be customized for services)
 
----
+3. **Itinerary Editor**
+   - Reuse existing `ItineraryEditor` component
+   - Time + Activity pairs
+   - Add/remove functionality
 
-## Task 3: Update CTA Section
+4. **FAQ Editor**
+   - Reuse existing `FAQEditor` component
+   - Accordion-based Q&A management
 
-### Current Issues
-- References "dhow cruise" specifically (should be broader marketplace language)
-- Link goes to "/tours" (should go to "/experiences")
-- Styling doesn't match new luxury branding
+5. **SEO Enhancements**
+   - CharacterCounter for meta fields
+   - Auto-suggest buttons for meta title/description
+   - SEOPreview component showing Google result
 
-### Proposed Changes
+6. **Location Selector**
+   - Use `useActiveLocations` hook
+   - Dropdown with MapPin icons
 
-**Content Updates:**
-- Title: "Ready to Experience Dubai?" (broader)
-- Description: "Discover 100+ activities from desert adventures to luxury cruises. Book today with instant confirmation and best price guaranteed."
-- Primary CTA: "Browse All Activities" (link to /experiences)
-- Secondary CTA: Keep phone number
+### 2. Update Database Schema
 
-**Design Updates:**
-- Add background image with overlay (Dubai skyline)
-- Enhanced motion animations
-- Larger, more prominent CTAs
-- Add trust badges inline
+The services table needs additional columns:
 
-### Files to Modify
-- `src/components/home/CTASection.tsx`
-
----
-
-## Task 4: Add Partners/Brands Logo Strip
-
-### Design
-Create a new section showing trusted partners and certifications:
-- Auto-scrolling horizontal logo carousel
-- Featured partners: TripAdvisor, Viator, GetYourGuide, Dubai Tourism, Emirates NBD, etc.
-- Section title: "Trusted By" or "Our Partners"
-- Grayscale logos with hover color effect
-- Infinite scroll animation
-
-### Implementation
-1. Create `src/components/home/PartnersStrip.tsx`
-2. Add to `src/pages/Home.tsx` (after TrustStrip or before Footer)
-3. Use placeholder logos with company names initially
-
-### File Structure
-```tsx
-// PartnersStrip.tsx
-- Marquee/carousel of partner logos
-- "Trusted By Industry Leaders" heading
-- SVG logos or text placeholders
-- Infinite horizontal scroll animation
+```sql
+ALTER TABLE services ADD COLUMN IF NOT EXISTS image_alt text;
+ALTER TABLE services ADD COLUMN IF NOT EXISTS itinerary jsonb;
+ALTER TABLE services ADD COLUMN IF NOT EXISTS faqs jsonb;
+ALTER TABLE services ADD COLUMN IF NOT EXISTS location text;
 ```
 
-### Files to Create/Modify
-- Create: `src/components/home/PartnersStrip.tsx`
-- Modify: `src/pages/Home.tsx`
+### 3. Update Service Mapper
 
----
+Add new fields to the Service interface and mapper:
 
-## Task 5: Remove Admin Authentication (Development Mode)
+```typescript
+// Add to Service interface:
+imageAlt: string | null;
+itinerary: ItineraryItem[];
+faqs: FAQItem[];
+location: string | null;
 
-### Current State
-All admin routes are wrapped in `<RequireSession>` component which:
-- Checks for Supabase auth session
-- Redirects to `/auth` if not logged in
-- Blocks access to admin pages
-
-### Proposed Solution
-Modify `RequireSession` to bypass authentication:
-
-**Option A: Development Flag (Recommended)**
-```tsx
-// Add environment check or bypass flag
-const BYPASS_AUTH = true; // Set to false for production
-
-if (BYPASS_AUTH) {
-  return <>{children}</>;
-}
-// ... existing auth logic
+// Update mapServiceFromRow to include these
 ```
 
-**Option B: Return children directly**
-Simply render children without any auth check:
+### 4. Update Hooks
+
+Update `useCreateService` and `useUpdateService` to handle new fields:
+- itinerary (jsonb)
+- faqs (jsonb)
+- image_alt
+- location
+
+### 5. Create Storage Bucket
+
+Ensure `service-images` storage bucket exists with public access (similar to `tour-images`).
+
+### 6. Update AddService Page
+
+Simplify to use the new ServiceForm component:
+
 ```tsx
-export default function RequireSession({ children }: RequireSessionProps) {
-  return <>{children}</>;
-}
-```
-
-### Files to Modify
-- `src/components/admin/RequireSession.tsx`
-
----
-
-## Technical Implementation Details
-
-### Hero Motion Features
-
-**1. Entrance Animations**
-```tsx
-// Staggered children animation
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15 }
-  }
+const AddService = () => {
+  return (
+    <AdminLayout>
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/admin/services">
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold">Add New Service</h1>
+            <p className="text-muted-foreground">Create a new activity or experience</p>
+          </div>
+        </div>
+        <ServiceForm mode="create" />
+      </div>
+    </AdminLayout>
+  );
 };
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0 }
-};
 ```
 
-**2. Floating Decorative Elements**
+### 7. Update EditService Page
+
+Update to use ServiceForm in edit mode:
+
 ```tsx
-<motion.div
-  className="absolute bg-secondary/20 rounded-full blur-2xl"
-  animate={{
-    y: [0, -20, 0],
-    x: [0, 10, 0],
-    scale: [1, 1.1, 1]
-  }}
-  transition={{ duration: 8, repeat: Infinity }}
-/>
-```
-
-**3. Background Parallax Effect**
-```tsx
-const { scrollY } = useScroll();
-const y = useTransform(scrollY, [0, 500], [0, 100]);
-
-<motion.div style={{ y }} className="absolute inset-0">
-  <OptimizedImage ... />
-</motion.div>
-```
-
-**4. Stats Cards Hover**
-```tsx
-<motion.div
-  whileHover={{ scale: 1.05, y: -5 }}
-  transition={{ type: "spring", stiffness: 300 }}
-/>
-```
-
-### Partners Strip Animation
-```tsx
-// Infinite scroll marquee
-<div className="flex animate-marquee">
-  {logos.map(logo => <Logo key={logo.name} />)}
-  {/* Duplicate for seamless loop */}
-  {logos.map(logo => <Logo key={`${logo.name}-dup`} />)}
-</div>
-
-// CSS keyframe
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
+<ServiceForm mode="edit" service={service} />
 ```
 
 ---
 
-## Summary of Files
+## Files to Create
 
-### Files to Create
-- `src/components/home/PartnersStrip.tsx`
+| File | Description |
+|------|-------------|
+| `src/components/admin/ServiceForm.tsx` | Main reusable form component |
 
-### Files to Modify
-- `src/components/home/HeroSection.tsx` - Lighter overlay + motion effects
-- `src/components/home/CTASection.tsx` - Updated content and styling
-- `src/components/admin/RequireSession.tsx` - Bypass authentication
-- `src/pages/Home.tsx` - Add PartnersStrip component
-- `src/index.css` - Add marquee animation keyframe
+## Files to Modify
+
+| File | Changes |
+|------|---------|
+| `src/pages/admin/AddService.tsx` | Simplify to use ServiceForm |
+| `src/pages/admin/EditService.tsx` | Update to use ServiceForm |
+| `src/lib/serviceMapper.ts` | Add new fields to interface and mapper |
+| `src/hooks/useServices.ts` | Update create/update mutations for new fields |
+
+## Database Changes
+
+| Change | SQL |
+|--------|-----|
+| Add image_alt column | `ALTER TABLE services ADD COLUMN image_alt text;` |
+| Add itinerary column | `ALTER TABLE services ADD COLUMN itinerary jsonb;` |
+| Add faqs column | `ALTER TABLE services ADD COLUMN faqs jsonb;` |
+| Add location column | `ALTER TABLE services ADD COLUMN location text;` |
+| Create storage bucket | `INSERT INTO storage.buckets...` |
 
 ---
 
 ## Implementation Order
 
-1. **RequireSession.tsx** - Bypass auth immediately for admin access
-2. **HeroSection.tsx** - Reduce overlay darkness, add motion
-3. **CTASection.tsx** - Update content and styling
-4. **PartnersStrip.tsx** - Create new component
-5. **Home.tsx** - Add PartnersStrip to page
-6. **index.css** - Add marquee animation
+1. **Database Migration** - Add new columns to services table
+2. **Storage Bucket** - Create service-images bucket
+3. **Service Mapper** - Update interface and mapper function
+4. **useServices Hook** - Update mutations for new fields
+5. **ServiceForm Component** - Create the main form component
+6. **AddService Page** - Simplify to use ServiceForm
+7. **EditService Page** - Update to use ServiceForm
+
+---
+
+## Component Reuse
+
+The following existing components will be reused:
+
+- `ItineraryEditor` - Time-based activity editor
+- `FAQEditor` - Q&A accordion editor
+- `RichTextEditor` - Markdown editor with toolbar
+- `SEOPreview` - Google search result preview
+- `CharacterCounter` - SEO field length indicator
+- `KeywordsInput` - Tag-style keyword input
+
+This ensures consistency with the tour form UX and reduces code duplication.
 
