@@ -155,7 +155,7 @@ const HeroSection = memo(() => {
 
       {/* Content with Parallax */}
       <motion.div className="container relative z-10 py-20" style={{ y: contentY }}>
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
           <motion.div 
             className="text-primary-foreground"
             variants={containerVariants}
@@ -193,20 +193,20 @@ const HeroSection = memo(() => {
             </motion.h1>
 
             <motion.p 
-              className="text-lg md:text-xl text-primary-foreground/90 mb-6 leading-relaxed max-w-xl"
+              className="text-lg md:text-xl text-primary-foreground/90 mb-6 leading-relaxed max-w-2xl mx-auto"
               variants={itemVariants}
             >
               Book unforgettable experiences including desert safaris, theme parks, water sports, dhow cruises, and 100+ activities across Dubai.
             </motion.p>
 
             {/* Search Bar */}
-            <motion.div className="mb-8" variants={itemVariants}>
+            <motion.div className="mb-8 w-full flex justify-center" variants={itemVariants}>
               <HeroSearchBar />
             </motion.div>
 
             {/* CTAs */}
             <motion.div 
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12 justify-center"
               variants={itemVariants}
             >
               <Link to="/experiences" className="w-full sm:w-auto">
@@ -235,7 +235,7 @@ const HeroSection = memo(() => {
 
             {/* Stats Row */}
             <motion.div 
-              className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"
+              className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 w-full"
               variants={itemVariants}
             >
               {statsDisplay.map((stat, index) => (
@@ -262,75 +262,9 @@ const HeroSection = memo(() => {
               ))}
             </motion.div>
           </motion.div>
-
-          {/* Right Side - Floating Card */}
-          <motion.div 
-            className="hidden lg:block"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4, duration: 0.7 }}
-          >
-            <motion.div 
-              className="relative"
-              animate={{ y: [0, -15, 0] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <motion.div 
-                className="bg-card/95 backdrop-blur-lg rounded-3xl p-6 shadow-2xl border border-border/50 max-w-sm ml-auto"
-                whileHover={{ 
-                  scale: 1.02,
-                  rotateY: 5,
-                  rotateX: -2,
-                }}
-                transition={{ type: "spring", stiffness: 200 }}
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <motion.div 
-                    className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center"
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  >
-                    <Compass className="w-6 h-6 text-secondary" />
-                  </motion.div>
-                  <div>
-                    <p className="font-semibold text-foreground">Find Your Adventure</p>
-                    <p className="text-sm text-muted-foreground">100+ experiences available</p>
-                  </div>
-                </div>
-                <div className="space-y-3 mb-4">
-                  {[
-                    "Desert safaris & dune bashing",
-                    "Theme parks & attractions",
-                    "Water sports & yacht cruises"
-                  ].map((item, idx) => (
-                    <motion.div 
-                      key={idx}
-                      className="flex items-center gap-2 text-sm"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.8 + idx * 0.15 }}
-                    >
-                      <motion.span 
-                        className="w-2 h-2 rounded-full bg-secondary"
-                        animate={{ scale: [1, 1.3, 1] }}
-                        transition={{ duration: 2, repeat: Infinity, delay: idx * 0.3 }}
-                      />
-                      <span className="text-muted-foreground">{item}</span>
-                    </motion.div>
-                  ))}
-                </div>
-                <Link to="/experiences">
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90">
-                      Browse All Experiences
-                    </Button>
-                  </motion.div>
-                </Link>
-              </motion.div>
-            </motion.div>
-          </motion.div>
         </div>
       </motion.div>
+
 
       {/* Scroll Indicator */}
       <motion.div 
