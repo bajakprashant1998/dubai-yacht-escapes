@@ -15,6 +15,7 @@ import Home from "./pages/Home";
 const Tours = lazy(() => import("./pages/Tours"));
 const TourDetail = lazy(() => import("./pages/TourDetail"));
 const Services = lazy(() => import("./pages/Services"));
+const Experiences = lazy(() => import("./pages/Experiences"));
 const ServiceDetail = lazy(() => import("./pages/ServiceDetail"));
 const SavedTours = lazy(() => import("./pages/SavedTours"));
 const Gallery = lazy(() => import("./pages/Gallery"));
@@ -93,6 +94,7 @@ const App = () => (
             {/* Legacy route - kept for backwards compatibility */}
             <Route path="/tours/:slug" element={<TourDetail />} />
             {/* Services routes */}
+            <Route path="/experiences" element={<Experiences />} />
             <Route path="/services" element={<Services />} />
             <Route path="/dubai/services/:categoryPath" element={<Services />} />
             <Route path="/dubai/services/:categoryPath/:slug" element={<ServiceDetail />} />

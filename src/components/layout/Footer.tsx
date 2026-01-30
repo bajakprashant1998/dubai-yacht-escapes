@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Youtube, Shield, Lock, CreditCard } from "lucide-react";
-import rentalYachtLogo from "@/assets/rental-yacht-logo.png";
+import betterviewLogo from "@/assets/betterview-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { ADMIN_CACHE_KEY, ADMIN_USER_KEY, getAdminCache } from "@/lib/adminAuth";
 import { useContactConfig } from "@/hooks/useContactConfig";
@@ -141,18 +141,18 @@ const Footer = () => {
           <div className="space-y-4 col-span-2 md:col-span-1">
             <div className="flex items-center gap-3">
               <img
-                src={rentalYachtLogo}
-                alt="Rental Yacht Dubai"
+                src={betterviewLogo}
+                alt="Betterview Tourism"
                 className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-lg"
               />
               <div className="flex flex-col">
-                <span className="font-display font-bold text-lg sm:text-xl text-secondary leading-tight">Rental Yacht</span>
-                <span className="text-[10px] sm:text-xs text-primary-foreground/70 tracking-wider uppercase">Dubai</span>
+                <span className="font-display font-bold text-lg sm:text-xl text-secondary leading-tight">Betterview</span>
+                <span className="text-[10px] sm:text-xs text-primary-foreground/70 tracking-wider uppercase">Tourism</span>
               </div>
             </div>
             <p className="text-primary-foreground/80 text-xs sm:text-sm leading-relaxed">
-              Experience the magic of Dubai with our premium yacht charters and dhow cruise experiences.
-              Creating unforgettable memories on the waters of Dubai Marina.
+              Discover the best of Dubai with Betterview Tourism. Premium yacht charters, desert safaris,
+              theme parks, and unforgettable experiences await you.
             </p>
             <div className="flex gap-3 sm:gap-4">
               <a href="#" className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110 touch-target">
@@ -307,7 +307,7 @@ const Footer = () => {
         <div className="container py-4 sm:py-6 px-4 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
           <div className="flex items-center gap-4">
             <p className="text-primary-foreground/60 text-xs sm:text-sm text-center md:text-left">
-              © 2026 Rental Yacht Dubai. All rights reserved.
+              © 2026 Betterview Tourism. All rights reserved.
             </p>
             <div className="hidden sm:flex items-center gap-2">
               <CreditCard className="w-4 h-4 text-secondary/60" />

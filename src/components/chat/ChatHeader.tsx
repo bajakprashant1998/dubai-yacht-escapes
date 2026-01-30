@@ -31,12 +31,12 @@ const ChatHeader = ({ isAgentConnected, isAgentOnline, onMinimize, onClose }: Ch
           >
             <div className="absolute inset-0 bg-secondary/50 rounded-full blur-md" />
             <div className="relative w-11 h-11 rounded-full bg-gradient-to-br from-secondary to-secondary/80 flex items-center justify-center shadow-lg border border-secondary/30">
-              <span className="text-primary font-display font-bold text-sm">LD</span>
+              <span className="text-primary-foreground font-display font-bold text-sm">BT</span>
             </div>
           </motion.div>
           
           <div>
-            <h3 className="font-display font-semibold text-sm tracking-wide">Luxury Dhow Escapes</h3>
+            <h3 className="font-display font-semibold text-sm tracking-wide">Betterview Tourism</h3>
             <motion.p 
               className="text-xs text-white/80 flex items-center gap-1.5 mt-0.5"
               initial={{ opacity: 0 }}

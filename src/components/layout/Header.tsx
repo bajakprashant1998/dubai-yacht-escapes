@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Phone, Mail, ChevronDown, Ship, Anchor, Crown, Users, Sparkles, Sun, FerrisWheel, Waves, MapPin } from "lucide-react";
-import rentalYachtLogo from "@/assets/rental-yacht-logo.png";
+import betterviewLogo from "@/assets/betterview-logo.png";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -128,13 +128,13 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <img 
-              src={rentalYachtLogo} 
-              alt="Rental Yacht Dubai" 
+              src={betterviewLogo} 
+              alt="Betterview Tourism" 
               className="w-11 h-11 object-contain rounded-lg"
             />
             <div className="flex flex-col">
-              <span className="font-display font-bold text-xl text-primary leading-tight tracking-tight">Rental Yacht</span>
-              <span className="text-[10px] text-muted-foreground tracking-[0.2em] uppercase font-medium">Dubai</span>
+              <span className="font-display font-bold text-xl text-primary leading-tight tracking-tight">Betterview</span>
+              <span className="text-[10px] text-muted-foreground tracking-[0.2em] uppercase font-medium">Tourism</span>
             </div>
           </Link>
 
