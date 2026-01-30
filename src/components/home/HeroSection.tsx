@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 import HeroSearchBar from "./HeroSearchBar";
-import heroDhowCruise from "@/assets/hero-dhow-cruise.webp";
+import heroBurjKhalifa from "@/assets/hero-burj-khalifa.webp";
 
 const HeroSection = memo(() => {
   const { stats } = useHomepageContent();
@@ -24,7 +24,7 @@ const HeroSection = memo(() => {
       {/* Background Image - Priority loading with optimized component */}
       <div className="absolute inset-0">
         <OptimizedImage
-          src={heroDhowCruise}
+          src={heroBurjKhalifa}
           alt="Dubai experiences and adventures"
           priority
           objectFit="cover"
