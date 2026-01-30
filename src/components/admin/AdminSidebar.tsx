@@ -24,6 +24,7 @@ import {
   Building,
   FileText,
   BookOpen,
+  Plane,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,6 +42,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { title: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { title: "AI Trip Planner", href: "/admin/ai-trips", icon: Plane },
   { title: "Bookings", href: "/admin/bookings", icon: Calendar },
   { title: "Live Chat", href: "/admin/live-chat", icon: Headset },
   { title: "Locations", href: "/admin/locations", icon: MapPin },

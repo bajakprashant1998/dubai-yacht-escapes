@@ -12,6 +12,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { useContactConfig } from "@/hooks/useContactConfig";
+import { cn } from "@/lib/utils";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,6 +30,7 @@ const Header = () => {
 
   const navLinks = [
     { name: "Home", path: "/" },
+    { name: "Plan Trip", path: "/plan-trip", highlight: true },
     { name: "Activities", path: "/experiences", hasDropdown: true },
     { name: "Car Rentals", path: "/car-rentals" },
     { name: "Hotels", path: "/hotels" },
@@ -172,11 +174,15 @@ const Header = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`text-sm font-medium transition-all px-4 py-2 rounded-lg hover:bg-muted/50
-                    ${isActive(link.path) 
-                      ? "text-secondary bg-secondary/10" 
-                      : "text-foreground hover:text-secondary"
-                    }`}
+                  className={cn(
+                    'text-sm font-medium transition-all px-4 py-2 rounded-lg',
+                    link.highlight 
+                      ? 'bg-secondary/10 text-secondary hover:bg-secondary/20'
+                      : 'hover:bg-muted/50',
+                    isActive(link.path) 
+                      ? 'text-secondary bg-secondary/10' 
+                      : link.highlight ? '' : 'text-foreground hover:text-secondary'
+                  )}
                 >
                   {link.name}
                 </Link>
