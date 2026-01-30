@@ -16,6 +16,7 @@ const Tours = lazy(() => import("./pages/Tours"));
 const TourDetail = lazy(() => import("./pages/TourDetail"));
 const Services = lazy(() => import("./pages/Services"));
 const Experiences = lazy(() => import("./pages/Experiences"));
+const Cruises = lazy(() => import("./pages/Cruises"));
 const ServiceDetail = lazy(() => import("./pages/ServiceDetail"));
 const SavedTours = lazy(() => import("./pages/SavedTours"));
 const Gallery = lazy(() => import("./pages/Gallery"));
@@ -25,6 +26,8 @@ const Auth = lazy(() => import("./pages/Auth"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const CancellationPolicy = lazy(() => import("./pages/CancellationPolicy"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const TravelTips = lazy(() => import("./pages/TravelTips"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Admin pages - lazy load entire admin section
@@ -48,6 +51,7 @@ const AdminLiveChat = lazy(() => import("./pages/admin/LiveChat"));
 const AdminServices = lazy(() => import("./pages/admin/Services"));
 const AdminAddService = lazy(() => import("./pages/admin/AddService"));
 const AdminEditService = lazy(() => import("./pages/admin/EditService"));
+const AdminFAQ = lazy(() => import("./pages/admin/FAQ"));
 const AdminServiceCategories = lazy(() => import("./pages/admin/ServiceCategories"));
 
 // RequireSession must be loaded synchronously as it's a wrapper component
@@ -95,6 +99,7 @@ const App = () => (
             <Route path="/tours/:slug" element={<TourDetail />} />
             {/* Services routes */}
             <Route path="/experiences" element={<Experiences />} />
+            <Route path="/cruises" element={<Cruises />} />
             <Route path="/services" element={<Services />} />
             <Route path="/dubai/services/:categoryPath" element={<Services />} />
             <Route path="/dubai/services/:categoryPath/:slug" element={<ServiceDetail />} />
@@ -106,6 +111,8 @@ const App = () => (
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/cancellation-policy" element={<CancellationPolicy />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/travel-tips" element={<TravelTips />} />
             {/* Admin Routes */}
             <Route
               path="/admin"
@@ -273,6 +280,14 @@ const App = () => (
               element={
                 <RequireSession>
                   <AdminServiceCategories />
+                </RequireSession>
+              }
+            />
+            <Route
+              path="/admin/faqs"
+              element={
+                <RequireSession>
+                  <AdminFAQ />
                 </RequireSession>
               }
             />

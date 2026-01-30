@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   Clock,
@@ -32,6 +32,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useService } from "@/hooks/useServices";
 import { useContactConfig } from "@/hooks/useContactConfig";
 import ServiceBookingModal from "@/components/service-detail/ServiceBookingModal";
+import { addToRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 const ServiceDetail = () => {
   const { slug, categoryPath } = useParams();
@@ -40,6 +41,21 @@ const ServiceDetail = () => {
   const { whatsappLink } = useContactConfig();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+
+  // Track recently viewed
+  useEffect(() => {
+    if (service) {
+      addToRecentlyViewed({
+        type: "service",
+        id: service.id,
+        slug: service.slug,
+        categorySlug: service.categorySlug,
+        title: service.title,
+        image: service.imageUrl || "/placeholder.svg",
+        price: service.price,
+      });
+    }
+  }, [service]);
 
   if (isLoading) {
     return (

@@ -29,7 +29,7 @@ const Header = () => {
 
   const navLinks = [
     { name: "Home", path: "/" },
-    { name: "Tours", path: "/tours", hasDropdown: true },
+    { name: "Cruises", path: "/cruises", hasDropdown: true },
     { name: "Experiences", path: "/experiences", hasDropdown: true, isExperiences: true },
     { name: "Gallery", path: "/gallery" },
     { name: "About Us", path: "/about" },
@@ -153,9 +153,9 @@ const Header = () => {
                         <div className="w-[400px] p-4 grid gap-2">
                           <div className="mb-2">
                             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                              {link.isExperiences ? "Popular Experiences" : "Explore Our Experiences"}
-                            </p>
-                          </div>
+                            {link.isExperiences ? "Popular Experiences" : "Cruise Experiences"}
+                          </p>
+                        </div>
                           {(link.isExperiences ? experienceCategories : tourCategories).map((category) => (
                             <NavigationMenuLink asChild key={category.path}>
                               <Link
@@ -172,9 +172,9 @@ const Header = () => {
                               </Link>
                             </NavigationMenuLink>
                           ))}
-                          <div className="mt-2 pt-3 border-t border-border">
-                            <Link to={link.isExperiences ? "/experiences" : "/tours"} className="flex items-center justify-center gap-2 text-sm font-medium text-secondary hover:underline">
-                              {link.isExperiences ? "View All Experiences →" : "View All Tours →"}
+                        <div className="mt-2 pt-3 border-t border-border">
+                            <Link to={link.isExperiences ? "/experiences" : "/cruises"} className="flex items-center justify-center gap-2 text-sm font-medium text-secondary hover:underline">
+                              {link.isExperiences ? "View All Experiences →" : "View All Cruises →"}
                             </Link>
                           </div>
                         </div>

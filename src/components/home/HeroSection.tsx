@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { memo, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Play, Sparkles, Waves } from "lucide-react";
+import { ArrowRight, Play, Sparkles, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
+import HeroSearchBar from "./HeroSearchBar";
 import heroDhowCruise from "@/assets/hero-dhow-cruise.webp";
 
 const HeroSection = memo(() => {
@@ -24,7 +25,7 @@ const HeroSection = memo(() => {
       <div className="absolute inset-0">
         <OptimizedImage
           src={heroDhowCruise}
-          alt="Dubai Marina at night"
+          alt="Dubai experiences and adventures"
           priority
           objectFit="cover"
           sizes="100vw"
@@ -58,30 +59,35 @@ const HeroSection = memo(() => {
               transition={{ delay: 0.2, duration: 0.4 }}
             >
               <Sparkles className="w-4 h-4" />
-              <span className="text-sm font-semibold">Dubai's #1 Rated Cruise Experience</span>
+              <span className="text-sm font-semibold">Dubai's Premier Experiences Marketplace</span>
             </motion.div>
 
-            <h1 className="font-display text-fluid-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.05] mb-6">
-              Experience Dubai
-              <span className="block text-shimmer mt-2">From The Water</span>
+            <h1 className="font-display text-fluid-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.05] mb-4">
+              Discover Dubai's
+              <span className="block text-shimmer mt-2">Best Adventures</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-primary-foreground/90 mb-8 leading-relaxed max-w-xl">
-              Unforgettable dhow cruises, luxury yacht charters, and megayacht dining experiences along Dubai Marina's stunning skyline.
+            <p className="text-lg md:text-xl text-primary-foreground/90 mb-6 leading-relaxed max-w-xl">
+              Book unforgettable experiences including desert safaris, theme parks, water sports, dhow cruises, and 100+ activities across Dubai.
             </p>
+
+            {/* Search Bar */}
+            <div className="mb-8">
+              <HeroSearchBar />
+            </div>
 
             {/* CTAs - Full width on mobile */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12">
-              <Link to="/tours" className="w-full sm:w-auto">
+              <Link to="/experiences" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:w-auto bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold text-base sm:text-lg px-6 sm:px-8 h-12 sm:h-14 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 group touch-target">
-                  Explore Tours
+                  Explore Experiences
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Link to="/gallery" className="w-full sm:w-auto">
+              <Link to="/cruises" className="w-full sm:w-auto">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 font-semibold text-base sm:text-lg px-6 sm:px-8 h-12 sm:h-14 backdrop-blur-sm touch-target">
                   <Play className="w-5 h-5 mr-2" />
-                  View Gallery
+                  View Cruises
                 </Button>
               </Link>
             </div>
@@ -106,30 +112,30 @@ const HeroSection = memo(() => {
               <div className="bg-card/95 backdrop-blur-lg rounded-3xl p-6 shadow-2xl border border-border/50 max-w-sm ml-auto">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center">
-                    <Waves className="w-6 h-6 text-secondary" />
+                    <Compass className="w-6 h-6 text-secondary" />
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">Book Your Experience</p>
-                    <p className="text-sm text-muted-foreground">Starting from AED 120</p>
+                    <p className="font-semibold text-foreground">Find Your Adventure</p>
+                    <p className="text-sm text-muted-foreground">100+ experiences available</p>
                   </div>
                 </div>
                 <div className="space-y-3 mb-4">
                   <div className="flex items-center gap-2 text-sm">
                     <span className="w-2 h-2 rounded-full bg-secondary" />
-                    <span className="text-muted-foreground">Instant confirmation</span>
+                    <span className="text-muted-foreground">Desert safaris & dune bashing</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <span className="w-2 h-2 rounded-full bg-secondary" />
-                    <span className="text-muted-foreground">Free cancellation up to 24h</span>
+                    <span className="text-muted-foreground">Theme parks & attractions</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <span className="w-2 h-2 rounded-full bg-secondary" />
-                    <span className="text-muted-foreground">Best price guaranteed</span>
+                    <span className="text-muted-foreground">Water sports & yacht cruises</span>
                   </div>
                 </div>
-                <Link to="/tours">
+                <Link to="/experiences">
                   <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90">
-                    View All Tours
+                    Browse All Experiences
                   </Button>
                 </Link>
               </div>
