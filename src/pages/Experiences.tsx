@@ -61,28 +61,28 @@ const experienceCategories = [
     slug: "museums-attractions",
     icon: Landmark,
     description: "Museum of the Future, AYA Universe, Madame Tussauds, and immersive experiences",
-    image: "/assets/services/city-tours.jpg",
+    image: "/assets/services/museums-attractions.jpg",
   },
   {
     name: "Zoos & Aquariums",
     slug: "zoos-aquariums",
     icon: Fish,
     description: "Dubai Aquarium, The Green Planet, Lost Chambers, and wildlife encounters",
-    image: "/assets/services/water-sports.jpg",
+    image: "/assets/services/zoos-aquariums.jpg",
   },
   {
     name: "Water Parks",
     slug: "water-parks",
     icon: Droplets,
     description: "Aquaventure Atlantis, Wild Wadi, Laguna Waterpark, and splash-filled adventures",
-    image: "/assets/services/water-sports.jpg",
+    image: "/assets/services/water-parks.jpg",
   },
   {
     name: "Parks & Gardens",
     slug: "parks-gardens",
     icon: Flower2,
     description: "Dubai Miracle Garden, Butterfly Garden, Safari Park, and natural escapes",
-    image: "/assets/services/city-tours.jpg",
+    image: "/assets/services/parks-gardens.jpg",
   },
   {
     name: "City Tours",
@@ -96,7 +96,7 @@ const experienceCategories = [
     slug: "sightseeing-cruises",
     icon: Ship,
     description: "Dhow cruises, yacht tours, speed boats, and scenic marina experiences",
-    image: "/assets/services/city-tours.jpg",
+    image: "/assets/services/sightseeing-cruises.jpg",
   },
   {
     name: "Adventure Sports",
@@ -124,7 +124,7 @@ const experienceCategories = [
     slug: "attraction-passes",
     icon: Ticket,
     description: "Multi-attraction combo passes for maximum savings and flexibility",
-    image: "/assets/services/theme-parks.jpg",
+    image: "/assets/services/attraction-passes.jpg",
   },
 ];
 
