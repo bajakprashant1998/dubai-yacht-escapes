@@ -1,510 +1,296 @@
 
+# Implementation Plan: Admin CRUD Pages & Sample Data
 
-# Implementation Plan: Car Rentals, Hotels, Visa Services & Blog
-
-This comprehensive plan adds 4 major new sections to the Dubai tourism platform, with full frontend pages and admin management capabilities.
-
----
-
-## Overview
-
-| Section | Frontend Routes | Admin Routes | Database Tables |
-|---------|-----------------|--------------|-----------------|
-| Car Rentals | `/car-rentals`, `/car-rentals/:slug` | `/admin/car-rentals/*` | `car_rentals`, `car_categories` |
-| Hotels | `/hotels`, `/hotels/:slug` | `/admin/hotels/*` | `hotels`, `hotel_rooms` |
-| Visa Services | `/visa-services`, `/visa-services/:slug` | `/admin/visa-services/*` | `visa_services` |
-| Blog | `/blog`, `/blog/:slug`, `/blog/category/:slug` | `/admin/blog/*` | `blog_posts`, `blog_categories`, `blog_tags` |
+This plan covers creating admin pages for Car Rentals, Hotels, Visa Services, and Blog sections, plus adding demo data to populate the frontend.
 
 ---
 
-## 1. Car Rental System
+## Testing Summary (Completed)
 
-### Database Schema
+The frontend pages have been tested and are working correctly:
 
-**`car_categories`**
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| name | text | Economy, Sedan, SUV, Luxury, Supercar |
-| slug | text | URL-friendly name |
-| description | text | Category description |
-| sort_order | integer | Display order |
-| is_active | boolean | Visibility flag |
+| Page | Status | Notes |
+|------|--------|-------|
+| /car-rentals | Working | Shows filters sidebar with categories (Economy, Sedan, SUV, Luxury, Supercar), transmission, and price range. Empty state displays correctly. |
+| /hotels | Working | Shows filters for category, star rating, and price range. Empty state displays correctly. |
+| /visa-services | Working | Shows "How It Works" section with 4-step process. Empty state displays correctly. |
+| /blog | Working | Shows sidebar with categories (Dubai Travel Guides, Best Time to Visit, etc.). Empty state displays correctly. |
 
-**`car_rentals`**
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| slug | text | URL-friendly identifier |
-| title | text | Car name (e.g., "Toyota Camry 2024") |
-| brand | text | Car manufacturer |
-| model | text | Car model |
-| year | integer | Model year |
-| category_id | uuid | FK to car_categories |
-| seats | integer | Number of seats |
-| transmission | text | Automatic/Manual |
-| fuel_type | text | Petrol/Diesel/Electric/Hybrid |
-| daily_price | numeric | Price per day |
-| weekly_price | numeric | Price per week |
-| monthly_price | numeric | Price per month |
-| deposit | numeric | Security deposit |
-| driver_available | boolean | Driver option available |
-| self_drive | boolean | Self-drive available |
-| features | text[] | AC, GPS, Bluetooth, etc. |
-| image_url | text | Main image |
-| gallery | text[] | Additional images |
-| description | text | Short description |
-| long_description | text | Full details |
-| requirements | text[] | License, age, etc. |
-| is_featured | boolean | Featured car |
-| is_active | boolean | Visibility |
-| meta_title | text | SEO title |
-| meta_description | text | SEO description |
-
-### Frontend Components
-
-```text
-src/pages/
-├── CarRentals.tsx           # Listing page with filters
-└── CarRentalDetail.tsx      # Detail page with booking
-
-src/components/car-rentals/
-├── CarCard.tsx              # Car listing card
-├── CarFilters.tsx           # Filter sidebar (category, transmission, seats)
-├── CarBookingModal.tsx      # Booking form + WhatsApp CTA
-├── CarPricingTable.tsx      # Daily/Weekly/Monthly pricing display
-└── CarSpecifications.tsx    # Seats, transmission, fuel specs
-```
-
-### Frontend Routes
-```typescript
-<Route path="/car-rentals" element={<CarRentals />} />
-<Route path="/car-rentals/:categorySlug" element={<CarRentals />} />
-<Route path="/car-rentals/:categorySlug/:slug" element={<CarRentalDetail />} />
-```
-
-### Admin Pages
-```text
-src/pages/admin/
-├── CarRentals.tsx           # Car list with CRUD
-├── AddCarRental.tsx         # Add new car form
-├── EditCarRental.tsx        # Edit car form
-└── CarCategories.tsx        # Manage car categories
-```
+All navigation links are functional and the header correctly shows Car Rentals, Hotels, Visa, Blog, and Contact.
 
 ---
 
-## 2. Hotel Booking System
+## Phase 1: Admin CRUD Pages
 
-### Database Schema
+### Car Rentals Admin (3 pages)
 
-**`hotels`**
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| slug | text | URL-friendly identifier |
-| name | text | Hotel name |
-| star_rating | integer | 1-5 stars |
-| category | text | Budget, 3-Star, 4-Star, 5-Star, Luxury |
-| location | text | Area/neighborhood |
-| address | text | Full address |
-| latitude | numeric | Map coordinate |
-| longitude | numeric | Map coordinate |
-| description | text | Short description |
-| long_description | text | Detailed info |
-| amenities | text[] | Pool, WiFi, Gym, etc. |
-| highlights | text[] | Key selling points |
-| image_url | text | Main hotel image |
-| gallery | text[] | Additional images |
-| price_from | numeric | Starting price per night |
-| contact_phone | text | Hotel contact |
-| contact_email | text | Hotel email |
-| check_in_time | text | Standard check-in |
-| check_out_time | text | Standard check-out |
-| is_featured | boolean | Featured hotel |
-| is_active | boolean | Visibility |
-| meta_title | text | SEO title |
-| meta_description | text | SEO description |
+**1. `src/pages/admin/CarRentals.tsx`** - Car listing management
+- Table with columns: Car (image + title), Category, Daily Price, Transmission, Status, Actions
+- Stats cards: Total Cars, Featured, Active, Average Price
+- Search and category filter
+- Quick toggle for featured/active status
+- Delete confirmation dialog
 
-**`hotel_rooms`**
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| hotel_id | uuid | FK to hotels |
-| name | text | Room type name |
-| description | text | Room description |
-| max_guests | integer | Maximum occupancy |
-| beds | text | Bed configuration |
-| size_sqm | numeric | Room size |
-| price_per_night | numeric | Nightly rate |
-| amenities | text[] | Room amenities |
-| image_url | text | Room image |
-| is_available | boolean | Availability |
+**2. `src/pages/admin/AddCarRental.tsx`** - Add new car form wrapper
+- Back button to /admin/car-rentals
+- Renders CarForm component in create mode
 
-### Frontend Components
+**3. `src/pages/admin/EditCarRental.tsx`** - Edit car form wrapper
+- Fetch car by slug
+- Loading and not-found states
+- Renders CarForm in edit mode
 
-```text
-src/pages/
-├── Hotels.tsx               # Hotel listing with filters
-└── HotelDetail.tsx          # Hotel detail with room selection
+**4. `src/pages/admin/CarCategories.tsx`** - Car category management
+- Similar to ServiceCategories page
+- Create/Edit/Delete categories with icon selection
 
-src/components/hotels/
-├── HotelCard.tsx            # Hotel listing card
-├── HotelFilters.tsx         # Filters (star rating, location, price)
-├── HotelRoomCard.tsx        # Room type display
-├── HotelAmenities.tsx       # Amenity icons grid
-├── HotelEnquiryModal.tsx    # Book Now / Enquiry form
-└── HotelMap.tsx             # Location map integration
-```
-
-### Frontend Routes
-```typescript
-<Route path="/hotels" element={<Hotels />} />
-<Route path="/hotels/:category" element={<Hotels />} />
-<Route path="/hotels/:category/:slug" element={<HotelDetail />} />
-```
-
-### Admin Pages
-```text
-src/pages/admin/
-├── Hotels.tsx               # Hotel list management
-├── AddHotel.tsx             # Add new hotel
-├── EditHotel.tsx            # Edit hotel details
-└── HotelRooms.tsx           # Manage rooms for a hotel
-```
+**5. `src/components/admin/CarForm.tsx`** - Comprehensive car form
+- Basic info: Title, Brand, Model, Year, Slug
+- Pricing: Daily, Weekly, Monthly rates, Deposit
+- Specifications: Seats, Transmission, Fuel Type
+- Options: Driver available, Self-drive
+- Features array with add/remove
+- Requirements array (license, age, etc.)
+- Image upload + Gallery
+- SEO fields: Meta title, description
+- Status toggles: Featured, Active
 
 ---
 
-## 3. Visa Services System
+### Hotels Admin (4 pages)
 
-### Database Schema
+**1. `src/pages/admin/Hotels.tsx`** - Hotel listing management
+- Table: Hotel (image + name + location), Star Rating, Category, Price From, Status, Actions
+- Stats: Total Hotels, Featured, 5-Star, Average Price
+- Search and category/star rating filters
 
-**`visa_services`**
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| slug | text | URL-friendly identifier |
-| title | text | Visa type name |
-| visa_type | text | Tourist, Express, Multiple Entry |
-| duration_days | integer | 14, 30, 60 days |
-| validity | text | Visa validity period |
-| processing_time | text | 2-3 business days |
-| price | numeric | Service fee |
-| original_price | numeric | For discount display |
-| description | text | Short description |
-| long_description | text | Full details |
-| requirements | text[] | Required documents |
-| included | text[] | What's included |
-| excluded | text[] | What's not included |
-| faqs | jsonb | Common questions |
-| image_url | text | Banner image |
-| is_express | boolean | Express processing |
-| is_featured | boolean | Featured service |
-| is_active | boolean | Visibility |
-| sort_order | integer | Display order |
-| meta_title | text | SEO title |
-| meta_description | text | SEO description |
+**2. `src/pages/admin/AddHotel.tsx`** - Add new hotel wrapper
+- Renders HotelForm in create mode
 
-### Frontend Components
+**3. `src/pages/admin/EditHotel.tsx`** - Edit hotel wrapper
+- Fetch by slug, loading/error states
+- Renders HotelForm in edit mode
 
-```text
-src/pages/
-├── VisaServices.tsx         # Visa listing page
-└── VisaServiceDetail.tsx    # Visa detail with application
-
-src/components/visa/
-├── VisaCard.tsx             # Visa service card
-├── VisaComparisonTable.tsx  # Compare visa types
-├── VisaRequirements.tsx     # Document checklist
-├── VisaApplicationForm.tsx  # Apply Now form
-└── VisaProcessTimeline.tsx  # Processing steps
-```
-
-### Frontend Routes
-```typescript
-<Route path="/visa-services" element={<VisaServices />} />
-<Route path="/visa-services/:slug" element={<VisaServiceDetail />} />
-```
-
-### Admin Pages
-```text
-src/pages/admin/
-├── VisaServices.tsx         # Visa services list
-├── AddVisaService.tsx       # Add new visa service
-└── EditVisaService.tsx      # Edit visa service
-```
+**4. `src/components/admin/HotelForm.tsx`** - Comprehensive hotel form
+- Basic: Name, Slug, Category, Star Rating
+- Location: Address, Latitude, Longitude
+- Details: Description, Long Description
+- Amenities array (Pool, WiFi, Gym, etc.)
+- Highlights array
+- Contact: Phone, Email
+- Check-in/Check-out times
+- Pricing: Price From
+- Images: Main image + Gallery
+- SEO fields
+- Room management section (inline add rooms)
 
 ---
 
-## 4. Blog System
+### Visa Services Admin (3 pages)
 
-### Database Schema
+**1. `src/pages/admin/VisaServices.tsx`** - Visa listing management
+- Table: Visa Type, Duration, Processing Time, Price, Status, Actions
+- Stats: Total Visas, Express Visas, Active
 
-**`blog_categories`**
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| name | text | Category name |
-| slug | text | URL-friendly name |
-| description | text | Category description |
-| image_url | text | Category image |
-| sort_order | integer | Display order |
-| is_active | boolean | Visibility |
+**2. `src/pages/admin/AddVisaService.tsx`** - Add visa wrapper
+- Renders VisaForm in create mode
 
-**`blog_tags`**
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| name | text | Tag name |
-| slug | text | URL-friendly tag |
+**3. `src/pages/admin/EditVisaService.tsx`** - Edit visa wrapper
+- Fetch by slug, renders VisaForm
 
-**`blog_posts`**
-| Column | Type | Description |
-|--------|------|-------------|
-| id | uuid | Primary key |
-| slug | text | URL-friendly identifier |
-| title | text | Post title |
-| excerpt | text | Short summary |
-| content | text | Full content (rich text) |
-| featured_image | text | Hero image |
-| author_id | uuid | FK to profiles |
-| category_id | uuid | FK to blog_categories |
-| tags | text[] | Tag slugs array |
-| reading_time | integer | Estimated minutes |
-| published_at | timestamp | Publish date |
-| is_featured | boolean | Featured post |
-| is_published | boolean | Published status |
-| view_count | integer | Page views |
-| meta_title | text | SEO title |
-| meta_description | text | SEO description |
-| meta_keywords | text[] | SEO keywords |
-
-### Frontend Components
-
-```text
-src/pages/
-├── Blog.tsx                 # Blog listing with sidebar
-├── BlogPost.tsx             # Single post view
-└── BlogCategory.tsx         # Category archive
-
-src/components/blog/
-├── BlogCard.tsx             # Post preview card
-├── BlogSidebar.tsx          # Categories, tags, recent posts
-├── BlogHero.tsx             # Featured post banner
-├── TableOfContents.tsx      # Post navigation
-├── ShareButtons.tsx         # Social sharing
-├── RelatedPosts.tsx         # Related articles
-└── AuthorCard.tsx           # Author bio
-```
-
-### SEO-Friendly Routes
-```typescript
-<Route path="/blog" element={<Blog />} />
-<Route path="/blog/category/:categorySlug" element={<BlogCategory />} />
-<Route path="/blog/:slug" element={<BlogPost />} />
-<Route path="/blog/tag/:tagSlug" element={<BlogTag />} />
-```
-
-### Admin Pages
-```text
-src/pages/admin/
-├── Blog.tsx                 # Post list with draft/published filters
-├── AddBlogPost.tsx          # Rich text editor for new posts
-├── EditBlogPost.tsx         # Edit existing post
-├── BlogCategories.tsx       # Manage categories
-└── BlogTags.tsx             # Manage tags
-```
+**4. `src/components/admin/VisaForm.tsx`** - Comprehensive visa form
+- Basic: Title, Slug, Visa Type
+- Duration: Days, Validity period
+- Processing: Processing time, Express option
+- Pricing: Price, Original price
+- Details: Description, Long description
+- Requirements array (documents needed)
+- Included/Excluded arrays
+- FAQs editor
+- Image upload
+- SEO fields
+- Status toggles
 
 ---
 
-## Navigation Updates
+### Blog Admin (5 pages)
 
-### Frontend Header
-Add new navigation items to `src/components/layout/Header.tsx`:
+**1. `src/pages/admin/Blog.tsx`** - Post listing management
+- Tabs: All Posts, Published, Drafts
+- Table: Post (image + title + excerpt), Category, Author, Published Date, Status, Actions
+- Stats: Total Posts, Published, Featured, Total Views
 
-```typescript
-const navLinks = [
-  { name: "Home", path: "/" },
-  { name: "Activities", path: "/experiences", hasDropdown: true },
-  { name: "Car Rentals", path: "/car-rentals" },
-  { name: "Hotels", path: "/hotels" },
-  { name: "Visa Services", path: "/visa-services" },
-  { name: "Blog", path: "/blog" },
-  // ... existing links
-];
-```
+**2. `src/pages/admin/AddBlogPost.tsx`** - Add post wrapper
+- Renders BlogPostForm in create mode
 
-### Admin Sidebar
-Add new sections to `src/components/admin/AdminSidebar.tsx`:
+**3. `src/pages/admin/EditBlogPost.tsx`** - Edit post wrapper
+- Fetch by slug, renders BlogPostForm
 
-```typescript
-const navItems = [
-  // ... existing items
-  {
-    title: "Car Rentals",
-    icon: Car,
-    children: [
-      { title: "All Cars", href: "/admin/car-rentals" },
-      { title: "Add Car", href: "/admin/car-rentals/add" },
-      { title: "Categories", href: "/admin/car-rentals/categories" },
-    ],
-  },
-  {
-    title: "Hotels",
-    icon: Building,
-    children: [
-      { title: "All Hotels", href: "/admin/hotels" },
-      { title: "Add Hotel", href: "/admin/hotels/add" },
-    ],
-  },
-  {
-    title: "Visa Services",
-    icon: FileText,
-    children: [
-      { title: "All Visas", href: "/admin/visa-services" },
-      { title: "Add Visa", href: "/admin/visa-services/add" },
-    ],
-  },
-  {
-    title: "Blog",
-    icon: BookOpen,
-    children: [
-      { title: "All Posts", href: "/admin/blog" },
-      { title: "Add Post", href: "/admin/blog/add" },
-      { title: "Categories", href: "/admin/blog/categories" },
-      { title: "Tags", href: "/admin/blog/tags" },
-    ],
-  },
-];
-```
+**4. `src/pages/admin/BlogCategories.tsx`** - Category management
+- Table with CRUD for blog categories
+- Similar to ServiceCategories pattern
+
+**5. `src/components/admin/BlogPostForm.tsx`** - Comprehensive post form
+- Basic: Title, Slug, Excerpt
+- Content: Rich text editor for full content
+- Category selection
+- Tags input (multi-select/create)
+- Featured image upload
+- Publishing: Published/Draft toggle, Publish date
+- SEO fields: Meta title, description, keywords
+- Reading time (auto-calculated or manual)
+- Featured toggle
 
 ---
 
-## Storage Buckets
+## Phase 2: Sample/Demo Data
 
-Create new storage buckets for each section:
-- `car-images` - Car rental photos
-- `hotel-images` - Hotel and room photos
-- `visa-images` - Visa service banners
-- `blog-images` - Blog post images
+Insert realistic sample data to demonstrate the platform capabilities.
+
+### Car Rentals Sample Data (6 cars)
+
+| Car | Category | Daily Price | Transmission |
+|-----|----------|-------------|--------------|
+| Toyota Corolla 2024 | Economy | AED 99 | Automatic |
+| Honda Accord 2024 | Sedan | AED 149 | Automatic |
+| Toyota Land Cruiser 2024 | SUV | AED 299 | Automatic |
+| BMW 7 Series 2024 | Luxury | AED 599 | Automatic |
+| Mercedes S-Class 2024 | Luxury | AED 699 | Automatic |
+| Lamborghini Urus 2024 | Supercar | AED 2,500 | Automatic |
+
+### Hotels Sample Data (6 hotels)
+
+| Hotel | Category | Star Rating | Price From |
+|-------|----------|-------------|------------|
+| Rove Dubai Marina | Budget | 3 | AED 350 |
+| Hilton Dubai Creek | 4-Star | 4 | AED 550 |
+| JW Marriott Marquis | 5-Star | 5 | AED 850 |
+| Atlantis The Palm | Luxury | 5 | AED 1,800 |
+| Burj Al Arab | Luxury | 5 | AED 5,000 |
+| Address Downtown | 5-Star | 5 | AED 1,200 |
+
+### Visa Services Sample Data (6 visas)
+
+| Visa Type | Duration | Processing | Price |
+|-----------|----------|------------|-------|
+| 14-Day Tourist Visa | 14 days | 2-3 days | AED 350 |
+| 30-Day Tourist Visa | 30 days | 2-3 days | AED 450 |
+| 60-Day Tourist Visa | 60 days | 3-5 days | AED 650 |
+| 96-Hour Transit Visa | 4 days | 24 hours | AED 150 |
+| Express 30-Day Visa | 30 days | 24 hours | AED 750 |
+| Multiple Entry Visa | 90 days | 5-7 days | AED 1,200 |
+
+### Blog Posts Sample Data (4 posts)
+
+| Title | Category | Status |
+|-------|----------|--------|
+| Ultimate Guide to Dubai Marina | Dubai Travel Guides | Published |
+| Best Time to Visit Dubai in 2024 | Best Time to Visit | Published |
+| Top 10 Must-See Attractions in Dubai | Top Attractions | Published |
+| Complete UAE Visa Guide for Tourists | Visa & Travel Tips | Published |
+
+---
+
+## Files to Create
+
+### Admin Pages (12 files)
+
+| File | Purpose |
+|------|---------|
+| `src/pages/admin/CarRentals.tsx` | Car listing with CRUD |
+| `src/pages/admin/AddCarRental.tsx` | Add car wrapper |
+| `src/pages/admin/EditCarRental.tsx` | Edit car wrapper |
+| `src/pages/admin/CarCategories.tsx` | Car category management |
+| `src/pages/admin/Hotels.tsx` | Hotel listing with CRUD |
+| `src/pages/admin/AddHotel.tsx` | Add hotel wrapper |
+| `src/pages/admin/EditHotel.tsx` | Edit hotel wrapper |
+| `src/pages/admin/VisaServices.tsx` | Visa listing with CRUD |
+| `src/pages/admin/AddVisaService.tsx` | Add visa wrapper |
+| `src/pages/admin/EditVisaService.tsx` | Edit visa wrapper |
+| `src/pages/admin/Blog.tsx` | Blog post listing |
+| `src/pages/admin/AddBlogPost.tsx` | Add post wrapper |
+| `src/pages/admin/EditBlogPost.tsx` | Edit post wrapper |
+| `src/pages/admin/BlogCategories.tsx` | Blog category management |
+
+### Admin Form Components (4 files)
+
+| File | Purpose |
+|------|---------|
+| `src/components/admin/CarForm.tsx` | Comprehensive car rental form |
+| `src/components/admin/HotelForm.tsx` | Comprehensive hotel form |
+| `src/components/admin/VisaForm.tsx` | Comprehensive visa form |
+| `src/components/admin/BlogPostForm.tsx` | Blog post editor with rich text |
+
+---
+
+## Files to Modify
+
+| File | Changes |
+|------|---------|
+| `src/App.tsx` | Add routes for all new admin pages |
 
 ---
 
 ## Implementation Order
 
-### Phase 1: Database Setup
-1. Create all database tables with proper relationships
-2. Set up RLS policies for public read and admin write
-3. Create storage buckets with public access
-4. Add sample data for testing
+### Step 1: Car Rentals Admin
+1. Create CarForm component with all fields
+2. Create CarRentals listing page
+3. Create Add/Edit wrapper pages
+4. Create CarCategories management page
+5. Add routes to App.tsx
 
-### Phase 2: Car Rentals (Frontend + Admin)
-5. Create car rental listing and detail pages
-6. Build car booking form with WhatsApp integration
-7. Create admin CRUD pages for cars
-8. Add car categories management
+### Step 2: Hotels Admin
+6. Create HotelForm component
+7. Create Hotels listing page
+8. Create Add/Edit wrapper pages
+9. Add routes to App.tsx
 
-### Phase 3: Hotels (Frontend + Admin)
-9. Create hotel listing and detail pages
-10. Build room cards and enquiry form
-11. Create admin hotel management
-12. Add room management per hotel
+### Step 3: Visa Services Admin
+10. Create VisaForm component
+11. Create VisaServices listing page
+12. Create Add/Edit wrapper pages
+13. Add routes to App.tsx
 
-### Phase 4: Visa Services (Frontend + Admin)
-13. Create visa services listing page
-14. Build visa detail with application form
-15. Create admin visa management
+### Step 4: Blog Admin
+14. Create BlogPostForm component with rich text
+15. Create Blog listing page with tabs
+16. Create Add/Edit wrapper pages
+17. Create BlogCategories management
+18. Add routes to App.tsx
 
-### Phase 5: Blog (Frontend + Admin)
-16. Create blog listing with category sidebar
-17. Build single post view with TOC
-18. Create rich text editor for admin
-19. Add category and tag management
-
-### Phase 6: Navigation & Polish
-20. Update header navigation
-21. Update admin sidebar
-22. Add sections to homepage
-23. SEO optimization
+### Step 5: Sample Data
+19. Insert car rentals demo data
+20. Insert hotels demo data with sample rooms
+21. Insert visa services demo data
+22. Insert blog posts demo data
 
 ---
 
-## Files Summary
+## Technical Notes
 
-### New Files to Create (70+ files)
+### Form Patterns
 
-**Frontend Pages (10 files)**
-- `src/pages/CarRentals.tsx`
-- `src/pages/CarRentalDetail.tsx`
-- `src/pages/Hotels.tsx`
-- `src/pages/HotelDetail.tsx`
-- `src/pages/VisaServices.tsx`
-- `src/pages/VisaServiceDetail.tsx`
-- `src/pages/Blog.tsx`
-- `src/pages/BlogPost.tsx`
-- `src/pages/BlogCategory.tsx`
-- `src/pages/BlogTag.tsx`
+All forms follow the existing ServiceForm pattern:
+- useState for form data with comprehensive initial state
+- Image upload to appropriate storage bucket
+- Array field management (add/remove items)
+- Rich text editor for long descriptions
+- SEO preview component
+- Save/Cancel buttons with loading state
 
-**Admin Pages (15 files)**
-- `src/pages/admin/CarRentals.tsx`
-- `src/pages/admin/AddCarRental.tsx`
-- `src/pages/admin/EditCarRental.tsx`
-- `src/pages/admin/CarCategories.tsx`
-- `src/pages/admin/Hotels.tsx`
-- `src/pages/admin/AddHotel.tsx`
-- `src/pages/admin/EditHotel.tsx`
-- `src/pages/admin/HotelRooms.tsx`
-- `src/pages/admin/VisaServices.tsx`
-- `src/pages/admin/AddVisaService.tsx`
-- `src/pages/admin/EditVisaService.tsx`
-- `src/pages/admin/Blog.tsx`
-- `src/pages/admin/AddBlogPost.tsx`
-- `src/pages/admin/EditBlogPost.tsx`
-- `src/pages/admin/BlogCategories.tsx`
+### Hooks Already Exist
 
-**Components (25+ files)**
-- Car rental components (5 files)
-- Hotel components (6 files)
-- Visa components (5 files)
-- Blog components (7 files)
+All necessary hooks are already created:
+- `useCarRentals`, `useCarCategories`, `useAdminCarRentals`, `useCreateCarRental`, etc.
+- `useHotels`, `useAdminHotels`, `useCreateHotel`, etc.
+- `useVisaServices`, `useAdminVisaServices`, `useCreateVisaService`, etc.
+- `useBlogPosts`, `useAdminBlogPosts`, `useCreateBlogPost`, etc.
 
-**Hooks (8 files)**
-- `src/hooks/useCarRentals.ts`
-- `src/hooks/useCarCategories.ts`
-- `src/hooks/useHotels.ts`
-- `src/hooks/useHotelRooms.ts`
-- `src/hooks/useVisaServices.ts`
-- `src/hooks/useBlogPosts.ts`
-- `src/hooks/useBlogCategories.ts`
-- `src/hooks/useBlogTags.ts`
+### Storage Buckets
 
-**Mappers (4 files)**
-- `src/lib/carMapper.ts`
-- `src/lib/hotelMapper.ts`
-- `src/lib/visaMapper.ts`
-- `src/lib/blogMapper.ts`
-
-### Files to Modify
-- `src/App.tsx` - Add all new routes
-- `src/components/layout/Header.tsx` - Update navigation
-- `src/components/admin/AdminSidebar.tsx` - Add admin sections
-
----
-
-## WhatsApp Integration
-
-All booking forms will include a WhatsApp CTA using the existing pattern:
-
-```typescript
-const handleWhatsApp = () => {
-  const message = encodeURIComponent(
-    `Hello! I'm interested in booking:\n\n` +
-    `${itemType}: ${itemName}\n` +
-    `Date: ${selectedDate}\n` +
-    `Details: ${formDetails}`
-  );
-  window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
-};
-```
-
-This ensures instant communication while the booking form captures lead data.
+Already created:
+- `car-images` - For car photos
+- `hotel-images` - For hotel photos
+- `visa-images` - For visa banners
+- `blog-images` - For blog post images
