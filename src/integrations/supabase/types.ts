@@ -80,6 +80,144 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          name: string
+          slug: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name: string
+          slug: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name?: string
+          slug?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      blog_posts: {
+        Row: {
+          author_id: string | null
+          category_id: string | null
+          content: string | null
+          created_at: string
+          excerpt: string | null
+          featured_image: string | null
+          id: string
+          is_featured: boolean | null
+          is_published: boolean | null
+          meta_description: string | null
+          meta_keywords: string[] | null
+          meta_title: string | null
+          published_at: string | null
+          reading_time: number | null
+          slug: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          view_count: number | null
+        }
+        Insert: {
+          author_id?: string | null
+          category_id?: string | null
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          meta_description?: string | null
+          meta_keywords?: string[] | null
+          meta_title?: string | null
+          published_at?: string | null
+          reading_time?: number | null
+          slug: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Update: {
+          author_id?: string | null
+          category_id?: string | null
+          content?: string | null
+          created_at?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          is_featured?: boolean | null
+          is_published?: boolean | null
+          meta_description?: string | null
+          meta_keywords?: string[] | null
+          meta_title?: string | null
+          published_at?: string | null
+          reading_time?: number | null
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_posts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "blog_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_tags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           adults: number
@@ -189,6 +327,146 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      car_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          name: string
+          slug: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name: string
+          slug: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          name?: string
+          slug?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      car_rentals: {
+        Row: {
+          brand: string
+          category_id: string | null
+          created_at: string
+          daily_price: number
+          deposit: number | null
+          description: string | null
+          driver_available: boolean | null
+          features: string[] | null
+          fuel_type: string | null
+          gallery: string[] | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          long_description: string | null
+          meta_description: string | null
+          meta_title: string | null
+          model: string
+          monthly_price: number | null
+          requirements: string[] | null
+          seats: number | null
+          self_drive: boolean | null
+          slug: string
+          sort_order: number | null
+          title: string
+          transmission: string | null
+          updated_at: string
+          weekly_price: number | null
+          year: number
+        }
+        Insert: {
+          brand: string
+          category_id?: string | null
+          created_at?: string
+          daily_price: number
+          deposit?: number | null
+          description?: string | null
+          driver_available?: boolean | null
+          features?: string[] | null
+          fuel_type?: string | null
+          gallery?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          long_description?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          model: string
+          monthly_price?: number | null
+          requirements?: string[] | null
+          seats?: number | null
+          self_drive?: boolean | null
+          slug: string
+          sort_order?: number | null
+          title: string
+          transmission?: string | null
+          updated_at?: string
+          weekly_price?: number | null
+          year: number
+        }
+        Update: {
+          brand?: string
+          category_id?: string | null
+          created_at?: string
+          daily_price?: number
+          deposit?: number | null
+          description?: string | null
+          driver_available?: boolean | null
+          features?: string[] | null
+          fuel_type?: string | null
+          gallery?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          long_description?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          model?: string
+          monthly_price?: number | null
+          requirements?: string[] | null
+          seats?: number | null
+          self_drive?: boolean | null
+          slug?: string
+          sort_order?: number | null
+          title?: string
+          transmission?: string | null
+          updated_at?: string
+          weekly_price?: number | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "car_rentals_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "car_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       categories: {
         Row: {
@@ -516,6 +794,158 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      hotel_rooms: {
+        Row: {
+          amenities: string[] | null
+          beds: string | null
+          created_at: string
+          description: string | null
+          gallery: string[] | null
+          hotel_id: string
+          id: string
+          image_url: string | null
+          is_available: boolean | null
+          max_guests: number | null
+          name: string
+          price_per_night: number
+          size_sqm: number | null
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          amenities?: string[] | null
+          beds?: string | null
+          created_at?: string
+          description?: string | null
+          gallery?: string[] | null
+          hotel_id: string
+          id?: string
+          image_url?: string | null
+          is_available?: boolean | null
+          max_guests?: number | null
+          name: string
+          price_per_night: number
+          size_sqm?: number | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          amenities?: string[] | null
+          beds?: string | null
+          created_at?: string
+          description?: string | null
+          gallery?: string[] | null
+          hotel_id?: string
+          id?: string
+          image_url?: string | null
+          is_available?: boolean | null
+          max_guests?: number | null
+          name?: string
+          price_per_night?: number
+          size_sqm?: number | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hotel_rooms_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: false
+            referencedRelation: "hotels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hotels: {
+        Row: {
+          address: string | null
+          amenities: string[] | null
+          category: string | null
+          check_in_time: string | null
+          check_out_time: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          gallery: string[] | null
+          highlights: string[] | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          latitude: number | null
+          location: string | null
+          long_description: string | null
+          longitude: number | null
+          meta_description: string | null
+          meta_title: string | null
+          name: string
+          price_from: number | null
+          slug: string
+          sort_order: number | null
+          star_rating: number | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          amenities?: string[] | null
+          category?: string | null
+          check_in_time?: string | null
+          check_out_time?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          gallery?: string[] | null
+          highlights?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          latitude?: number | null
+          location?: string | null
+          long_description?: string | null
+          longitude?: number | null
+          meta_description?: string | null
+          meta_title?: string | null
+          name: string
+          price_from?: number | null
+          slug: string
+          sort_order?: number | null
+          star_rating?: number | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          amenities?: string[] | null
+          category?: string | null
+          check_in_time?: string | null
+          check_out_time?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          gallery?: string[] | null
+          highlights?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          latitude?: number | null
+          location?: string | null
+          long_description?: string | null
+          longitude?: number | null
+          meta_description?: string | null
+          meta_title?: string | null
+          name?: string
+          price_from?: number | null
+          slug?: string
+          sort_order?: number | null
+          star_rating?: number | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       inquiries: {
         Row: {
@@ -1094,6 +1524,87 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      visa_services: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_days: number | null
+          excluded: string[] | null
+          faqs: Json | null
+          id: string
+          image_url: string | null
+          included: string[] | null
+          is_active: boolean | null
+          is_express: boolean | null
+          is_featured: boolean | null
+          long_description: string | null
+          meta_description: string | null
+          meta_title: string | null
+          original_price: number | null
+          price: number
+          processing_time: string | null
+          requirements: string[] | null
+          slug: string
+          sort_order: number | null
+          title: string
+          updated_at: string
+          validity: string | null
+          visa_type: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_days?: number | null
+          excluded?: string[] | null
+          faqs?: Json | null
+          id?: string
+          image_url?: string | null
+          included?: string[] | null
+          is_active?: boolean | null
+          is_express?: boolean | null
+          is_featured?: boolean | null
+          long_description?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          original_price?: number | null
+          price: number
+          processing_time?: string | null
+          requirements?: string[] | null
+          slug: string
+          sort_order?: number | null
+          title: string
+          updated_at?: string
+          validity?: string | null
+          visa_type: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_days?: number | null
+          excluded?: string[] | null
+          faqs?: Json | null
+          id?: string
+          image_url?: string | null
+          included?: string[] | null
+          is_active?: boolean | null
+          is_express?: boolean | null
+          is_featured?: boolean | null
+          long_description?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          original_price?: number | null
+          price?: number
+          processing_time?: string | null
+          requirements?: string[] | null
+          slug?: string
+          sort_order?: number | null
+          title?: string
+          updated_at?: string
+          validity?: string | null
+          visa_type?: string
         }
         Relationships: []
       }

@@ -30,8 +30,10 @@ const Header = () => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Activities", path: "/experiences", hasDropdown: true },
-    { name: "Gallery", path: "/gallery" },
-    { name: "About Us", path: "/about" },
+    { name: "Car Rentals", path: "/car-rentals" },
+    { name: "Hotels", path: "/hotels" },
+    { name: "Visa", path: "/visa-services" },
+    { name: "Blog", path: "/blog" },
     { name: "Contact", path: "/contact" },
   ];
 

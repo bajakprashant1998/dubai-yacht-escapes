@@ -31,6 +31,17 @@ const FAQ = lazy(() => import("./pages/FAQ"));
 const TravelTips = lazy(() => import("./pages/TravelTips"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
+// New module pages
+const CarRentals = lazy(() => import("./pages/CarRentals"));
+const CarRentalDetail = lazy(() => import("./pages/CarRentalDetail"));
+const Hotels = lazy(() => import("./pages/Hotels"));
+const HotelDetail = lazy(() => import("./pages/HotelDetail"));
+const VisaServicesPage = lazy(() => import("./pages/VisaServices"));
+const VisaServiceDetail = lazy(() => import("./pages/VisaServiceDetail"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const BlogCategory = lazy(() => import("./pages/BlogCategory"));
+
 // Admin pages - lazy load entire admin section
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminBookings = lazy(() => import("./pages/admin/Bookings"));
@@ -117,6 +128,21 @@ const App = () => (
             <Route path="/cancellation-policy" element={<CancellationPolicy />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/travel-tips" element={<TravelTips />} />
+            {/* Car Rentals */}
+            <Route path="/car-rentals" element={<CarRentals />} />
+            <Route path="/car-rentals/:categorySlug" element={<CarRentals />} />
+            <Route path="/car-rentals/:categorySlug/:slug" element={<CarRentalDetail />} />
+            {/* Hotels */}
+            <Route path="/hotels" element={<Hotels />} />
+            <Route path="/hotels/:category" element={<Hotels />} />
+            <Route path="/hotels/:category/:slug" element={<HotelDetail />} />
+            {/* Visa Services */}
+            <Route path="/visa-services" element={<VisaServicesPage />} />
+            <Route path="/visa-services/:slug" element={<VisaServiceDetail />} />
+            {/* Blog */}
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/category/:categorySlug" element={<BlogCategory />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
             {/* Admin Routes */}
             <Route
               path="/admin"
