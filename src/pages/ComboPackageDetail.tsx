@@ -6,6 +6,8 @@ import ComboItinerary from "@/components/combo/ComboItinerary";
 import ComboPricing from "@/components/combo/ComboPricing";
 import ComboBookingCard from "@/components/combo/ComboBookingCard";
 import ComboCard from "@/components/combo/ComboCard";
+import ComboGallery from "@/components/combo/ComboGallery";
+import ComboQuickInfo from "@/components/combo/ComboQuickInfo";
 import { useComboPackageWithItems, useComboPackages } from "@/hooks/useComboPackages";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -139,6 +141,26 @@ const ComboPackageDetail = () => {
                 </p>
               </motion.div>
 
+              {/* Quick Info Pills */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.05 }}
+              >
+                <ComboQuickInfo combo={combo} />
+              </motion.div>
+
+              {/* Gallery */}
+              {combo.gallery && combo.gallery.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.08 }}
+                >
+                  <h2 className="text-2xl font-bold text-foreground mb-4">Gallery</h2>
+                  <ComboGallery images={combo.gallery} name={combo.name} />
+                </motion.div>
+              )}
               {/* What's Included */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

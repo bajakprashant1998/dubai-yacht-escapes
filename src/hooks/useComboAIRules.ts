@@ -163,43 +163,99 @@ export const useMatchCombo = (params: MatchComboParams) => {
       if (params.tripDays <= 0) return null;
 
       // Fetch active rules sorted by priority
-      const { data: rules, error } = await supabase
+      const { data: rules, error: rulesError } = await supabase
         .from("combo_ai_rules")
-        .select("*, combo:combo_packages(*)")
+        .select("*")
         .eq("is_active", true)
         .order("priority", { ascending: false });
 
-      if (error) throw error;
+      if (rulesError) {
+        console.error("Error fetching AI rules:", rulesError);
+        throw rulesError;
+      }
+
+      if (!rules || rules.length === 0) {
+        console.log("No active AI rules found");
+        return null;
+      }
 
       // Find matching rule
-      for (const rule of rules || []) {
+      for (const rule of rules) {
         const conditions = rule.conditions as ComboAIRule["conditions"];
         let matches = true;
+        let matchReasons: string[] = [];
 
-        if (conditions.trip_days_max && params.tripDays > conditions.trip_days_max) {
-          matches = false;
+        // Check trip days range
+        if (conditions.trip_days_max !== undefined && conditions.trip_days_max > 0) {
+          if (params.tripDays > conditions.trip_days_max) {
+            matches = false;
+          } else {
+            matchReasons.push(`days <= ${conditions.trip_days_max}`);
+          }
         }
-        if (conditions.trip_days_min && params.tripDays < conditions.trip_days_min) {
-          matches = false;
-        }
-        if (conditions.travel_style && conditions.travel_style !== params.travelStyle) {
-          matches = false;
-        }
-        if (conditions.budget_tier && conditions.budget_tier !== params.budgetTier) {
-          matches = false;
-        }
-        if (conditions.has_children !== undefined && conditions.has_children !== params.hasChildren) {
-          matches = false;
+        
+        if (conditions.trip_days_min !== undefined && conditions.trip_days_min > 0) {
+          if (params.tripDays < conditions.trip_days_min) {
+            matches = false;
+          } else {
+            matchReasons.push(`days >= ${conditions.trip_days_min}`);
+          }
         }
 
-        if (matches && rule.combo) {
-          return {
-            combo: rule.combo,
-            rule,
-          };
+        // Check travel style (case-insensitive)
+        if (conditions.travel_style && conditions.travel_style.trim() !== "") {
+          const conditionStyle = conditions.travel_style.toLowerCase();
+          const paramStyle = params.travelStyle.toLowerCase();
+          if (conditionStyle !== paramStyle) {
+            matches = false;
+          } else {
+            matchReasons.push(`style = ${conditions.travel_style}`);
+          }
+        }
+
+        // Check budget tier (case-insensitive)
+        if (conditions.budget_tier && conditions.budget_tier.trim() !== "") {
+          const conditionBudget = conditions.budget_tier.toLowerCase();
+          const paramBudget = params.budgetTier.toLowerCase();
+          if (conditionBudget !== paramBudget) {
+            matches = false;
+          } else {
+            matchReasons.push(`budget = ${conditions.budget_tier}`);
+          }
+        }
+
+        // Check has children
+        if (conditions.has_children === true && params.hasChildren !== true) {
+          matches = false;
+        } else if (conditions.has_children === true) {
+          matchReasons.push("has children");
+        }
+
+        if (matches) {
+          // Fetch the combo package separately
+          const { data: combo, error: comboError } = await supabase
+            .from("combo_packages")
+            .select("*")
+            .eq("id", rule.combo_id)
+            .eq("is_active", true)
+            .single();
+
+          if (comboError) {
+            console.error("Error fetching combo package:", comboError);
+            continue;
+          }
+
+          if (combo) {
+            console.log("Matched rule:", rule.rule_name, "with reasons:", matchReasons.join(", "));
+            return {
+              combo,
+              rule,
+            };
+          }
         }
       }
 
+      console.log("No matching rules found for params:", params);
       return null;
     },
     enabled: params.tripDays > 0,
