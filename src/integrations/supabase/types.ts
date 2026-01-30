@@ -589,12 +589,41 @@ export type Database = {
         }
         Relationships: []
       }
+      permissions: {
+        Row: {
+          action: string
+          allowed: boolean
+          created_at: string
+          id: string
+          resource: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          action: string
+          allowed?: boolean
+          created_at?: string
+          id?: string
+          resource: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          action?: string
+          allowed?: boolean
+          created_at?: string
+          id?: string
+          resource?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           created_at: string
           full_name: string | null
           id: string
+          phone: string | null
+          status: string | null
           updated_at: string
           user_id: string
         }
@@ -603,6 +632,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          phone?: string | null
+          status?: string | null
           updated_at?: string
           user_id: string
         }
@@ -611,6 +642,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          phone?: string | null
+          status?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1044,6 +1077,10 @@ export type Database = {
           tour_count: number
           updated_at: string
         }[]
+      }
+      has_permission: {
+        Args: { _action: string; _resource: string; _user_id: string }
+        Returns: boolean
       }
       has_role: {
         Args: {
