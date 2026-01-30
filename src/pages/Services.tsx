@@ -1,19 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Search, Grid3X3, List, Star, MapPin } from "lucide-react";
+import { Search, Grid3X3, List, Star, MapPin, TrendingUp, ArrowUpDown, ThumbsUp } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import ServiceCardRedesigned from "@/components/ServiceCardRedesigned";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SortingTabs, type SortOption } from "@/components/ui/sorting-tabs";
 import { useServices, useServicesByCategory } from "@/hooks/useServices";
 import { useActiveServiceCategories } from "@/hooks/useServiceCategories";
 import { cn } from "@/lib/utils";
@@ -24,6 +18,13 @@ import {
   defaultFilters,
   type FilterState,
 } from "@/components/services/ServiceFilters";
+
+const sortOptions: SortOption[] = [
+  { value: "popular", label: "Recommended", icon: TrendingUp },
+  { value: "price-low", label: "Price: Low to High", icon: ArrowUpDown },
+  { value: "price-high", label: "Price: High to Low", icon: ArrowUpDown },
+  { value: "rating", label: "Highest Rated", icon: ThumbsUp },
+];
 
 // Helper to parse duration string to hours
 const parseDurationToHours = (duration: string | null): number | null => {
@@ -240,17 +241,35 @@ const Services = () => {
 
             {/* Main Content */}
             <div className="flex-1 min-w-0">
-              {/* Filter Bar */}
-              <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              {/* Results Header Bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-border">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-lg font-semibold text-foreground">
+                    {activeCategory ? activeCategory.name : "All Experiences"}
+                  </h2>
+                  <Badge variant="secondary" className="text-xs font-medium">
+                    {sortedServices?.length || 0} results
+                  </Badge>
+                </div>
+                <div className="relative flex-1 max-w-xs">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search experiences..."
+                    placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
+                    className="pl-9 h-9 text-sm"
                   />
                 </div>
+              </div>
+
+              {/* Sorting Tabs & View Toggle */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <SortingTabs
+                  options={sortOptions}
+                  value={sortBy}
+                  onChange={setSortBy}
+                  className="flex-1"
+                />
                 <div className="flex items-center gap-2">
                   <ServiceFiltersDrawer
                     filters={filters}
@@ -258,31 +277,26 @@ const Services = () => {
                     maxPrice={maxPrice}
                     activeFilterCount={activeFilterCount}
                   />
-                  <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-[160px]">
-                      <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="popular">Most Popular</SelectItem>
-                      <SelectItem value="rating">Highest Rated</SelectItem>
-                      <SelectItem value="price-low">Price: Low to High</SelectItem>
-                      <SelectItem value="price-high">Price: High to Low</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div className="hidden sm:flex items-center border rounded-lg">
+                  <div className="hidden sm:flex items-center border border-border rounded-lg bg-muted/30">
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="sm"
                       onClick={() => setViewMode("grid")}
-                      className={cn(viewMode === "grid" && "bg-muted")}
+                      className={cn(
+                        "h-8 px-3 rounded-r-none",
+                        viewMode === "grid" && "bg-background shadow-sm"
+                      )}
                     >
                       <Grid3X3 className="w-4 h-4" />
                     </Button>
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="sm"
                       onClick={() => setViewMode("list")}
-                      className={cn(viewMode === "list" && "bg-muted")}
+                      className={cn(
+                        "h-8 px-3 rounded-l-none",
+                        viewMode === "list" && "bg-background shadow-sm"
+                      )}
                     >
                       <List className="w-4 h-4" />
                     </Button>
@@ -314,7 +328,11 @@ const Services = () => {
                   )}
                 >
                   {sortedServices.map((service) => (
-                    <ServiceCardRedesigned key={service.id} service={service} />
+                    <ServiceCardRedesigned 
+                      key={service.id} 
+                      service={service}
+                      viewMode={viewMode}
+                    />
                   ))}
                 </div>
               ) : (
