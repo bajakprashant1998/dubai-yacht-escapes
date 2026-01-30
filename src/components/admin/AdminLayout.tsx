@@ -278,7 +278,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
           onSearchClick={() => setCommandOpen(true)}
           user={user}
         />
-        <main className="flex-1 p-4 lg:p-6 overflow-auto pb-20 lg:pb-6">
+        <main className="flex-1 p-4 lg:p-6 overflow-auto pb-24 lg:pb-6 mb-safe">
           {children}
         </main>
       </div>

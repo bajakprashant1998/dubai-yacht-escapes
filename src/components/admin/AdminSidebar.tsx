@@ -268,7 +268,7 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
         </nav>
 
         {/* User Profile Section - Fixed at Bottom */}
-        <div className="flex-shrink-0 p-4 border-t border-white/10 bg-primary">
+        <div className="flex-shrink-0 p-4 border-t border-white/10 bg-primary pb-safe">
           <div className="flex items-center gap-3 mb-3">
             <Avatar className="h-10 w-10 border-2 border-secondary/50">
               <AvatarFallback className="bg-secondary text-primary font-semibold text-sm">
@@ -276,7 +276,7 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
+              <p className="text-sm font-medium text-white truncate max-w-[140px]">
                 {userEmail || "Admin"}
               </p>
               <p className="text-xs text-white/50">Administrator</p>

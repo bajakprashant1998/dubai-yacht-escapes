@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Package } from "lucide-react";
@@ -9,6 +9,46 @@ import { useFeaturedComboPackages } from "@/hooks/useComboPackages";
 
 const FeaturedCombos = memo(() => {
   const { data: featuredCombos = [], isLoading } = useFeaturedComboPackages();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Intersection Observer to track active card
+  useEffect(() => {
+    if (isLoading || featuredCombos.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            const index = cardRefs.current.findIndex(
+              (ref) => ref === entry.target
+            );
+            if (index !== -1) {
+              setActiveIndex(index);
+            }
+          }
+        });
+      },
+      {
+        root: scrollContainerRef.current,
+        threshold: 0.5,
+      }
+    );
+
+    cardRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, [isLoading, featuredCombos.length]);
+
+  const setCardRef = useCallback(
+    (index: number) => (el: HTMLDivElement | null) => {
+      cardRefs.current[index] = el;
+    },
+    []
+  );
 
   return (
     <section className="py-20 bg-gradient-to-b from-muted/50 to-background">
@@ -67,22 +107,38 @@ const FeaturedCombos = memo(() => {
           <>
             {/* Mobile: Horizontal scroll carousel */}
             <div className="lg:hidden -mx-4 px-4">
-              <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide">
-                {featuredCombos.slice(0, 4).map((combo) => (
+              <div
+                ref={scrollContainerRef}
+                className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide"
+              >
+                {featuredCombos.slice(0, 4).map((combo, index) => (
                   <div
                     key={combo.id}
-                    className="flex-shrink-0 w-[85%] sm:w-[75%] snap-start"
+                    ref={setCardRef(index)}
+                    className="flex-shrink-0 w-[85%] sm:w-[75%] snap-center"
                   >
                     <ComboCard combo={combo} />
                   </div>
                 ))}
               </div>
-              {/* Scroll indicator */}
+              {/* Scroll indicator - synced with visible card */}
               <div className="flex justify-center gap-1.5 mt-2">
                 {featuredCombos.slice(0, 4).map((_, index) => (
-                  <div
+                  <button
                     key={index}
-                    className={`w-2 h-2 rounded-full transition-all ${index === 0 ? 'bg-secondary w-4' : 'bg-muted-foreground/30'}`}
+                    onClick={() => {
+                      cardRefs.current[index]?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "nearest",
+                        inline: "center",
+                      });
+                    }}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      index === activeIndex
+                        ? "bg-secondary w-6"
+                        : "bg-muted-foreground/30 w-2 hover:bg-muted-foreground/50"
+                    }`}
+                    aria-label={`Go to slide ${index + 1}`}
                   />
                 ))}
               </div>
