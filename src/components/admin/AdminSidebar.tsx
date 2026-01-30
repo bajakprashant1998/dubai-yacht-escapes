@@ -50,6 +50,7 @@ const navItems: NavItem[] = [
     children: [
       { title: "All Combos", href: "/admin/combo-packages" },
       { title: "Add Combo", href: "/admin/combo-packages/add" },
+      { title: "Package Types", href: "/admin/combo-packages/types" },
     ],
   },
   { title: "Bookings", href: "/admin/bookings", icon: Calendar },
