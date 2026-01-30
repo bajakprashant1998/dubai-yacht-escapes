@@ -3,9 +3,8 @@ import HeroSection from "@/components/home/HeroSection";
 import TrustStrip from "@/components/home/TrustStrip";
 import ExperienceCategories from "@/components/home/ExperienceCategories";
 import CategoryShowcase from "@/components/home/CategoryShowcase";
-import FeaturedExperiences from "@/components/home/FeaturedExperiences";
+import FeaturedCombos from "@/components/home/FeaturedCombos";
 import RecentlyViewedSection from "@/components/home/RecentlyViewedSection";
-import FeaturedTours from "@/components/home/FeaturedTours";
 import PopularDestinations from "@/components/home/PopularDestinations";
 import HowItWorks from "@/components/home/HowItWorks";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
@@ -28,12 +27,11 @@ const Home = () => {
       <HeroSection />
       <TrustStrip />
       <ExperienceCategories />
-      <FeaturedExperiences />
+      <FeaturedCombos />
       <RecentlyViewedSection />
       <QuickServices />
       <PopularDestinations />
       <CategoryShowcase />
-      <FeaturedTours />
       <HowItWorks />
       <WhyChooseUs />
       <TestimonialsCarousel />

@@ -165,11 +165,18 @@ const Services = () => {
     });
   }, [filteredServices, sortBy]);
 
+  // Dynamic banner based on selected category
+  const bannerImage = activeCategory?.imageUrl || "/assets/services/city-tours.jpg";
+
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-16 bg-gradient-to-br from-primary via-primary/95 to-primary/90">
-        <div className="absolute inset-0 bg-[url('/placeholder.svg')] opacity-10 bg-cover bg-center" />
+      {/* Hero Section with Dynamic Banner */}
+      <section className="relative pt-32 pb-16 bg-gradient-to-br from-primary via-primary/95 to-primary/90 overflow-hidden">
+        <div 
+          className="absolute inset-0 opacity-20 bg-cover bg-center transition-all duration-500"
+          style={{ backgroundImage: `url(${bannerImage})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/50 to-primary/90" />
         <div className="container relative z-10">
           <div className="max-w-3xl">
             <Badge className="mb-4 bg-secondary/20 text-secondary border-secondary/30">

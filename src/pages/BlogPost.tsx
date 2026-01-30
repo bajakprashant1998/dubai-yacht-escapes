@@ -218,6 +218,18 @@ const BlogPost = () => {
                   prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
                   prose-pre:bg-primary prose-pre:text-primary-foreground prose-pre:rounded-xl prose-pre:p-6
                   prose-img:rounded-xl prose-img:shadow-lg prose-img:my-8
+                  
+                  [&_.blog-card]:bg-card [&_.blog-card]:rounded-xl [&_.blog-card]:border [&_.blog-card]:border-border 
+                  [&_.blog-card]:p-6 [&_.blog-card]:mb-6 [&_.blog-card]:shadow-sm
+                  [&_.card-heading]:text-xl [&_.card-heading]:font-bold [&_.card-heading]:text-foreground [&_.card-heading]:mb-4 [&_.card-heading]:flex [&_.card-heading]:items-center [&_.card-heading]:gap-2
+                  [&_.card-bullets]:list-none [&_.card-bullets]:pl-0 [&_.card-bullets]:space-y-2
+                  [&_.card-bullets_li]:flex [&_.card-bullets_li]:items-start [&_.card-bullets_li]:gap-2 [&_.card-bullets_li]:text-muted-foreground
+                  [&_.card-bullets_li]:before:content-['✓'] [&_.card-bullets_li]:before:text-secondary [&_.card-bullets_li]:before:font-bold
+                  [&_.card-highlight]:bg-secondary/10 [&_.card-highlight]:border-l-4 [&_.card-highlight]:border-secondary 
+                  [&_.card-highlight]:rounded-r-lg [&_.card-highlight]:p-4 [&_.card-highlight]:mt-4 
+                  [&_.card-highlight]:text-foreground [&_.card-highlight]:font-medium [&_.card-highlight]:text-sm
+                  [&_.card-takeaway]:bg-muted [&_.card-takeaway]:rounded-lg [&_.card-takeaway]:p-3 [&_.card-takeaway]:mt-3
+                  [&_.card-takeaway]:text-sm [&_.card-takeaway]:text-muted-foreground [&_.card-takeaway]:italic
                 "
                 dangerouslySetInnerHTML={{ __html: post.content || "" }}
               />

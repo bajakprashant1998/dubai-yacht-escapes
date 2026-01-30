@@ -1,11 +1,15 @@
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import Layout from "@/components/layout/Layout";
 import { useVisaServices } from "@/hooks/useVisaServices";
 import VisaCard from "@/components/visa/VisaCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { FileText, Clock, Shield, CheckCircle, Zap, Globe, Users, HeadphonesIcon } from "lucide-react";
+import { SortingTabs } from "@/components/ui/sorting-tabs";
+import { FileText, Clock, Shield, CheckCircle, Zap, Globe, Users, HeadphonesIcon, ArrowUpDown, ThumbsUp, TrendingUp, Star } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const faqs = [
   {
@@ -37,20 +41,67 @@ const stats = [
   { icon: HeadphonesIcon, value: "24/7", label: "Customer Support" },
 ];
 
+const visaTypeFilters = [
+  { value: "all", label: "All Types" },
+  { value: "tourist", label: "Tourist" },
+  { value: "business", label: "Business" },
+  { value: "transit", label: "Transit" },
+  { value: "express", label: "Express", icon: Zap },
+];
+
+const sortOptions = [
+  { value: "recommended", label: "Recommended", icon: TrendingUp },
+  { value: "price-low", label: "Price: Low to High", icon: ArrowUpDown },
+  { value: "price-high", label: "Price: High to Low", icon: ArrowUpDown },
+  { value: "duration", label: "Longest Duration", icon: Clock },
+];
+
 const VisaServices = () => {
   const { data: visas = [], isLoading } = useVisaServices();
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("recommended");
 
-  const expressVisas = visas.filter(v => v.is_express);
-  const regularVisas = visas.filter(v => !v.is_express);
+  // Filter visas based on selected type
+  const filteredVisas = useMemo(() => {
+    if (activeFilter === "all") return visas;
+    if (activeFilter === "express") return visas.filter(v => v.is_express);
+    return visas.filter(v => v.visa_type?.toLowerCase().includes(activeFilter));
+  }, [visas, activeFilter]);
+
+  // Sort visas
+  const sortedVisas = useMemo(() => {
+    return [...filteredVisas].sort((a, b) => {
+      switch (sortBy) {
+        case "price-low":
+          return a.price - b.price;
+        case "price-high":
+          return b.price - a.price;
+        case "duration":
+          return (b.duration_days || 0) - (a.duration_days || 0);
+        default:
+          // Recommended: featured first, then express, then by price
+          if (a.is_express && !b.is_express) return -1;
+          if (!a.is_express && b.is_express) return 1;
+          return a.price - b.price;
+      }
+    });
+  }, [filteredVisas, sortBy]);
+
+  // Find most popular visa (lowest price tourist visa)
+  const mostPopularId = useMemo(() => {
+    const touristVisas = visas.filter(v => v.visa_type?.toLowerCase().includes("tourist"));
+    if (touristVisas.length === 0) return null;
+    return touristVisas.sort((a, b) => a.price - b.price)[0]?.id;
+  }, [visas]);
 
   return (
     <Layout>
       <div className="min-h-screen bg-muted/30">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-primary to-primary/90 text-primary-foreground py-20 pt-32 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
-        </div>
+        {/* Hero Section */}
+        <div className="bg-gradient-to-br from-primary to-primary/90 text-primary-foreground py-20 pt-32 relative overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
+          </div>
           
           <div className="container relative z-10">
             <motion.div
@@ -90,57 +141,97 @@ const VisaServices = () => {
           </div>
         </div>
         
-        <div className="container py-16">
-          {/* Express Visas Section */}
-          {expressVisas.length > 0 && (
-            <section className="mb-16">
-              <div className="flex items-center gap-3 mb-6">
-                <Zap className="w-6 h-6 text-amber-500" />
-                <h2 className="text-2xl font-bold">Express Processing</h2>
-                <Badge className="bg-amber-500 text-white">Fast Track</Badge>
+        <div className="container py-12">
+          {/* Filter Tabs & Sorting */}
+          <div className="mb-8">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+              {/* Visa Type Filter Tabs */}
+              <div className="flex flex-wrap gap-2">
+                {visaTypeFilters.map((filter) => {
+                  const Icon = filter.icon;
+                  return (
+                    <Button
+                      key={filter.value}
+                      variant={activeFilter === filter.value ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setActiveFilter(filter.value)}
+                      className={cn(
+                        "gap-1.5",
+                        activeFilter === filter.value && "bg-secondary text-secondary-foreground"
+                      )}
+                    >
+                      {Icon && <Icon className="w-3.5 h-3.5" />}
+                      {filter.label}
+                    </Button>
+                  );
+                })}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {expressVisas.map((visa) => (
-                  <VisaCard key={visa.id} visa={visa} />
-                ))}
+              
+              {/* Results Count & Sorting */}
+              <div className="flex items-center gap-4">
+                <Badge variant="outline" className="text-sm">
+                  {sortedVisas.length} visa{sortedVisas.length !== 1 ? "s" : ""} found
+                </Badge>
+                <SortingTabs
+                  options={sortOptions}
+                  value={sortBy}
+                  onChange={setSortBy}
+                  className="hidden md:flex"
+                />
               </div>
-            </section>
-          )}
-          
-          {/* Regular Visas Section */}
-          <section className="mb-16">
-            <div className="flex items-center gap-3 mb-6">
-              <FileText className="w-6 h-6 text-secondary" />
-              <h2 className="text-2xl font-bold">All Visa Types</h2>
             </div>
             
-            {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="space-y-3">
-                    <Skeleton className="h-48 w-full rounded-lg" />
-                    <Skeleton className="h-6 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                    <Skeleton className="h-10 w-full" />
-                  </div>
-                ))}
-              </div>
-            ) : visas.length === 0 ? (
-              <div className="text-center py-16 bg-card rounded-xl border">
-                <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No visa services available</h3>
-                <p className="text-muted-foreground">
-                  Please check back later for available visa services.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {regularVisas.map((visa) => (
-                  <VisaCard key={visa.id} visa={visa} />
-                ))}
-              </div>
-            )}
-          </section>
+            {/* Mobile Sorting */}
+            <div className="md:hidden">
+              <SortingTabs
+                options={sortOptions}
+                value={sortBy}
+                onChange={setSortBy}
+                className="w-full overflow-x-auto"
+              />
+            </div>
+          </div>
+          
+          {/* Visa Cards Grid */}
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="space-y-3">
+                  <Skeleton className="h-48 w-full rounded-lg" />
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              ))}
+            </div>
+          ) : sortedVisas.length === 0 ? (
+            <div className="text-center py-16 bg-card rounded-xl border mb-16">
+              <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No visa services found</h3>
+              <p className="text-muted-foreground mb-4">
+                Try selecting a different visa type.
+              </p>
+              <Button variant="outline" onClick={() => setActiveFilter("all")}>
+                View All Visas
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+              {sortedVisas.map((visa) => (
+                <div key={visa.id} className="relative">
+                  {visa.id === mostPopularId && (
+                    <div className="absolute -top-3 left-4 z-10">
+                      <Badge className="bg-secondary text-secondary-foreground shadow-lg gap-1">
+                        <Star className="w-3 h-3 fill-current" />
+                        Most Popular
+                      </Badge>
+                    </div>
+                  )}
+                  <VisaCard visa={visa} />
+                </div>
+              ))}
+            </div>
+          )}
           
           {/* How It Works */}
           <section className="mb-16">

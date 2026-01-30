@@ -130,6 +130,11 @@ export const useComboPackages = (options?: {
   });
 };
 
+// Fetch featured combo packages (convenience hook)
+export const useFeaturedComboPackages = () => {
+  return useComboPackages({ featured: true });
+};
+
 // Fetch single combo package by slug
 export const useComboPackage = (slug: string) => {
   return useQuery({
