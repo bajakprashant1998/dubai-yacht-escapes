@@ -165,6 +165,25 @@ const TripItinerary = () => {
     });
   };
 
+  const handleDownloadPDF = () => {
+    // Store current expanded state
+    const previousExpanded = [...expandedDays];
+    
+    // Expand all days before printing
+    const allDays = Array.from({ length: trip?.total_days || 0 }, (_, i) => i + 1);
+    setExpandedDays(allDays);
+    
+    // Wait for DOM update, then print
+    setTimeout(() => {
+      window.print();
+      
+      // Restore state after print dialog closes
+      setTimeout(() => {
+        setExpandedDays(previousExpanded);
+      }, 500);
+    }, 150);
+  };
+
   const getItemIcon = (type: string) => {
     switch (type) {
       case 'transfer':
@@ -237,8 +256,8 @@ const TripItinerary = () => {
                 <Button 
                   variant="secondary" 
                   size="sm" 
-                  className="gap-2"
-                  onClick={() => window.print()}
+                  className="gap-2 print-visible"
+                  onClick={handleDownloadPDF}
                 >
                   <Download className="w-4 h-4" />
                   PDF
