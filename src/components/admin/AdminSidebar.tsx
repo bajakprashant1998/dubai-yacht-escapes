@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Calendar,
@@ -22,8 +22,13 @@ import {
   Headset,
   Sparkles,
   HelpCircle,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { clearAdminCache } from "@/lib/adminAuth";
 
 interface NavItem {
   title: string;
@@ -82,7 +87,18 @@ interface AdminSidebarProps {
 
 const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [expandedItems, setExpandedItems] = useState<string[]>(["Tours", "Settings", "Activities"]);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserEmail(user?.email || null);
+    };
+    getUser();
+  }, []);
 
   const toggleExpand = (title: string) => {
     setExpandedItems((prev) =>
@@ -90,9 +106,21 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
     );
   };
 
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    clearAdminCache();
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
+
   const isActive = (href: string) => location.pathname === href;
   const isParentActive = (children: { href: string }[]) =>
     children.some((child) => location.pathname === child.href);
+
+  const getInitials = (email: string | null) => {
+    if (!email) return "AD";
+    return email.substring(0, 2).toUpperCase();
+  };
 
   return (
     <>
@@ -107,12 +135,12 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-50 h-full w-64 bg-primary text-white transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto",
+          "fixed left-0 top-0 z-50 h-full w-64 bg-gradient-to-b from-primary via-primary to-primary/95 text-white transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto flex flex-col",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 p-6 border-b border-white/10">
+        <div className="flex-shrink-0 flex items-center gap-3 p-6 border-b border-white/10">
           <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
             <Ship className="w-6 h-6 text-primary" />
           </div>
@@ -122,8 +150,8 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
           </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="p-4 space-y-1 overflow-y-auto h-[calc(100vh-88px)]">
+        {/* Navigation - Scrollable */}
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => (
             <div key={item.title}>
               {item.children ? (
@@ -185,6 +213,33 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
             </div>
           ))}
         </nav>
+
+        {/* User Profile Section - Fixed at Bottom */}
+        <div className="flex-shrink-0 p-4 border-t border-white/10 bg-primary/50 backdrop-blur-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <Avatar className="h-10 w-10 border-2 border-secondary/50">
+              <AvatarFallback className="bg-secondary text-primary font-semibold text-sm">
+                {getInitials(userEmail)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">
+                {userEmail || "Admin"}
+              </p>
+              <p className="text-xs text-white/50">Administrator</p>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="w-full justify-start text-white/70 hover:text-white hover:bg-white/10"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            {isLoggingOut ? "Logging out..." : "Sign out"}
+          </Button>
+        </div>
       </aside>
     </>
   );
