@@ -80,6 +80,33 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_trip_config: {
+        Row: {
+          config_key: string
+          config_value: Json
+          created_at: string
+          description: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          config_key: string
+          config_value?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          config_key?: string
+          config_value?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blog_categories: {
         Row: {
           created_at: string
@@ -633,6 +660,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      currency_rates: {
+        Row: {
+          created_at: string
+          currency_code: string
+          currency_name: string
+          currency_symbol: string
+          id: string
+          is_enabled: boolean
+          margin_percent: number
+          rate_to_aed: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency_code: string
+          currency_name: string
+          currency_symbol?: string
+          id?: string
+          is_enabled?: boolean
+          margin_percent?: number
+          rate_to_aed?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency_code?: string
+          currency_name?: string
+          currency_symbol?: string
+          id?: string
+          is_enabled?: boolean
+          margin_percent?: number
+          rate_to_aed?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       discounts: {
         Row: {
@@ -1437,6 +1500,146 @@ export type Database = {
           },
         ]
       }
+      trip_items: {
+        Row: {
+          created_at: string
+          day_number: number
+          description: string | null
+          end_time: string | null
+          id: string
+          is_included: boolean
+          is_optional: boolean
+          item_id: string | null
+          item_type: string
+          metadata: Json | null
+          price_aed: number
+          quantity: number
+          sort_order: number
+          start_time: string | null
+          title: string
+          trip_id: string
+        }
+        Insert: {
+          created_at?: string
+          day_number: number
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          is_included?: boolean
+          is_optional?: boolean
+          item_id?: string | null
+          item_type: string
+          metadata?: Json | null
+          price_aed?: number
+          quantity?: number
+          sort_order?: number
+          start_time?: string | null
+          title: string
+          trip_id: string
+        }
+        Update: {
+          created_at?: string
+          day_number?: number
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          is_included?: boolean
+          is_optional?: boolean
+          item_id?: string | null
+          item_type?: string
+          metadata?: Json | null
+          price_aed?: number
+          quantity?: number
+          sort_order?: number
+          start_time?: string | null
+          title?: string
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_items_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trip_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_plans: {
+        Row: {
+          arrival_date: string
+          budget_tier: string
+          created_at: string
+          departure_date: string
+          destination: string
+          display_currency: string | null
+          display_price: number | null
+          hotel_preference: string | null
+          id: string
+          metadata: Json | null
+          nationality: string
+          pdf_url: string | null
+          special_occasion: string | null
+          status: string
+          total_days: number | null
+          total_price_aed: number | null
+          travel_style: string
+          travelers_adults: number
+          travelers_children: number
+          updated_at: string
+          user_id: string | null
+          visitor_id: string
+        }
+        Insert: {
+          arrival_date: string
+          budget_tier?: string
+          created_at?: string
+          departure_date: string
+          destination?: string
+          display_currency?: string | null
+          display_price?: number | null
+          hotel_preference?: string | null
+          id?: string
+          metadata?: Json | null
+          nationality: string
+          pdf_url?: string | null
+          special_occasion?: string | null
+          status?: string
+          total_days?: number | null
+          total_price_aed?: number | null
+          travel_style?: string
+          travelers_adults?: number
+          travelers_children?: number
+          updated_at?: string
+          user_id?: string | null
+          visitor_id: string
+        }
+        Update: {
+          arrival_date?: string
+          budget_tier?: string
+          created_at?: string
+          departure_date?: string
+          destination?: string
+          display_currency?: string | null
+          display_price?: number | null
+          hotel_preference?: string | null
+          id?: string
+          metadata?: Json | null
+          nationality?: string
+          pdf_url?: string | null
+          special_occasion?: string | null
+          status?: string
+          total_days?: number | null
+          total_price_aed?: number | null
+          travel_style?: string
+          travelers_adults?: number
+          travelers_children?: number
+          updated_at?: string
+          user_id?: string | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
       url_redirects: {
         Row: {
           created_at: string
@@ -1526,6 +1729,56 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      visa_nationality_rules: {
+        Row: {
+          country_code: string
+          country_name: string
+          created_at: string
+          documents_required: string[] | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          recommended_visa_id: string | null
+          updated_at: string
+          visa_on_arrival: boolean
+          visa_required: boolean
+        }
+        Insert: {
+          country_code: string
+          country_name: string
+          created_at?: string
+          documents_required?: string[] | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          recommended_visa_id?: string | null
+          updated_at?: string
+          visa_on_arrival?: boolean
+          visa_required?: boolean
+        }
+        Update: {
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          documents_required?: string[] | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          recommended_visa_id?: string | null
+          updated_at?: string
+          visa_on_arrival?: boolean
+          visa_required?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visa_nationality_rules_recommended_visa_id_fkey"
+            columns: ["recommended_visa_id"]
+            isOneToOne: false
+            referencedRelation: "visa_services"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       visa_services: {
         Row: {
