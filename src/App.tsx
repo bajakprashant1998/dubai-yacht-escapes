@@ -55,6 +55,8 @@ const AdminEditService = lazy(() => import("./pages/admin/EditService"));
 const AdminFAQ = lazy(() => import("./pages/admin/FAQ"));
 const AdminServiceCategories = lazy(() => import("./pages/admin/ServiceCategories"));
 const AdminRoles = lazy(() => import("./pages/admin/Roles"));
+const AdminUsers = lazy(() => import("./pages/admin/Users"));
+const VerifyEmail = lazy(() => import("./pages/auth/VerifyEmail"));
 
 // RequireSession must be loaded synchronously as it's a wrapper component
 import RequireSession from "./components/admin/RequireSession";
@@ -296,11 +298,21 @@ const App = () => (
             <Route
               path="/admin/roles"
               element={
-                <RequireSession>
+                <RequireSession requiredRoles={["admin"]}>
                   <AdminRoles />
                 </RequireSession>
               }
             />
+            <Route
+              path="/admin/users"
+              element={
+                <RequireSession requiredRoles={["admin", "manager"]}>
+                  <AdminUsers />
+                </RequireSession>
+              }
+            />
+            {/* Auth routes */}
+            <Route path="/auth/verify-email" element={<VerifyEmail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

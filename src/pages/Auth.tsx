@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Lock, Mail, User, Ship } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, User, Ship, RefreshCw } from "lucide-react";
 import heroDhowCruise from "@/assets/hero-dhow-cruise.jpg";
 
 const Auth = () => {
@@ -15,6 +15,9 @@ const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showVerifyMessage, setShowVerifyMessage] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState("");
+  const [isResending, setIsResending] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -28,6 +31,18 @@ const Auth = () => {
     if (!raw.startsWith("/")) return "/";
     return raw;
   }, [searchParams]);
+
+  // Check for verification message param
+  useEffect(() => {
+    const message = searchParams.get("message");
+    if (message === "verify-email") {
+      toast({
+        title: "Email Verification Required",
+        description: "Please verify your email address before logging in.",
+        variant: "destructive",
+      });
+    }
+  }, [searchParams, toast]);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -47,6 +62,36 @@ const Auth = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate, redirectTo]);
+
+  const handleResendVerification = async () => {
+    if (!pendingEmail) return;
+    
+    setIsResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: pendingEmail,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Email Sent",
+        description: "Verification email has been resent. Please check your inbox.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to resend verification email.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +113,7 @@ const Auth = () => {
 
         navigate(redirectTo, { replace: true });
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { error, data } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
           options: {
@@ -81,11 +126,23 @@ const Auth = () => {
 
         if (error) throw error;
 
-        toast({
-          title: "Account created!",
-          description: "You can now log in with your credentials.",
-        });
-        setIsLogin(true);
+        // Check if email confirmation is required
+        if (data.user && !data.session) {
+          // Email confirmation is required
+          setPendingEmail(formData.email);
+          setShowVerifyMessage(true);
+          toast({
+            title: "Check your email",
+            description: "We've sent you a verification link. Please check your inbox.",
+          });
+        } else if (data.session) {
+          // Auto-confirm is enabled, user is logged in
+          toast({
+            title: "Account created!",
+            description: "Welcome to BetterView!",
+          });
+          navigate(redirectTo, { replace: true });
+        }
       }
     } catch (error: any) {
       console.error("Auth error:", error);
@@ -98,6 +155,72 @@ const Auth = () => {
       setLoading(false);
     }
   };
+
+  // Show verification pending message
+  if (showVerifyMessage) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="w-full max-w-md text-center">
+          <div className="bg-card border border-border rounded-2xl p-8 shadow-lg">
+            <div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Mail className="w-8 h-8 text-secondary" />
+            </div>
+
+            <h1 className="font-display text-2xl font-bold text-foreground mb-2">
+              Check Your Email
+            </h1>
+
+            <p className="text-muted-foreground mb-6">
+              We've sent a verification link to{" "}
+              <span className="font-medium text-foreground">{pendingEmail}</span>
+              . Please click the link to verify your account.
+            </p>
+
+            <div className="bg-muted/50 rounded-lg p-4 mb-6">
+              <h3 className="font-medium text-foreground mb-2">Didn't receive the email?</h3>
+              <ul className="text-sm text-muted-foreground text-left space-y-1">
+                <li>• Check your spam or junk folder</li>
+                <li>• Make sure you entered the correct email</li>
+                <li>• Wait a few minutes and try again</li>
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              <Button
+                onClick={handleResendVerification}
+                disabled={isResending}
+                variant="outline"
+                className="w-full"
+              >
+                {isResending ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Resending...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Resend Verification Email
+                  </>
+                )}
+              </Button>
+
+              <Button
+                variant="ghost"
+                className="w-full"
+                onClick={() => {
+                  setShowVerifyMessage(false);
+                  setIsLogin(true);
+                }}
+              >
+                Back to Sign In
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex">
