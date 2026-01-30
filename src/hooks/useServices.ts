@@ -105,12 +105,16 @@ interface CreateServiceInput {
   original_price?: number;
   duration?: string;
   image_url?: string;
+  image_alt?: string;
   gallery?: string[];
   category_id?: string;
   highlights?: string[];
   included?: string[];
   excluded?: string[];
   meeting_point?: string;
+  location?: string;
+  itinerary?: unknown;
+  faqs?: unknown;
   is_featured?: boolean;
   is_active?: boolean;
   booking_type?: string;
@@ -133,7 +137,7 @@ export function useCreateService() {
     mutationFn: async (input: CreateServiceInput) => {
       const { data, error } = await supabase
         .from("services")
-        .insert(input)
+        .insert(input as any)
         .select(`*, service_categories(*)`)
         .single();
 
@@ -166,7 +170,7 @@ export function useUpdateService() {
     mutationFn: async ({ id, ...input }: UpdateServiceInput) => {
       const { data, error } = await supabase
         .from("services")
-        .update(input)
+        .update(input as any)
         .eq("id", id)
         .select(`*, service_categories(*)`)
         .single();

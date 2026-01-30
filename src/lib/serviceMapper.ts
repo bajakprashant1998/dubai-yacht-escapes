@@ -3,6 +3,16 @@ import { Tables } from "@/integrations/supabase/types";
 export type ServiceRow = Tables<"services">;
 export type ServiceCategoryRow = Tables<"service_categories">;
 
+export interface ItineraryItem {
+  time: string;
+  activity: string;
+}
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
 export interface Service {
   id: string;
   slug: string;
@@ -14,6 +24,7 @@ export interface Service {
   originalPrice: number | null;
   duration: string | null;
   imageUrl: string;
+  imageAlt: string | null;
   gallery: string[];
   categoryId: string | null;
   categoryName?: string;
@@ -22,6 +33,9 @@ export interface Service {
   included: string[];
   excluded: string[];
   meetingPoint: string | null;
+  location: string | null;
+  itinerary: ItineraryItem[];
+  faqs: FAQItem[];
   rating: number;
   reviewCount: number;
   isFeatured: boolean;
@@ -68,6 +82,7 @@ export function mapServiceFromRow(row: ServiceRow, category?: ServiceCategoryRow
     originalPrice: row.original_price ? Number(row.original_price) : null,
     duration: row.duration,
     imageUrl: row.image_url || DEFAULT_SERVICE_IMAGE,
+    imageAlt: (row as any).image_alt || null,
     gallery: row.gallery || [],
     categoryId: row.category_id,
     categoryName: category?.name,
@@ -76,6 +91,9 @@ export function mapServiceFromRow(row: ServiceRow, category?: ServiceCategoryRow
     included: row.included || [],
     excluded: row.excluded || [],
     meetingPoint: row.meeting_point,
+    location: (row as any).location || null,
+    itinerary: ((row as any).itinerary as ItineraryItem[]) || [],
+    faqs: ((row as any).faqs as FAQItem[]) || [],
     rating: Number(row.rating) || 4.5,
     reviewCount: row.review_count || 0,
     isFeatured: row.is_featured || false,

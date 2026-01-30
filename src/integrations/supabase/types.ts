@@ -715,15 +715,19 @@ export type Database = {
           description: string | null
           duration: string | null
           excluded: string[] | null
+          faqs: Json | null
           gallery: string[] | null
           highlights: string[] | null
           hotel_pickup: boolean | null
           id: string
+          image_alt: string | null
           image_url: string | null
           included: string[] | null
           instant_confirmation: boolean | null
           is_active: boolean | null
           is_featured: boolean | null
+          itinerary: Json | null
+          location: string | null
           long_description: string | null
           max_participants: number | null
           meeting_point: string | null
@@ -749,15 +753,19 @@ export type Database = {
           description?: string | null
           duration?: string | null
           excluded?: string[] | null
+          faqs?: Json | null
           gallery?: string[] | null
           highlights?: string[] | null
           hotel_pickup?: boolean | null
           id?: string
+          image_alt?: string | null
           image_url?: string | null
           included?: string[] | null
           instant_confirmation?: boolean | null
           is_active?: boolean | null
           is_featured?: boolean | null
+          itinerary?: Json | null
+          location?: string | null
           long_description?: string | null
           max_participants?: number | null
           meeting_point?: string | null
@@ -783,15 +791,19 @@ export type Database = {
           description?: string | null
           duration?: string | null
           excluded?: string[] | null
+          faqs?: Json | null
           gallery?: string[] | null
           highlights?: string[] | null
           hotel_pickup?: boolean | null
           id?: string
+          image_alt?: string | null
           image_url?: string | null
           included?: string[] | null
           instant_confirmation?: boolean | null
           is_active?: boolean | null
           is_featured?: boolean | null
+          itinerary?: Json | null
+          location?: string | null
           long_description?: string | null
           max_participants?: number | null
           meeting_point?: string | null
