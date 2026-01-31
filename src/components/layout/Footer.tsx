@@ -1,45 +1,32 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Youtube, Shield, Lock, CreditCard } from "lucide-react";
+import { motion } from "framer-motion";
+import { 
+  Phone, 
+  Mail, 
+  MapPin, 
+  Facebook, 
+  Instagram, 
+  Twitter, 
+  Youtube, 
+  Shield, 
+  Lock, 
+  ArrowRight,
+  Sparkles,
+  Clock,
+  CheckCircle2,
+  Headphones
+} from "lucide-react";
 import betterviewLogo from "@/assets/betterview-logo.png";
 import { supabase } from "@/integrations/supabase/client";
-import { ADMIN_CACHE_KEY, ADMIN_USER_KEY, getAdminCache } from "@/lib/adminAuth";
+import { getAdminCache } from "@/lib/adminAuth";
 import { useContactConfig } from "@/hooks/useContactConfig";
-
-// Payment brand icons as inline SVGs
-const VisaIcon = () => (
-  <svg viewBox="0 0 48 32" className="w-12 h-8" fill="none">
-    <rect width="48" height="32" rx="4" fill="hsl(var(--primary-foreground) / 0.1)" />
-    <path d="M19.5 21h-3l1.9-11.5h3L19.5 21zm-5.3-11.5l-2.8 8-0.3-1.6-1-5.2c-0.2-0.7-0.7-0.9-1.3-0.9H4.1l-0.1 0.3c1 0.3 2.1 0.7 2.8 1.2l2.4 9.2h3.1l4.7-11h-2.8zm24.8 11h2.7l-2.4-11.5h-2.5c-0.6 0-1.1 0.3-1.3 0.8l-4.5 10.7h3.1l0.6-1.7h3.8l0.5 1.7zm-3.3-4l1.6-4.3 0.9 4.3h-2.5zm-6.2-4.8l0.4-2.4c-0.5-0.2-1.3-0.4-2.1-0.4-2.3 0-4 1.2-4 3 0 1.3 1.2 2 2.1 2.4 0.9 0.4 1.3 0.7 1.3 1.1 0 0.6-0.8 0.9-1.5 0.9-1 0-1.5-0.1-2.4-0.5l-0.3-0.2-0.4 2.3c0.6 0.3 1.7 0.5 2.8 0.5 2.5 0 4.1-1.2 4.1-3.1 0-1-0.6-1.8-2-2.4-0.8-0.4-1.3-0.7-1.3-1.1 0-0.4 0.4-0.8 1.3-0.8 0.7 0 1.3 0.2 1.7 0.3l0.3 0.4z" fill="hsl(var(--secondary))" />
-  </svg>
-);
-
-const MastercardIcon = () => (
-  <svg viewBox="0 0 48 32" className="w-12 h-8" fill="none">
-    <rect width="48" height="32" rx="4" fill="hsl(var(--primary-foreground) / 0.1)" />
-    <circle cx="19" cy="16" r="8" fill="#EB001B" opacity="0.9" />
-    <circle cx="29" cy="16" r="8" fill="#F79E1B" opacity="0.9" />
-    <path d="M24 10.5c1.7 1.4 2.8 3.4 2.8 5.5s-1.1 4.1-2.8 5.5c-1.7-1.4-2.8-3.4-2.8-5.5s1.1-4.1 2.8-5.5z" fill="#FF5F00" />
-  </svg>
-);
-
-const AmexIcon = () => (
-  <svg viewBox="0 0 48 32" className="w-12 h-8" fill="none">
-    <rect width="48" height="32" rx="4" fill="hsl(var(--secondary) / 0.15)" />
-    <path d="M8 12h3l0.5 1.2 0.5-1.2h3v6h-2.5l-0.5-1-0.5 1H8v-6zm1.5 1.5v3h1l0.5-1 0.5 1h1v-3h-0.8v1.8l-0.7-1.8h-0.5l-0.7 1.8v-1.8h-0.8z" fill="hsl(var(--secondary))" />
-    <text x="24" y="18" textAnchor="middle" fontSize="6" fontWeight="bold" fill="hsl(var(--secondary))">AMEX</text>
-  </svg>
-);
-
-const SecurePaymentIcon = () => (
-  <div className="relative">
-    <Shield className="w-8 h-8 text-secondary" />
-    <Lock className="w-3 h-3 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-  </div>
-);
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const Footer = () => {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
   const { phone, phoneFormatted, email, address } = useContactConfig();
 
   useEffect(() => {
@@ -109,275 +96,337 @@ const Footer = () => {
     };
   }, []);
 
-  const paymentMethods = [
-    {
-      name: "Secure Checkout",
-      description: "256-bit SSL",
-      icon: <SecurePaymentIcon />,
-    },
-    {
-      name: "Visa",
-      description: "Accepted",
-      icon: <VisaIcon />,
-    },
-    {
-      name: "Mastercard",
-      description: "Accepted",
-      icon: <MastercardIcon />,
-    },
-    {
-      name: "American Express",
-      description: "Accepted",
-      icon: <AmexIcon />,
-    },
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!emailInput.trim()) return;
+    
+    try {
+      await supabase.from("newsletter_subscribers").insert({
+        email: emailInput.trim(),
+        source: "footer"
+      });
+      setEmailInput("");
+    } catch (error) {
+      console.error("Newsletter subscription error:", error);
+    }
+  };
+
+  const trustBadges = [
+    { icon: Shield, label: "Secure Booking", description: "256-bit SSL" },
+    { icon: Clock, label: "24/7 Support", description: "Always available" },
+    { icon: CheckCircle2, label: "Best Price", description: "Guaranteed" },
+    { icon: Headphones, label: "Expert Team", description: "Local guides" },
+  ];
+
+  const quickLinks = [
+    { name: "Home", path: "/" },
+    { name: "Plan Trip", path: "/plan-trip" },
+    { name: "Combo Packages", path: "/combo-packages" },
+    { name: "Activities", path: "/experiences" },
+    { name: "Blog", path: "/blog" },
+    { name: "Contact", path: "/contact" },
+  ];
+
+  const services = [
+    { name: "Car Rentals", path: "/car-rentals" },
+    { name: "Hotels", path: "/hotels" },
+    { name: "Visa Services", path: "/visa-services" },
+    { name: "Gallery", path: "/gallery" },
+    { name: "FAQ", path: "/faq" },
+    { name: "Travel Tips", path: "/travel-tips" },
+  ];
+
+  const activities = [
+    { name: "Desert Safari", path: "/dubai/services/desert-safari" },
+    { name: "Theme Parks", path: "/dubai/services/theme-parks" },
+    { name: "Sightseeing Cruises", path: "/dubai/services/sightseeing-cruises" },
+    { name: "Water Sports", path: "/dubai/services/water-sports" },
+    { name: "City Tours", path: "/dubai/services/city-tours" },
+    { name: "Adventure Sports", path: "/dubai/services/adventure-sports" },
+  ];
+
+  const socialLinks = [
+    { icon: Facebook, href: "https://www.facebook.com/betterviewtourism", label: "Facebook" },
+    { icon: Instagram, href: "https://www.instagram.com/betterviewtourism", label: "Instagram" },
+    { icon: Twitter, href: "https://twitter.com/betterviewuae", label: "Twitter" },
+    { icon: Youtube, href: "https://www.youtube.com/@betterviewtourism", label: "YouTube" },
   ];
 
   return (
-    <footer className="bg-primary text-primary-foreground">
-      {/* Main Footer */}
-      <div className="container py-10 sm:py-16 px-4 sm:px-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-12">
-          {/* Brand */}
-          <div className="space-y-4 col-span-2 md:col-span-1">
-            <div className="flex items-center gap-3">
-              <img
-                src={betterviewLogo}
-                alt="Betterview Tourism"
-                className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-lg"
-              />
-              <div className="flex flex-col">
-                <span className="font-display font-bold text-lg sm:text-xl text-secondary leading-tight">Betterview</span>
-                <span className="text-[10px] sm:text-xs text-primary-foreground/70 tracking-wider uppercase">Tourism</span>
-              </div>
-            </div>
-            <p className="text-primary-foreground/80 text-xs sm:text-sm leading-relaxed">
-              Discover the best of Dubai with Betterview Tourism. Premium yacht charters, desert safaris,
-              theme parks, and unforgettable experiences await you.
-            </p>
-            <div className="flex gap-3 sm:gap-4">
-              <a href="https://www.facebook.com/betterviewtourism" target="_blank" rel="noopener noreferrer" className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110 touch-target" aria-label="Facebook">
-                <Facebook className="w-4 h-4 sm:w-5 sm:h-5" />
-              </a>
-              <a href="https://www.instagram.com/betterviewtourism" target="_blank" rel="noopener noreferrer" className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110 touch-target" aria-label="Instagram">
-                <Instagram className="w-4 h-4 sm:w-5 sm:h-5" />
-              </a>
-              <a href="https://twitter.com/betterviewuae" target="_blank" rel="noopener noreferrer" className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110 touch-target" aria-label="Twitter">
-                <Twitter className="w-4 h-4 sm:w-5 sm:h-5" />
-              </a>
-              <a href="https://www.youtube.com/@betterviewtourism" target="_blank" rel="noopener noreferrer" className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-secondary-foreground transition-all duration-300 hover:scale-110 touch-target" aria-label="YouTube">
-                <Youtube className="w-4 h-4 sm:w-5 sm:h-5" />
-              </a>
-            </div>
-          </div>
+    <footer className="relative overflow-hidden">
+      {/* Decorative Background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-primary via-primary to-primary/95" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/50 to-transparent" />
+      
+      {/* Floating Decorative Elements */}
+      <div className="absolute top-20 right-10 w-64 h-64 bg-secondary/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-40 left-10 w-48 h-48 bg-secondary/5 rounded-full blur-2xl" />
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="font-display text-base sm:text-lg font-semibold text-secondary mb-4 sm:mb-6">Quick Links</h4>
-            <ul className="space-y-2 sm:space-y-3">
-              <li>
-                <Link to="/" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link to="/plan-trip" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Plan Trip
-                </Link>
-              </li>
-              <li>
-                <Link to="/combo-packages" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Combo Packages
-                </Link>
-              </li>
-              <li>
-                <Link to="/experiences" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Activities
-                </Link>
-              </li>
-              <li>
-                <Link to="/blog" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Contact
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Services */}
-          <div>
-            <h4 className="font-display text-base sm:text-lg font-semibold text-secondary mb-4 sm:mb-6">Services</h4>
-            <ul className="space-y-2 sm:space-y-3">
-              <li>
-                <Link to="/car-rentals" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Car Rentals
-                </Link>
-              </li>
-              <li>
-                <Link to="/hotels" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Hotels
-                </Link>
-              </li>
-              <li>
-                <Link to="/visa-services" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Visa Services
-                </Link>
-              </li>
-              <li>
-                <Link to="/gallery" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Gallery
-                </Link>
-              </li>
-              <li>
-                <Link to="/faq" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  FAQ
-                </Link>
-              </li>
-              <li>
-                <Link to="/travel-tips" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Travel Tips
-                </Link>
-              </li>
-              {isAdmin && (
-                <li>
-                  <Link to="/admin" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                    Admin Panel
-                  </Link>
-                </li>
-              )}
-            </ul>
-          </div>
-
-          {/* Popular Activities */}
-          <div className="hidden sm:block">
-            <h4 className="font-display text-base sm:text-lg font-semibold text-secondary mb-4 sm:mb-6">Popular Activities</h4>
-            <ul className="space-y-2 sm:space-y-3">
-              <li>
-                <Link to="/dubai/services/desert-safari" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Desert Safari
-                </Link>
-              </li>
-              <li>
-                <Link to="/dubai/services/theme-parks" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Theme Parks
-                </Link>
-              </li>
-              <li>
-                <Link to="/dubai/services/sightseeing-cruises" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Sightseeing Cruises
-                </Link>
-              </li>
-              <li>
-                <Link to="/dubai/services/water-sports" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Water Sports
-                </Link>
-              </li>
-              <li>
-                <Link to="/dubai/services/city-tours" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  City Tours
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h4 className="font-display text-base sm:text-lg font-semibold text-secondary mb-4 sm:mb-6">Contact Us</h4>
-            <ul className="space-y-3 sm:space-y-4">
-              <li>
-                <a href={`tel:${phone}`} className="flex items-start gap-2 sm:gap-3 text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 touch-target group">
-                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform" />
-                  <span>{phoneFormatted}</span>
-                </a>
-              </li>
-              <li>
-                <a href={`mailto:${email}`} className="flex items-start gap-2 sm:gap-3 text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 touch-target group">
-                  <Mail className="w-4 h-4 sm:w-5 sm:h-5 mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform" />
-                  <span className="break-all">{email}</span>
-                </a>
-              </li>
-              <li>
-                <div className="flex items-start gap-2 sm:gap-3 text-primary-foreground/80 text-xs sm:text-sm">
-                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 mt-0.5 flex-shrink-0" />
-                  <span>{address}</span>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* Payment Methods Section */}
-      <div className="border-t border-primary-foreground/10">
-        <div className="container py-8 sm:py-10 px-4 sm:px-6">
-          <div className="text-center mb-6">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Lock className="w-4 h-4 text-secondary" />
-              <h4 className="font-display text-sm sm:text-base font-semibold text-secondary uppercase tracking-wider">
-                Secure Payment
-              </h4>
-            </div>
-            <p className="text-primary-foreground/60 text-xs">
-              Your transactions are protected with industry-leading encryption
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
-            {paymentMethods.map((method, index) => (
-              <div
-                key={method.name}
-                className="group relative bg-primary-foreground/5 border border-secondary/20 rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:border-secondary/50 hover:bg-primary-foreground/10 transition-all duration-300 hover:scale-105"
-                style={{ animationDelay: `${index * 100}ms` }}
+      {/* Trust Badges Strip */}
+      <div className="relative border-b border-primary-foreground/10">
+        <div className="container py-8 px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            {trustBadges.map((badge, index) => (
+              <motion.div
+                key={badge.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="flex items-center gap-3 sm:gap-4"
               >
-                <div className="transition-transform duration-300 group-hover:scale-110">
-                  {method.icon}
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-secondary/10 border border-secondary/20 flex items-center justify-center">
+                  <badge.icon className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
                 </div>
-                <div className="text-center">
-                  <p className="text-primary-foreground/90 text-xs sm:text-sm font-medium">
-                    {method.name}
-                  </p>
-                  <p className="text-primary-foreground/50 text-[10px] sm:text-xs">
-                    {method.description}
-                  </p>
+                <div>
+                  <p className="text-primary-foreground font-semibold text-sm sm:text-base">{badge.label}</p>
+                  <p className="text-primary-foreground/60 text-xs sm:text-sm">{badge.description}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="border-t border-primary-foreground/10 bg-primary-foreground/5">
-        <div className="container py-4 sm:py-6 px-4 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
-          <div className="flex items-center gap-4">
-            <p className="text-primary-foreground/60 text-xs sm:text-sm text-center md:text-left">
-              © 2026 Betterview Tourism. All rights reserved.
+      {/* Main Footer Content */}
+      <div className="relative container py-12 sm:py-16 px-4 sm:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8">
+          
+          {/* Brand & Newsletter - Takes 4 columns */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* Brand */}
+            <Link to="/" className="inline-flex items-center gap-3 group">
+              <img
+                src={betterviewLogo}
+                alt="Betterview Tourism"
+                className="w-14 h-14 object-contain rounded-xl transition-transform group-hover:scale-105"
+              />
+              <div className="flex flex-col">
+                <span className="font-display font-bold text-2xl text-secondary leading-tight">Betterview</span>
+                <span className="text-xs text-primary-foreground/60 tracking-widest uppercase">Tourism L.L.C</span>
+              </div>
+            </Link>
+            
+            <p className="text-primary-foreground/70 text-sm leading-relaxed max-w-sm">
+              Dubai's premier tourism company offering luxury experiences, desert adventures, 
+              theme parks, and unforgettable memories since 2015.
             </p>
-            <div className="hidden sm:flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-secondary/60" />
-              <span className="text-primary-foreground/40 text-xs">SSL Encrypted</span>
+
+            {/* Newsletter */}
+            <div className="bg-primary-foreground/5 border border-primary-foreground/10 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="w-4 h-4 text-secondary" />
+                <span className="text-secondary font-semibold text-sm">Get Exclusive Deals</span>
+              </div>
+              <p className="text-primary-foreground/60 text-xs mb-4">
+                Subscribe for special offers and travel tips
+              </p>
+              <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  className="h-11 bg-primary-foreground/5 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40 flex-1"
+                />
+                <Button type="submit" className="h-11 px-4 bg-secondary text-secondary-foreground hover:bg-secondary/90">
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </form>
+            </div>
+
+            {/* Social Links */}
+            <div className="flex gap-3">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-11 h-11 rounded-xl bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center text-primary-foreground/70 hover:bg-secondary hover:text-secondary-foreground hover:border-secondary transition-all duration-300 hover:scale-110"
+                  aria-label={social.label}
+                >
+                  <social.icon className="w-5 h-5" />
+                </a>
+              ))}
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-xs sm:text-sm">
-            <Link to="/privacy-policy" className="text-primary-foreground/60 hover:text-secondary transition-colors py-1 touch-target">
-              Privacy Policy
-            </Link>
-            <Link to="/terms-of-service" className="text-primary-foreground/60 hover:text-secondary transition-colors py-1 touch-target">
-              Terms of Service
-            </Link>
-            <Link to="/cancellation-policy" className="text-primary-foreground/60 hover:text-secondary transition-colors py-1 touch-target">
-              Cancellation
-            </Link>
+
+          {/* Links Grid - Takes 8 columns */}
+          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
+            {/* Quick Links */}
+            <div>
+              <h4 className="font-display text-secondary font-semibold text-sm uppercase tracking-wider mb-5">
+                Quick Links
+              </h4>
+              <ul className="space-y-3">
+                {quickLinks.map((link) => (
+                  <li key={link.path}>
+                    <Link
+                      to={link.path}
+                      className="text-primary-foreground/70 hover:text-secondary text-sm transition-colors inline-flex items-center gap-1 group"
+                    >
+                      <span className="w-0 group-hover:w-2 h-px bg-secondary transition-all duration-200" />
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Services */}
+            <div>
+              <h4 className="font-display text-secondary font-semibold text-sm uppercase tracking-wider mb-5">
+                Services
+              </h4>
+              <ul className="space-y-3">
+                {services.map((link) => (
+                  <li key={link.path}>
+                    <Link
+                      to={link.path}
+                      className="text-primary-foreground/70 hover:text-secondary text-sm transition-colors inline-flex items-center gap-1 group"
+                    >
+                      <span className="w-0 group-hover:w-2 h-px bg-secondary transition-all duration-200" />
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+                {isAdmin && (
+                  <li>
+                    <Link
+                      to="/admin"
+                      className="text-primary-foreground/70 hover:text-secondary text-sm transition-colors inline-flex items-center gap-1 group"
+                    >
+                      <span className="w-0 group-hover:w-2 h-px bg-secondary transition-all duration-200" />
+                      Admin Panel
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            </div>
+
+            {/* Activities */}
+            <div>
+              <h4 className="font-display text-secondary font-semibold text-sm uppercase tracking-wider mb-5">
+                Activities
+              </h4>
+              <ul className="space-y-3">
+                {activities.map((link) => (
+                  <li key={link.path}>
+                    <Link
+                      to={link.path}
+                      className="text-primary-foreground/70 hover:text-secondary text-sm transition-colors inline-flex items-center gap-1 group"
+                    >
+                      <span className="w-0 group-hover:w-2 h-px bg-secondary transition-all duration-200" />
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="font-display text-secondary font-semibold text-sm uppercase tracking-wider mb-5">
+                Contact Us
+              </h4>
+              <ul className="space-y-4">
+                <li>
+                  <a 
+                    href={`tel:${phone}`} 
+                    className="flex items-start gap-3 text-primary-foreground/70 hover:text-secondary transition-colors group"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center flex-shrink-0 group-hover:border-secondary/50 transition-colors">
+                      <Phone className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-primary-foreground/50 mb-0.5">Call us</p>
+                      <p className="text-sm font-medium">{phoneFormatted}</p>
+                    </div>
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href={`mailto:${email}`} 
+                    className="flex items-start gap-3 text-primary-foreground/70 hover:text-secondary transition-colors group"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center flex-shrink-0 group-hover:border-secondary/50 transition-colors">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-primary-foreground/50 mb-0.5">Email</p>
+                      <p className="text-sm font-medium break-all">{email}</p>
+                    </div>
+                  </a>
+                </li>
+                <li>
+                  <div className="flex items-start gap-3 text-primary-foreground/70">
+                    <div className="w-9 h-9 rounded-lg bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-primary-foreground/50 mb-0.5">Address</p>
+                      <p className="text-sm">{address}</p>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Payment & Security Strip */}
+      <div className="relative border-t border-primary-foreground/10">
+        <div className="container py-6 px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Lock className="w-4 h-4 text-secondary" />
+              <span className="text-primary-foreground/60 text-sm">Secured by 256-bit SSL Encryption</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-primary-foreground/40 text-xs uppercase tracking-wider">We Accept</span>
+              <div className="flex items-center gap-2">
+                {["Visa", "Mastercard", "Amex", "Apple Pay"].map((method) => (
+                  <div 
+                    key={method} 
+                    className="h-8 px-3 rounded-md bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center"
+                  >
+                    <span className="text-primary-foreground/70 text-xs font-medium">{method}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Bar */}
+      <div className="relative border-t border-primary-foreground/10 bg-primary-foreground/5">
+        <div className="container py-5 px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-primary-foreground/50 text-sm text-center md:text-left">
+              © {new Date().getFullYear()} Betterview Tourism L.L.C. All rights reserved.
+            </p>
+            <div className="flex flex-wrap justify-center gap-6 text-sm">
+              <Link to="/privacy-policy" className="text-primary-foreground/50 hover:text-secondary transition-colors">
+                Privacy Policy
+              </Link>
+              <Link to="/terms-of-service" className="text-primary-foreground/50 hover:text-secondary transition-colors">
+                Terms of Service
+              </Link>
+              <Link to="/cancellation-policy" className="text-primary-foreground/50 hover:text-secondary transition-colors">
+                Cancellation Policy
+              </Link>
+            </div>
+          </div>
+        </div>
+
         {/* Dibull Credit */}
         <div className="border-t border-primary-foreground/10">
           <div className="container py-3 px-4 sm:px-6">
-            <p className="text-center text-primary-foreground/50 text-xs">
-              Created and maintained by{" "}
+            <p className="text-center text-primary-foreground/40 text-xs">
+              Crafted with ♥ by{" "}
               <a
                 href="https://www.dibull.com"
                 target="_blank"
