@@ -136,7 +136,7 @@ const Footer = () => {
     <footer className="bg-primary text-primary-foreground">
       {/* Main Footer */}
       <div className="container py-10 sm:py-16 px-4 sm:px-6">
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-12">
           {/* Brand */}
           <div className="space-y-4 col-span-2 md:col-span-1">
             <div className="flex items-center gap-3">
@@ -195,6 +195,23 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/blog" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Services */}
+          <div>
+            <h4 className="font-display text-base sm:text-lg font-semibold text-secondary mb-4 sm:mb-6">Services</h4>
+            <ul className="space-y-2 sm:space-y-3">
+              <li>
                 <Link to="/car-rentals" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
                   Car Rentals
                 </Link>
@@ -207,16 +224,6 @@ const Footer = () => {
               <li>
                 <Link to="/visa-services" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
                   Visa Services
-                </Link>
-              </li>
-              <li>
-                <Link to="/blog" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
-                  Contact
                 </Link>
               </li>
               <li>
@@ -266,6 +273,11 @@ const Footer = () => {
               <li>
                 <Link to="/dubai/services/water-sports" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
                   Water Sports
+                </Link>
+              </li>
+              <li>
+                <Link to="/dubai/services/city-tours" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  City Tours
                 </Link>
               </li>
             </ul>

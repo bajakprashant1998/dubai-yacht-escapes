@@ -54,7 +54,6 @@ const Header = () => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Plan Trip", path: "/plan-trip", highlight: true },
-    { name: "Combo Packages", path: "/combo-packages" },
     { name: "Activities", path: "/experiences", dropdown: "activities" as DropdownType },
     { name: "Services", path: "/services", dropdown: "services" as DropdownType },
     { name: "Blog", path: "/blog" },
@@ -107,6 +106,7 @@ const Header = () => {
   ];
 
   const serviceCategories = [
+    { name: "Combo Packages", path: "/combo-packages", icon: Sparkles, description: "Bundled tour packages" },
     { name: "Car Rentals", path: "/car-rentals", icon: Car, description: "Luxury & economy vehicles" },
     { name: "Hotels", path: "/hotels", icon: Building, description: "Premium accommodations" },
     { name: "Visa Services", path: "/visa-services", icon: FileText, description: "UAE visa assistance" },
