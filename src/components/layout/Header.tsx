@@ -20,6 +20,7 @@ import {
   Building,
   FileText
 } from "lucide-react";
+import betterviewLogo from "@/assets/betterview-logo.png";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -254,11 +255,11 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center group">
             <motion.img
-              src="/betterviewLogo.png"
+              src={betterviewLogo}
               alt="Betterview Tourism"
               className={cn(
                 "object-contain rounded-lg transition-all duration-300",
-                isScrolled ? "h-16 w-auto" : "h-24 w-auto"
+                isScrolled ? "h-12 w-auto" : "h-14 w-auto"
               )}
             />
           </Link>
@@ -406,7 +407,7 @@ const Header = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="lg:hidden fixed inset-0 top-[128px] bg-background z-[60] overflow-y-auto"
+              className="lg:hidden fixed inset-0 top-[88px] bg-background z-[60] overflow-y-auto"
             >
               <div className="container py-6 flex flex-col min-h-full">
                 {/* Search Bar */}
