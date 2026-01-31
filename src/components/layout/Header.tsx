@@ -20,7 +20,7 @@ import {
   Building,
   FileText
 } from "lucide-react";
-import betterviewLogo from "@/assets/betterview-logo.png";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useContactConfig } from "@/hooks/useContactConfig";
@@ -221,8 +221,8 @@ const Header = () => {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-        ? "bg-background/98 backdrop-blur-lg shadow-lg"
-        : "bg-background/95 backdrop-blur-md"
+      ? "bg-background/98 backdrop-blur-lg shadow-lg"
+      : "bg-background/95 backdrop-blur-md"
       } border-b border-border`}>
       {/* Top bar */}
       <div className="hidden md:block bg-primary text-primary-foreground py-2">
@@ -254,11 +254,11 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center group">
             <motion.img
-              src={betterviewLogo}
+              src="/betterviewLogo.png"
               alt="Betterview Tourism"
               className={cn(
                 "object-contain rounded-lg transition-all duration-300",
-                isScrolled ? "h-12 w-auto" : "h-14 w-auto"
+                isScrolled ? "h-16 w-auto" : "h-24 w-auto"
               )}
             />
           </Link>
@@ -406,7 +406,7 @@ const Header = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="lg:hidden fixed inset-0 top-[88px] bg-background z-[60] overflow-y-auto"
+              className="lg:hidden fixed inset-0 top-[128px] bg-background z-[60] overflow-y-auto"
             >
               <div className="container py-6 flex flex-col min-h-full">
                 {/* Search Bar */}
