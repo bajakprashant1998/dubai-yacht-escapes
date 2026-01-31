@@ -18,7 +18,6 @@ import {
   ArrowRight,
   Car,
   Building,
-  Star,
   FileText
 } from "lucide-react";
 import betterviewLogo from "@/assets/betterview-logo.png";
@@ -27,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import { useContactConfig } from "@/hooks/useContactConfig";
 import { cn } from "@/lib/utils";
 
-type DropdownType = "activities" | "hotels" | "cars" | null;
+type DropdownType = "activities" | "services" | null;
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -57,9 +56,7 @@ const Header = () => {
     { name: "Plan Trip", path: "/plan-trip", highlight: true },
     { name: "Combo Packages", path: "/combo-packages" },
     { name: "Activities", path: "/experiences", dropdown: "activities" as DropdownType },
-    { name: "Car Rentals", path: "/car-rentals", dropdown: "cars" as DropdownType },
-    { name: "Hotels", path: "/hotels", dropdown: "hotels" as DropdownType },
-    { name: "Visa", path: "/visa-services" },
+    { name: "Services", path: "/services", dropdown: "services" as DropdownType },
     { name: "Blog", path: "/blog" },
     { name: "Contact", path: "/contact" },
   ];
@@ -109,16 +106,10 @@ const Header = () => {
     },
   ];
 
-  const hotelCategories = [
-    { name: "5-Star Luxury", path: "/hotels/5-star", icon: Star },
-    { name: "4-Star Hotels", path: "/hotels/4-star", icon: Building },
-    { name: "Beach Resorts", path: "/hotels/luxury", icon: Waves },
-  ];
-
-  const carCategories = [
-    { name: "Economy", path: "/car-rentals/economy", icon: Car },
-    { name: "Luxury", path: "/car-rentals/luxury", icon: Sparkles },
-    { name: "SUV", path: "/car-rentals/suv", icon: Car },
+  const serviceCategories = [
+    { name: "Car Rentals", path: "/car-rentals", icon: Car, description: "Luxury & economy vehicles" },
+    { name: "Hotels", path: "/hotels", icon: Building, description: "Premium accommodations" },
+    { name: "Visa Services", path: "/visa-services", icon: FileText, description: "UAE visa assistance" },
   ];
 
   const featuredActivities = activityCategories.slice(0, 3);
@@ -196,14 +187,14 @@ const Header = () => {
       );
     }
 
-    if (type === "hotels") {
+    if (type === "services") {
       return (
         <div className="bg-card rounded-xl shadow-2xl border border-border overflow-hidden p-5 w-[320px]">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            Hotel Categories
+            Our Services
           </p>
-          <div className="space-y-1 mb-4">
-            {hotelCategories.map((category) => (
+          <div className="space-y-1">
+            {serviceCategories.map((category) => (
               <Link
                 key={category.path}
                 to={category.path}
@@ -212,52 +203,15 @@ const Header = () => {
                 <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
                   <category.icon className="w-4 h-4 text-secondary" />
                 </div>
-                <span className="font-medium text-sm text-foreground group-hover:text-secondary transition-colors">
-                  {category.name}
-                </span>
-              </Link>
-            ))}
-          </div>
-          <Link
-            to="/hotels"
-            className="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-secondary text-secondary-foreground rounded-lg text-sm font-semibold hover:bg-secondary/90 transition-colors"
-          >
-            View All Hotels
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      );
-    }
-
-    if (type === "cars") {
-      return (
-        <div className="bg-card rounded-xl shadow-2xl border border-border overflow-hidden p-5 w-[320px]">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            Vehicle Types
-          </p>
-          <div className="space-y-1 mb-4">
-            {carCategories.map((category) => (
-              <Link
-                key={category.path}
-                to={category.path}
-                className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-all group"
-              >
-                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
-                  <category.icon className="w-4 h-4 text-secondary" />
+                <div>
+                  <span className="font-medium text-sm text-foreground group-hover:text-secondary transition-colors block">
+                    {category.name}
+                  </span>
+                  <span className="text-xs text-muted-foreground">{category.description}</span>
                 </div>
-                <span className="font-medium text-sm text-foreground group-hover:text-secondary transition-colors">
-                  {category.name}
-                </span>
               </Link>
             ))}
           </div>
-          <Link
-            to="/car-rentals"
-            className="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-secondary text-secondary-foreground rounded-lg text-sm font-semibold hover:bg-secondary/90 transition-colors"
-          >
-            Browse All Vehicles
-            <ArrowRight className="w-4 h-4" />
-          </Link>
         </div>
       );
     }

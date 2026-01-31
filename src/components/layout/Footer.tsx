@@ -180,8 +180,43 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/plan-trip" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Plan Trip
+                </Link>
+              </li>
+              <li>
+                <Link to="/combo-packages" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Combo Packages
+                </Link>
+              </li>
+              <li>
                 <Link to="/experiences" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
                   Activities
+                </Link>
+              </li>
+              <li>
+                <Link to="/car-rentals" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Car Rentals
+                </Link>
+              </li>
+              <li>
+                <Link to="/hotels" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Hotels
+                </Link>
+              </li>
+              <li>
+                <Link to="/visa-services" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Visa Services
+                </Link>
+              </li>
+              <li>
+                <Link to="/blog" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="text-primary-foreground/80 hover:text-secondary transition-colors text-xs sm:text-sm py-1 inline-block touch-target hover:translate-x-1 transition-transform duration-200">
+                  Contact
                 </Link>
               </li>
               <li>
