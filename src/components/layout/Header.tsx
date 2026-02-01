@@ -250,7 +250,7 @@ const Header = () => {
       </div>
 
       {/* Main nav */}
-      <nav className="container py-4">
+      <nav className="container py-3 lg:py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center group">
@@ -259,13 +259,13 @@ const Header = () => {
               alt="Betterview Tourism"
               className={cn(
                 "object-contain rounded-lg transition-all duration-300",
-                isScrolled ? "h-12 w-auto" : "h-14 w-auto"
+                isScrolled ? "h-10 w-auto" : "h-12 w-auto"
               )}
             />
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-1">
+          {/* Desktop Navigation - Clean & Simple */}
+          <div className="hidden lg:flex items-center gap-2">
             {navLinks.map((link) => (
               link.dropdown ? (
                 <div
@@ -276,24 +276,29 @@ const Header = () => {
                 >
                   <button
                     className={cn(
-                      "flex items-center gap-1 text-sm font-medium px-4 py-2 rounded-lg transition-all",
-                      isActive(link.path) ? "text-secondary bg-secondary/10" : "text-foreground hover:text-secondary hover:bg-muted/50"
+                      "flex items-center gap-1.5 text-sm font-medium px-4 py-2.5 rounded-full transition-all duration-200",
+                      isActive(link.path) 
+                        ? "text-secondary bg-secondary/10" 
+                        : "text-foreground/80 hover:text-foreground hover:bg-muted"
                     )}
                   >
                     {link.name}
-                    <ChevronDown className={cn("w-4 h-4 transition-transform", activeDropdown === link.dropdown && "rotate-180")} />
+                    <ChevronDown className={cn(
+                      "w-3.5 h-3.5 transition-transform duration-200", 
+                      activeDropdown === link.dropdown && "rotate-180"
+                    )} />
                   </button>
 
                   {/* Dropdown Menu */}
                   <AnimatePresence>
                     {activeDropdown === link.dropdown && (
                       <motion.div
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.2 }}
+                        exit={{ opacity: 0, y: 8 }}
+                        transition={{ duration: 0.15 }}
                         className={cn(
-                          "absolute top-full pt-4",
+                          "absolute top-full pt-3",
                           link.dropdown === "activities" ? "left-1/2 -translate-x-1/2 w-[700px]" : "left-0"
                         )}
                       >
@@ -307,13 +312,12 @@ const Header = () => {
                   key={link.path}
                   to={link.path}
                   className={cn(
-                    'text-sm font-medium transition-all px-4 py-2 rounded-lg',
+                    'text-sm font-medium transition-all duration-200 px-4 py-2.5 rounded-full',
                     link.highlight
-                      ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-md'
-                      : 'hover:bg-muted/50',
-                    isActive(link.path) && !link.highlight
-                      ? 'text-secondary bg-secondary/10'
-                      : link.highlight ? '' : 'text-foreground hover:text-secondary'
+                      ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90'
+                      : isActive(link.path)
+                        ? 'text-secondary bg-secondary/10'
+                        : 'text-foreground/80 hover:text-foreground hover:bg-muted'
                   )}
                 >
                   {link.name}
@@ -322,7 +326,7 @@ const Header = () => {
             ))}
           </div>
 
-          {/* Right Side Actions */}
+          {/* Right Side Actions - Minimal */}
           <div className="hidden lg:flex items-center gap-3">
             {/* Search */}
             <div className="relative">
@@ -330,18 +334,18 @@ const Header = () => {
                 {isSearchOpen ? (
                   <motion.form
                     initial={{ width: 0, opacity: 0 }}
-                    animate={{ width: 240, opacity: 1 }}
+                    animate={{ width: 220, opacity: 1 }}
                     exit={{ width: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.2 }}
                     onSubmit={handleSearch}
                     className="overflow-hidden"
                   >
                     <Input
                       type="search"
-                      placeholder="Search activities..."
+                      placeholder="Search..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="h-10 pr-10"
+                      className="h-9 pr-9 rounded-full bg-muted/50 border-0 focus-visible:ring-1"
                       autoFocus
                       onBlur={() => {
                         if (!searchQuery) setIsSearchOpen(false);
@@ -363,23 +367,26 @@ const Header = () => {
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsSearchOpen(true)}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-foreground/70 hover:text-foreground hover:bg-muted rounded-full h-9 w-9"
                   >
-                    <Search className="w-5 h-5" />
+                    <Search className="w-4 h-4" />
                   </Button>
                 )}
               </AnimatePresence>
             </div>
 
-            {/* Phone */}
-            <a href={`tel:${phone}`} className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            {/* Phone - Simple icon */}
+            <a 
+              href={`tel:${phone}`} 
+              className="flex items-center justify-center h-9 w-9 rounded-full text-foreground/70 hover:text-foreground hover:bg-muted transition-colors"
+              title={phoneFormatted}
+            >
               <Phone className="w-4 h-4" />
-              <span className="hidden xl:inline">{phoneFormatted}</span>
             </a>
 
-            {/* CTA */}
+            {/* CTA - Clean button */}
             <Link to="/contact">
-              <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold px-6 shadow-md hover:shadow-lg transition-all">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium px-5 h-9 rounded-full text-sm">
                 Book Now
               </Button>
             </Link>
@@ -387,14 +394,13 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden p-2 rounded-lg hover:bg-muted/50 transition-colors"
+            className="lg:hidden p-2 rounded-full hover:bg-muted transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
-
       </nav>
 
       {/* Mobile Navigation - Full Screen Overlay - Outside nav for proper fixed positioning */}
