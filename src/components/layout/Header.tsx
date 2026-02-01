@@ -403,8 +403,7 @@ const Header = () => {
         </div>
       </nav>
 
-      {/* Mobile Navigation - Full Screen Overlay - Outside nav for proper fixed positioning */}
-      {/* Mobile Navigation - Full Screen Overlay - Outside nav for proper fixed positioning */}
+      {/* Mobile Navigation - Clean & Modern */}
       {createPortal(
         <AnimatePresence>
           {isMenuOpen && (
@@ -413,46 +412,46 @@ const Header = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="lg:hidden fixed inset-0 top-[88px] bg-background z-[60] overflow-y-auto"
+              className="lg:hidden fixed inset-0 top-[72px] bg-background z-[60] overflow-y-auto"
             >
               <div className="container py-6 flex flex-col min-h-full">
-                {/* Search Bar */}
-                <form onSubmit={handleSearch} className="mb-6">
+                {/* Search Bar - Minimal */}
+                <form onSubmit={handleSearch} className="mb-8">
                   <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       type="search"
-                      placeholder="Search activities, tours..."
+                      placeholder="Search..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="h-12 pl-12 text-base"
+                      className="h-11 pl-11 text-sm rounded-full bg-muted/50 border-0 focus-visible:ring-1"
                     />
                   </div>
                 </form>
 
-                {/* Nav Links */}
-                <div className="space-y-1 mb-6">
+                {/* Nav Links - Simple List */}
+                <div className="space-y-1 mb-8">
                   {navLinks.map((link, index) => (
                     <motion.div
                       key={link.path}
-                      initial={{ opacity: 0, x: -20 }}
+                      initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
+                      transition={{ delay: index * 0.03 }}
                     >
                       <Link
                         to={link.path}
                         className={cn(
-                          "flex items-center justify-between text-lg font-medium py-4 px-4 rounded-xl transition-colors",
+                          "flex items-center justify-between text-base font-medium py-3.5 px-4 rounded-xl transition-colors",
                           isActive(link.path)
                             ? "text-secondary bg-secondary/10"
-                            : "text-foreground hover:bg-muted/50"
+                            : "text-foreground/80 hover:text-foreground hover:bg-muted"
                         )}
                         onClick={() => setIsMenuOpen(false)}
                       >
                         {link.name}
                         {link.highlight && (
-                          <span className="text-xs bg-secondary/20 text-secondary px-2 py-1 rounded-full">
-                            AI Powered
+                          <span className="text-xs bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full font-medium">
+                            AI
                           </span>
                         )}
                       </Link>
@@ -460,51 +459,51 @@ const Header = () => {
                   ))}
                 </div>
 
-                {/* Mobile Activity Categories */}
-                <div className="border-t border-border pt-6 mb-6">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 mb-4">
-                    Popular Activities
+                {/* Quick Categories - Compact Grid */}
+                <div className="border-t border-border/50 pt-6 mb-6">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-1 mb-4">
+                    Quick Access
                   </p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {activityCategories.map((category, index) => (
+                  <div className="grid grid-cols-3 gap-2">
+                    {activityCategories.slice(0, 6).map((category, index) => (
                       <motion.div
                         key={category.path}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 + index * 0.05 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.15 + index * 0.03 }}
                       >
                         <Link
                           to={category.path}
                           onClick={() => setIsMenuOpen(false)}
-                          className="flex items-center gap-3 p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
+                          className="flex flex-col items-center gap-2 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors text-center"
                         >
-                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                            <category.icon className="w-5 h-5 text-secondary" />
+                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                            <category.icon className="w-4 h-4 text-secondary" />
                           </div>
-                          <span className="text-sm font-medium">{category.name}</span>
+                          <span className="text-xs font-medium text-foreground/80 leading-tight">{category.name}</span>
                         </Link>
                       </motion.div>
                     ))}
                   </div>
                 </div>
 
-                {/* Bottom Actions */}
-                <div className="mt-auto border-t border-border pt-6 space-y-4 pb-safe">
+                {/* Bottom Actions - Clean */}
+                <div className="mt-auto pt-4 space-y-3 pb-safe">
                   <a
                     href={`tel:${phone}`}
-                    className="flex items-center gap-3 text-muted-foreground hover:text-foreground px-4 py-3"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                      <Phone className="w-5 h-5" />
+                    <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Phone className="w-4 h-4 text-secondary" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">Call Us</p>
-                      <p className="text-sm">{phoneFormatted}</p>
+                      <p className="text-sm font-medium text-foreground">{phoneFormatted}</p>
+                      <p className="text-xs text-muted-foreground">Tap to call</p>
                     </div>
                   </a>
 
                   <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
-                    <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold h-14 text-base">
+                    <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-medium h-12 text-sm rounded-full">
                       Book Now
                     </Button>
                   </Link>
