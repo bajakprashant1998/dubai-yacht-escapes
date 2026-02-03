@@ -13,6 +13,8 @@ import NewsletterSection from "@/components/home/NewsletterSection";
 import PartnersStrip from "@/components/home/PartnersStrip";
 import CTASection from "@/components/home/CTASection";
 import QuickServices from "@/components/home/QuickServices";
+import ValuePillars from "@/components/home/ValuePillars";
+import ResultsShowcase from "@/components/home/ResultsShowcase";
 import SEOHead, { createLocalBusinessSchema } from "@/components/SEOHead";
 
 const Home = () => {
@@ -27,11 +29,13 @@ const Home = () => {
       <HeroSection />
       <TrustStrip />
       <ExperienceCategories />
+      <ValuePillars />
       <FeaturedCombos />
       <RecentlyViewedSection />
       <QuickServices />
       <PopularDestinations />
       <CategoryShowcase />
+      <ResultsShowcase />
       <HowItWorks />
       <WhyChooseUs />
       <TestimonialsCarousel />
