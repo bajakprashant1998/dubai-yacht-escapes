@@ -1,47 +1,146 @@
-import { memo } from "react";
-import { Shield, Clock, BadgeCheck, Headphones, Users } from "lucide-react";
+import { memo, useEffect, useState, useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { Shield, Clock, BadgeCheck, Headphones, Users, TrendingUp, Star, Zap } from "lucide-react";
+
+interface CounterProps {
+  end: number;
+  suffix?: string;
+  duration?: number;
+}
+
+const AnimatedNumber = ({ end, suffix = "", duration = 2 }: CounterProps) => {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true });
+  
+  useEffect(() => {
+    if (!isInView) return;
+    
+    let startTime: number;
+    let animationFrame: number;
+    
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / (duration * 1000), 1);
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(easeOut * end));
+      
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      } else {
+        setCount(end);
+      }
+    };
+    
+    animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [isInView, end, duration]);
+  
+  const formatNumber = (num: number) => {
+    if (num >= 1000) return (num / 1000).toFixed(0) + "K";
+    return num.toString();
+  };
+  
+  return <span ref={ref}>{formatNumber(count)}{suffix}</span>;
+};
 
 const trustItems = [
   {
     icon: Users,
-    value: "50,000+",
+    value: 50000,
+    suffix: "+",
     label: "Happy Travelers",
+    color: "from-blue-500 to-indigo-600",
   },
   {
-    icon: BadgeCheck,
-    value: "4.9★",
+    icon: Star,
+    value: 4.9,
+    suffix: "★",
     label: "Average Rating",
+    isDecimal: true,
+    color: "from-amber-500 to-orange-600",
   },
   {
-    icon: Shield,
-    value: "Best Price",
-    label: "Guaranteed",
+    icon: Zap,
+    value: 100,
+    suffix: "+",
+    label: "Activities",
+    color: "from-emerald-500 to-teal-600",
   },
   {
     icon: Headphones,
-    value: "24/7",
+    value: 24,
+    suffix: "/7",
     label: "Support",
+    color: "from-purple-500 to-pink-600",
   },
 ];
 
 const TrustStrip = memo(() => {
   return (
-    <section className="bg-primary py-4 border-y border-primary-foreground/10">
-      <div className="container">
-        <div className="flex flex-wrap justify-center md:justify-between items-center gap-4 md:gap-6">
+    <section className="relative bg-gradient-to-r from-primary via-primary to-primary py-5 border-y border-primary-foreground/10 overflow-hidden">
+      {/* Animated background gradient */}
+      <motion.div 
+        className="absolute inset-0 bg-gradient-to-r from-secondary/5 via-transparent to-secondary/5"
+        animate={{ 
+          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+        }}
+        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+      />
+      
+      <div className="container relative z-10">
+        <motion.div 
+          className="flex flex-wrap justify-center md:justify-between items-center gap-6 md:gap-4"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           {trustItems.map((item, index) => (
-            <div
+            <motion.div
               key={index}
-              className="flex items-center gap-2 text-primary-foreground/90"
+              className="flex items-center gap-3 group cursor-default"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ scale: 1.05 }}
             >
-              <item.icon className="w-5 h-5 text-secondary" />
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-sm">{item.value}</span>
-                <span className="text-xs text-primary-foreground/70">{item.label}</span>
+              {/* Icon with gradient background */}
+              <motion.div 
+                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow`}
+                whileHover={{ rotate: [0, -5, 5, 0] }}
+                transition={{ duration: 0.3 }}
+              >
+                <item.icon className="w-5 h-5 text-white" />
+              </motion.div>
+              
+              <div className="flex flex-col">
+                <span className="font-bold text-lg text-primary-foreground leading-tight">
+                  {item.isDecimal ? (
+                    <>{item.value}{item.suffix}</>
+                  ) : (
+                    <AnimatedNumber end={item.value as number} suffix={item.suffix} />
+                  )}
+                </span>
+                <span className="text-xs text-primary-foreground/60">{item.label}</span>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+          
+          {/* Live indicator */}
+          <motion.div 
+            className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/20 border border-secondary/30"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <motion.div 
+              className="w-2 h-2 rounded-full bg-secondary"
+              animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+            <span className="text-xs font-medium text-secondary">Live Bookings</span>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

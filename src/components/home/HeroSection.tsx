@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { memo, useState, useRef, useEffect } from "react";
 import { motion, useScroll, useTransform, type Easing } from "framer-motion";
-import { ArrowRight, Play, Sparkles } from "lucide-react";
+import { ArrowRight, Play, Sparkles, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
@@ -26,6 +26,46 @@ const itemVariants = {
     transition: { duration: 0.6, ease: easeOut }
   }
 };
+
+// Live counter component
+const LiveRevenueCounter = memo(() => {
+  const [pulse, setPulse] = useState(false);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPulse(true);
+      setTimeout(() => setPulse(false), 500);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <motion.div 
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card/10 backdrop-blur-sm border border-primary-foreground/20 text-primary-foreground"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.8 }}
+    >
+      <div className="relative flex items-center gap-1.5">
+        <motion.div 
+          className="w-2 h-2 rounded-full bg-secondary"
+          animate={pulse ? { scale: [1, 1.5, 1] } : {}}
+        />
+        <motion.div 
+          className="absolute w-2 h-2 rounded-full bg-secondary"
+          animate={{ scale: [1, 2.5], opacity: [0.6, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        />
+      </div>
+      <TrendingUp className="w-3.5 h-3.5 text-secondary" />
+      <span className="text-xs font-medium">
+        <span className="text-secondary font-bold">AED 2.8M+</span> in experiences booked
+      </span>
+    </motion.div>
+  );
+});
+
+LiveRevenueCounter.displayName = "LiveRevenueCounter";
 
 const HeroSection = memo(() => {
   const { stats } = useHomepageContent();
@@ -213,6 +253,11 @@ const HeroSection = memo(() => {
             initial="hidden"
             animate="visible"
           >
+            {/* Live Counter Badge */}
+            <motion.div variants={itemVariants} className="mb-4">
+              <LiveRevenueCounter />
+            </motion.div>
+            
             {/* Badge */}
             <motion.div 
               className="inline-flex items-center gap-2 bg-secondary/20 backdrop-blur-sm text-secondary px-4 py-2 rounded-full mb-6 border border-secondary/30"
