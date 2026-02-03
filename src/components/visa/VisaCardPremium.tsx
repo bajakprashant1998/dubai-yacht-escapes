@@ -24,10 +24,11 @@ const VisaCardPremium = ({ visa, isPopular, index = 0 }: VisaCardPremiumProps) =
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.1 }}
+      className="h-full"
     >
-      <Link to={`/visa-services/${visa.slug}`} className="block group">
+      <Link to={`/visa-services/${visa.slug}`} className="block group h-full">
         <div className={cn(
-          "relative overflow-hidden rounded-2xl border transition-all duration-500",
+          "relative overflow-hidden rounded-2xl border transition-all duration-500 h-full flex flex-col",
           "bg-gradient-to-br from-card via-card to-muted/20",
           "hover:shadow-2xl hover:shadow-secondary/10 hover:-translate-y-1",
           "backdrop-blur-xl",
@@ -38,19 +39,17 @@ const VisaCardPremium = ({ visa, isPopular, index = 0 }: VisaCardPremiumProps) =
           
           {/* Popular Badge */}
           {isPopular && (
-            <div className="absolute -top-0 left-0 right-0">
-              <div className="bg-secondary text-secondary-foreground text-center py-2 text-sm font-medium">
-                <Star className="w-4 h-4 inline mr-1.5 fill-current" />
-                Most Popular Choice
-              </div>
+            <div className="bg-secondary text-secondary-foreground text-center py-2 text-sm font-medium">
+              <Star className="w-4 h-4 inline mr-1.5 fill-current" />
+              Most Popular Choice
             </div>
           )}
 
-          <div className={cn("p-6", isPopular && "pt-12")}>
+          <div className={cn("p-6 flex flex-col flex-1", !isPopular && "pt-6")}>
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-2 min-h-[24px]">
                   {visa.is_express && (
                     <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-lg shadow-amber-500/20">
                       <Zap className="w-3 h-3 mr-1" />
@@ -63,26 +62,24 @@ const VisaCardPremium = ({ visa, isPopular, index = 0 }: VisaCardPremiumProps) =
                     </Badge>
                   )}
                 </div>
-                <h3 className="font-bold text-xl group-hover:text-secondary transition-colors">
+                <h3 className="font-bold text-xl group-hover:text-secondary transition-colors line-clamp-1">
                   {visa.title}
                 </h3>
                 <p className="text-sm text-muted-foreground mt-1">{visa.visa_type}</p>
               </div>
               
               {/* Duration Badge */}
-              {visa.duration_days && (
-                <div className="flex flex-col items-center justify-center w-16 h-16 rounded-2xl bg-secondary/10 border border-secondary/20">
-                  <span className="text-2xl font-bold text-secondary">{visa.duration_days}</span>
-                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Days</span>
-                </div>
-              )}
+              <div className="flex flex-col items-center justify-center w-16 h-16 rounded-2xl bg-secondary/10 border border-secondary/20 flex-shrink-0">
+                <span className="text-2xl font-bold text-secondary">{visa.duration_days || "—"}</span>
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Days</span>
+              </div>
             </div>
 
             {/* Quick Info Pills */}
             <div className="flex flex-wrap gap-2 mb-5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/50 text-sm">
                 <Clock className="w-3.5 h-3.5 text-secondary" />
-                <span>{visa.processing_time}</span>
+                <span>{visa.processing_time || "3-5 Days"}</span>
               </div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/50 text-sm">
                 <FileText className="w-3.5 h-3.5 text-secondary" />
@@ -90,31 +87,33 @@ const VisaCardPremium = ({ visa, isPopular, index = 0 }: VisaCardPremiumProps) =
               </div>
             </div>
 
-            {/* Description */}
-            {visa.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-5">
-                {visa.description}
-              </p>
-            )}
+            {/* Description - Fixed height */}
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-5 min-h-[40px]">
+              {visa.description || "Complete visa processing with all documentation support."}
+            </p>
 
-            {/* Included Items */}
-            {visa.included.length > 0 && (
-              <div className="space-y-2 mb-6">
-                {visa.included.slice(0, 3).map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-sm">
-                    <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-green-600" />
-                    </div>
-                    <span>{item}</span>
+            {/* Included Items - Fixed height area */}
+            <div className="space-y-2 mb-6 min-h-[88px]">
+              {visa.included.slice(0, 3).map((item) => (
+                <div key={item} className="flex items-center gap-2 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-green-600" />
                   </div>
-                ))}
-                {visa.included.length > 3 && (
-                  <p className="text-xs text-secondary font-medium pl-7">
-                    +{visa.included.length - 3} more benefits
-                  </p>
-                )}
-              </div>
-            )}
+                  <span className="line-clamp-1">{item}</span>
+                </div>
+              ))}
+              {visa.included.length > 3 && (
+                <p className="text-xs text-secondary font-medium pl-7">
+                  +{visa.included.length - 3} more benefits
+                </p>
+              )}
+              {visa.included.length === 0 && (
+                <p className="text-sm text-muted-foreground">Contact us for details</p>
+              )}
+            </div>
+
+            {/* Spacer to push footer to bottom */}
+            <div className="flex-1" />
 
             {/* Divider */}
             <div className="border-t border-dashed my-5" />
