@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { memo } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles, TrendingUp, Users } from "lucide-react";
 import { useActiveServiceCategories } from "@/hooks/useServiceCategories";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -22,6 +22,9 @@ const categoryImages: Record<string, string> = {
   "attraction-passes": "/assets/services/attraction-passes.jpg",
 };
 
+// Featured categories with extra data
+const featuredSlugs = ["desert-safari", "theme-parks", "sightseeing-cruises", "adventure-sports"];
+
 const CategoryShowcase = memo(() => {
   const { data: categories, isLoading } = useActiveServiceCategories();
 
@@ -30,15 +33,15 @@ const CategoryShowcase = memo(() => {
 
   if (isLoading) {
     return (
-      <section className="py-12 md:py-20">
+      <section className="py-16 md:py-24">
         <div className="container">
-          <div className="text-center mb-10">
+          <div className="text-center mb-12">
             <Skeleton className="h-8 w-64 mx-auto mb-3" />
             <Skeleton className="h-5 w-96 mx-auto" />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
-              <Skeleton key={i} className="aspect-[4/3] rounded-xl" />
+              <Skeleton key={i} className="aspect-[4/3] rounded-2xl" />
             ))}
           </div>
         </div>
@@ -47,78 +50,112 @@ const CategoryShowcase = memo(() => {
   }
 
   return (
-    <section className="py-12 md:py-20 bg-muted/30">
-      <div className="container">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-muted/50 to-background relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+      </div>
+
+      <div className="container relative">
         <motion.div
-          className="text-center mb-10"
+          className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
-            Explore Dubai <span className="text-secondary">Experiences</span>
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            From thrilling adventures to serene escapes, discover the perfect experience for every traveler
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-          {displayCategories.map((category, index) => (
-            <motion.div
-              key={category.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+          <div>
+            <motion.div 
+              className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-4 py-2 rounded-full mb-4"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: index * 0.05 }}
             >
-              <Link
-                to={`/dubai/services/${category.slug}`}
-                className="group relative block aspect-[4/3] rounded-xl overflow-hidden"
-              >
-                <img
-                  src={categoryImages[category.slug] || category.imageUrl || "/placeholder.svg"}
-                  alt={category.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent" />
-                
-                <div className="absolute inset-0 flex flex-col justify-end p-3 md:p-4">
-                  <h3 className="font-display font-semibold text-sm md:text-base text-primary-foreground mb-0.5 md:mb-1 group-hover:text-secondary transition-colors">
-                    {category.name}
-                  </h3>
-                  {category.serviceCount !== undefined && (
-                    <p className="text-xs text-primary-foreground/70">
-                      {category.serviceCount} experiences
-                    </p>
-                  )}
-                </div>
-
-                <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-secondary/0 group-hover:bg-secondary flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100">
-                  <ArrowRight className="w-4 h-4 text-secondary-foreground" />
-                </div>
-              </Link>
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-semibold">Curated Experiences</span>
             </motion.div>
-          ))}
-        </div>
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+              Explore Dubai <span className="text-secondary">Experiences</span>
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-xl">
+              From thrilling adventures to serene escapes, discover the perfect experience for every traveler
+            </p>
+          </div>
 
-        <motion.div
-          className="text-center mt-8"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.4 }}
-        >
           <Link
             to="/experiences"
-            className="inline-flex items-center gap-2 text-secondary font-semibold hover:gap-3 transition-all"
+            className="inline-flex items-center gap-2 text-secondary font-semibold hover:gap-3 transition-all group"
           >
             View All Categories
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </motion.div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          {displayCategories.map((category, index) => {
+            const isFeatured = featuredSlugs.includes(category.slug);
+            
+            return (
+              <motion.div
+                key={category.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
+                className={index === 0 ? "md:col-span-2 md:row-span-2" : ""}
+              >
+                <Link
+                  to={`/dubai/services/${category.slug}`}
+                  className={`group relative block rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 ${
+                    index === 0 ? "aspect-square md:aspect-auto md:h-full" : "aspect-[4/3]"
+                  }`}
+                >
+                  <img
+                    src={categoryImages[category.slug] || category.imageUrl || "/placeholder.svg"}
+                    alt={category.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/50 to-transparent group-hover:from-primary/90 transition-all duration-300" />
+                  
+                  {/* Featured badge */}
+                  {isFeatured && (
+                    <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full text-xs font-bold">
+                      <TrendingUp className="w-3 h-3" />
+                      Popular
+                    </div>
+                  )}
+
+                  {/* Experience count badge */}
+                  {category.serviceCount !== undefined && category.serviceCount > 0 && (
+                    <div className="absolute top-3 right-3 flex items-center gap-1 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-full">
+                      <Users className="w-3 h-3 text-muted-foreground" />
+                      <span className="text-xs font-bold text-foreground">{category.serviceCount}</span>
+                    </div>
+                  )}
+                  
+                  <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-5">
+                    <h3 className={`font-display font-bold text-primary-foreground mb-1 group-hover:text-secondary transition-colors ${
+                      index === 0 ? "text-xl md:text-2xl" : "text-base md:text-lg"
+                    }`}>
+                      {category.name}
+                    </h3>
+                    {category.description && index === 0 && (
+                      <p className="text-primary-foreground/70 text-sm line-clamp-2 mb-2">
+                        {category.description}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2 text-secondary font-semibold text-sm opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                      <span>Explore</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

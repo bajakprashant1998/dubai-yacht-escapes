@@ -72,10 +72,10 @@ const experienceCategories = [
 
 const ExperienceCategories = memo(() => {
   return (
-    <section className="py-6 sm:py-8 -mt-16 sm:-mt-20 relative z-20">
+    <section className="py-8 sm:py-10 relative z-20">
       <div className="container">
         <motion.div
-          className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5 sm:gap-3"
+          className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -85,17 +85,17 @@ const ExperienceCategories = memo(() => {
             <Link
               key={index}
               to={category.link}
-              className="group block bg-card p-3 sm:p-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-border hover:border-secondary/30 relative overflow-hidden touch-target hover:-translate-y-1"
+              className="group block bg-card p-4 sm:p-5 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-border hover:border-secondary/30 relative overflow-hidden touch-target hover:-translate-y-1"
             >
               {/* Background Gradient */}
               <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
 
               <div className="relative text-center">
-                <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted/50 flex items-center justify-center mb-2 mx-auto group-hover:scale-110 group-hover:bg-secondary/20 transition-all duration-300">
-                  <category.icon className={`w-5 sm:w-6 h-5 sm:h-6 ${category.iconColor} group-hover:text-secondary transition-colors`} />
+                <div className="w-12 sm:w-14 h-12 sm:h-14 rounded-xl sm:rounded-2xl bg-muted/50 flex items-center justify-center mb-3 mx-auto group-hover:scale-110 group-hover:bg-secondary/20 transition-all duration-300">
+                  <category.icon className={`w-6 sm:w-7 h-6 sm:h-7 ${category.iconColor} group-hover:text-secondary transition-colors`} />
                 </div>
-                <h3 className="font-display font-bold text-xs sm:text-sm text-foreground mb-0.5 group-hover:text-secondary transition-colors">{category.title}</h3>
-                <p className="text-[10px] sm:text-xs text-muted-foreground line-clamp-1 hidden sm:block">{category.description}</p>
+                <h3 className="font-display font-bold text-sm sm:text-base text-foreground mb-1 group-hover:text-secondary transition-colors">{category.title}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground line-clamp-1">{category.description}</p>
               </div>
             </Link>
           ))}
