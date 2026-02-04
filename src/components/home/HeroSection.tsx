@@ -120,7 +120,7 @@ const HeroSection = memo(() => {
   ];
 
   return (
-    <section className="relative min-h-[95vh] flex items-center overflow-hidden">
+    <section className="relative min-h-[95vh] flex items-center overflow-visible pb-24">
       {/* Background Video/Image with Parallax */}
       <motion.div className="absolute inset-0" style={{ y: backgroundY }}>
         {/* Video Background */}
@@ -362,9 +362,9 @@ const HeroSection = memo(() => {
       </motion.div>
 
       {/* Category Quick Cards - Overlapping bottom */}
-      <div className="absolute -bottom-16 left-0 right-0 z-20 px-4">
+      <div className="absolute left-0 right-0 z-20 px-4" style={{ bottom: '-60px' }}>
         <div className="container mx-auto">
-          <div className="grid grid-cols-4 md:grid-cols-8 gap-3 md:gap-4">
+          <div className="grid grid-cols-4 md:grid-cols-8 gap-2 md:gap-4">
             {[
               { icon: Sun, label: "Desert Safari", desc: "Dune bashing & BBQ", color: "text-amber-500" },
               { icon: Ticket, label: "Theme Parks", desc: "World-class attractions", color: "text-rose-500" },
@@ -381,39 +381,18 @@ const HeroSection = memo(() => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 + index * 0.05 }}
                 whileHover={{ y: -4, scale: 1.02 }}
-                className="bg-card rounded-xl p-3 md:p-4 shadow-lg border border-border/50 cursor-pointer text-center group"
+                className="bg-white dark:bg-card rounded-xl p-4 md:p-5 shadow-xl border border-border/30 cursor-pointer text-center group hover:shadow-2xl transition-all duration-300"
               >
-                <div className={`${item.color} mb-2 flex justify-center`}>
-                  <item.icon className="w-6 h-6 md:w-7 md:h-7" />
+                <div className={`${item.color} mb-3 flex justify-center`}>
+                  <item.icon className="w-7 h-7 md:w-8 md:h-8" />
                 </div>
-                <h3 className="text-xs md:text-sm font-semibold text-foreground truncate">{item.label}</h3>
-                <p className="text-[10px] md:text-xs text-muted-foreground truncate hidden md:block">{item.desc}</p>
+                <h3 className="text-xs md:text-sm font-bold text-foreground mb-1">{item.label}</h3>
+                <p className="text-[10px] md:text-xs text-muted-foreground line-clamp-1 hidden md:block">{item.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </div>
-
-      {/* Scroll Indicator */}
-      <motion.div 
-        className="absolute bottom-28 left-1/2 -translate-x-1/2"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.5 }}
-      >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <div className="w-8 h-12 rounded-full border-2 border-primary-foreground/30 flex items-start justify-center p-2">
-            <motion.div 
-              className="w-1.5 h-3 bg-secondary rounded-full"
-              animate={{ y: [0, 8, 0], opacity: [1, 0.5, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </div>
-        </motion.div>
-      </motion.div>
     </section>
   );
 });

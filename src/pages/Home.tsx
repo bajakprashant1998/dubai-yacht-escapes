@@ -23,7 +23,7 @@ const Home = () => {
       />
       <HeroSection />
       {/* Spacer for overlapping hero cards */}
-      <div className="pt-20" />
+      <div className="pt-24 md:pt-28" />
       <ValuePillars />
       <FeaturedCombos />
       <RecentlyViewedSection />
