@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { memo, useState, useRef, useEffect } from "react";
 import { motion, useScroll, useTransform, type Easing } from "framer-motion";
-import { ArrowRight, Play, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowRight, Play, Sparkles, TrendingUp, Sun, Waves, Ship, Mountain, MapPin, Eye, Utensils, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
@@ -361,10 +361,42 @@ const HeroSection = memo(() => {
         </div>
       </motion.div>
 
+      {/* Category Quick Cards - Overlapping bottom */}
+      <div className="absolute -bottom-16 left-0 right-0 z-20 px-4">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-4 md:grid-cols-8 gap-3 md:gap-4">
+            {[
+              { icon: Sun, label: "Desert Safari", desc: "Dune bashing & BBQ", color: "text-amber-500" },
+              { icon: Ticket, label: "Theme Parks", desc: "World-class attractions", color: "text-rose-500" },
+              { icon: Waves, label: "Water Sports", desc: "Jet ski & flyboard", color: "text-cyan-500" },
+              { icon: Ship, label: "Cruises", desc: "Dhow & yacht tours", color: "text-blue-500" },
+              { icon: Mountain, label: "Adventure", desc: "Skydive & hot air", color: "text-violet-500" },
+              { icon: MapPin, label: "City Tours", desc: "Explore Dubai landmarks", color: "text-orange-500" },
+              { icon: Eye, label: "Observation", desc: "Burj Khalifa & more", color: "text-emerald-500" },
+              { icon: Utensils, label: "Dining", desc: "Unique culinary", color: "text-pink-500" },
+            ].map((item, index) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 + index * 0.05 }}
+                whileHover={{ y: -4, scale: 1.02 }}
+                className="bg-card rounded-xl p-3 md:p-4 shadow-lg border border-border/50 cursor-pointer text-center group"
+              >
+                <div className={`${item.color} mb-2 flex justify-center`}>
+                  <item.icon className="w-6 h-6 md:w-7 md:h-7" />
+                </div>
+                <h3 className="text-xs md:text-sm font-semibold text-foreground truncate">{item.label}</h3>
+                <p className="text-[10px] md:text-xs text-muted-foreground truncate hidden md:block">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Scroll Indicator */}
       <motion.div 
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-28 left-1/2 -translate-x-1/2"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.5 }}
