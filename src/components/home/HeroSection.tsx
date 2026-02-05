@@ -8,6 +8,16 @@ import { useHomepageContent } from "@/hooks/useHomepageContent";
 import HeroSearchBar from "./HeroSearchBar";
 import heroBurjKhalifaEvening from "@/assets/hero-burj-khalifa-evening.webp";
 
+// Category images
+import desertSafariImg from "@/assets/services/desert-safari.jpg";
+import themeParksImg from "@/assets/services/theme-parks.jpg";
+import waterSportsImg from "@/assets/services/water-sports.jpg";
+import cityToursImg from "@/assets/services/city-tours.jpg";
+import adventureImg from "@/assets/services/adventure-sports.jpg";
+import observationImg from "@/assets/services/observation-decks.jpg";
+import diningImg from "@/assets/services/dining-experiences.jpg";
+import dhowCruiseImg from "@/assets/tours/dhow-cruise-marina.webp";
+
 const easeOut: Easing = [0.16, 1, 0.3, 1];
 
 const containerVariants = {
@@ -362,18 +372,18 @@ const HeroSection = memo(() => {
       </motion.div>
 
       {/* Category Quick Cards - Overlapping bottom */}
-      <div className="absolute left-0 right-0 z-20 px-3 md:px-4" style={{ bottom: '-70px' }}>
+      <div className="absolute left-0 right-0 z-20 px-3 md:px-4" style={{ bottom: '-80px' }}>
         <div className="container mx-auto">
           <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-1.5 sm:gap-2 md:gap-3">
             {[
-              { icon: Sun, label: "Desert Safari", desc: "Dune bashing & BBQ", color: "text-amber-500", bgColor: "bg-amber-50 dark:bg-amber-500/10", slug: "desert-safari" },
-              { icon: Ticket, label: "Theme Parks", desc: "World-class attractions", color: "text-rose-500", bgColor: "bg-rose-50 dark:bg-rose-500/10", slug: "theme-parks" },
-              { icon: Waves, label: "Water Sports", desc: "Jet ski & flyboard", color: "text-cyan-500", bgColor: "bg-cyan-50 dark:bg-cyan-500/10", slug: "water-sports" },
-              { icon: Ship, label: "Cruises", desc: "Dhow & yacht tours", color: "text-blue-500", bgColor: "bg-blue-50 dark:bg-blue-500/10", slug: "sightseeing-cruises" },
-              { icon: Mountain, label: "Adventure", desc: "Skydive & hot air", color: "text-violet-500", bgColor: "bg-violet-50 dark:bg-violet-500/10", slug: "adventure-sports" },
-              { icon: MapPin, label: "City Tours", desc: "Explore Dubai landmarks", color: "text-orange-500", bgColor: "bg-orange-50 dark:bg-orange-500/10", slug: "city-tours" },
-              { icon: Eye, label: "Observation", desc: "Burj Khalifa & more", color: "text-emerald-500", bgColor: "bg-emerald-50 dark:bg-emerald-500/10", slug: "observation-decks" },
-              { icon: Utensils, label: "Dining", desc: "Unique culinary", color: "text-pink-500", bgColor: "bg-pink-50 dark:bg-pink-500/10", slug: "dining-experiences" },
+              { icon: Sun, label: "Desert Safari", image: desertSafariImg, overlay: "from-amber-600/80 to-orange-500/60", slug: "desert-safari" },
+              { icon: Ticket, label: "Theme Parks", image: themeParksImg, overlay: "from-rose-600/80 to-pink-500/60", slug: "theme-parks" },
+              { icon: Waves, label: "Water Sports", image: waterSportsImg, overlay: "from-cyan-600/80 to-blue-500/60", slug: "water-sports" },
+              { icon: Ship, label: "Cruises", image: dhowCruiseImg, overlay: "from-blue-600/80 to-indigo-500/60", slug: "sightseeing-cruises" },
+              { icon: Mountain, label: "Adventure", image: adventureImg, overlay: "from-violet-600/80 to-purple-500/60", slug: "adventure-sports" },
+              { icon: MapPin, label: "City Tours", image: cityToursImg, overlay: "from-orange-600/80 to-amber-500/60", slug: "city-tours" },
+              { icon: Eye, label: "Observation", image: observationImg, overlay: "from-emerald-600/80 to-teal-500/60", slug: "observation-decks" },
+              { icon: Utensils, label: "Dining", image: diningImg, overlay: "from-pink-600/80 to-rose-500/60", slug: "dining-experiences" },
             ].map((item, index) => (
               <Link key={item.label} to={`/experiences?category=${item.slug}`} className="block h-full">
                 <motion.div
@@ -387,20 +397,34 @@ const HeroSection = memo(() => {
                   whileHover={{ 
                     y: -8, 
                     scale: 1.05,
-                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.35)"
                   }}
                   whileTap={{ scale: 0.98 }}
-                  className="bg-white dark:bg-card rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-5 shadow-lg border border-border/20 cursor-pointer text-center h-full flex flex-col items-center justify-center min-h-[80px] sm:min-h-[100px] md:min-h-[130px] transition-colors duration-300 hover:border-primary/30"
+                  className="relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg cursor-pointer h-full min-h-[90px] sm:min-h-[110px] md:min-h-[140px] group"
                 >
-                  <motion.div 
-                    className={`${item.bgColor} ${item.color} w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl flex items-center justify-center mb-1.5 sm:mb-2 md:mb-3`}
-                    whileHover={{ rotate: [0, -10, 10, 0] }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <item.icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-                  </motion.div>
-                  <h3 className="text-[9px] sm:text-[10px] md:text-sm font-bold text-foreground leading-tight line-clamp-1">{item.label}</h3>
-                  <p className="text-[8px] md:text-xs text-muted-foreground line-clamp-1 hidden sm:block leading-tight mt-0.5">{item.desc}</p>
+                  {/* Background Image */}
+                  <div className="absolute inset-0">
+                    <img 
+                      src={item.image} 
+                      alt={item.label}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                  </div>
+                  
+                  {/* Gradient Overlay */}
+                  <div className={`absolute inset-0 bg-gradient-to-t ${item.overlay}`} />
+                  
+                  {/* Content */}
+                  <div className="relative z-10 h-full flex flex-col items-center justify-center p-2 sm:p-3 md:p-4 text-center">
+                    <motion.div 
+                      className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-1.5 sm:mb-2 md:mb-3 border border-white/30"
+                      whileHover={{ rotate: [0, -10, 10, 0] }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <item.icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+                    </motion.div>
+                    <h3 className="text-[9px] sm:text-[10px] md:text-sm font-bold text-white leading-tight drop-shadow-md">{item.label}</h3>
+                  </div>
                 </motion.div>
               </Link>
             ))}
