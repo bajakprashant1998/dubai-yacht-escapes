@@ -362,9 +362,9 @@ const HeroSection = memo(() => {
       </motion.div>
 
       {/* Category Quick Cards - Overlapping bottom */}
-      <div className="absolute left-0 right-0 z-20 px-4" style={{ bottom: '-60px' }}>
+      <div className="absolute left-0 right-0 z-20 px-3 md:px-4" style={{ bottom: '-70px' }}>
         <div className="container mx-auto">
-          <div className="grid grid-cols-4 md:grid-cols-8 gap-2 md:gap-3">
+          <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-1.5 sm:gap-2 md:gap-3">
             {[
               { icon: Sun, label: "Desert Safari", desc: "Dune bashing & BBQ", color: "text-amber-500", bgColor: "bg-amber-50 dark:bg-amber-500/10", slug: "desert-safari" },
               { icon: Ticket, label: "Theme Parks", desc: "World-class attractions", color: "text-rose-500", bgColor: "bg-rose-50 dark:bg-rose-500/10", slug: "theme-parks" },
@@ -390,17 +390,17 @@ const HeroSection = memo(() => {
                     boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
                   }}
                   whileTap={{ scale: 0.98 }}
-                  className="bg-white dark:bg-card rounded-2xl p-3 md:p-5 shadow-lg border border-border/20 cursor-pointer text-center h-full flex flex-col items-center justify-center min-h-[100px] md:min-h-[130px] transition-colors duration-300 hover:border-primary/30"
+                  className="bg-white dark:bg-card rounded-xl sm:rounded-2xl p-2 sm:p-3 md:p-5 shadow-lg border border-border/20 cursor-pointer text-center h-full flex flex-col items-center justify-center min-h-[80px] sm:min-h-[100px] md:min-h-[130px] transition-colors duration-300 hover:border-primary/30"
                 >
                   <motion.div 
-                    className={`${item.bgColor} ${item.color} w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center mb-2 md:mb-3`}
+                    className={`${item.bgColor} ${item.color} w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl flex items-center justify-center mb-1.5 sm:mb-2 md:mb-3`}
                     whileHover={{ rotate: [0, -10, 10, 0] }}
                     transition={{ duration: 0.5 }}
                   >
-                    <item.icon className="w-5 h-5 md:w-6 md:h-6" />
+                    <item.icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                   </motion.div>
-                  <h3 className="text-[10px] md:text-sm font-bold text-foreground mb-0.5 md:mb-1 leading-tight">{item.label}</h3>
-                  <p className="text-[8px] md:text-xs text-muted-foreground line-clamp-2 hidden md:block leading-tight">{item.desc}</p>
+                  <h3 className="text-[9px] sm:text-[10px] md:text-sm font-bold text-foreground leading-tight line-clamp-1">{item.label}</h3>
+                  <p className="text-[8px] md:text-xs text-muted-foreground line-clamp-1 hidden sm:block leading-tight mt-0.5">{item.desc}</p>
                 </motion.div>
               </Link>
             ))}
