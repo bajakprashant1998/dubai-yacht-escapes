@@ -366,29 +366,30 @@ const HeroSection = memo(() => {
         <div className="container mx-auto">
           <div className="grid grid-cols-4 md:grid-cols-8 gap-2 md:gap-4">
             {[
-              { icon: Sun, label: "Desert Safari", desc: "Dune bashing & BBQ", color: "text-amber-500" },
-              { icon: Ticket, label: "Theme Parks", desc: "World-class attractions", color: "text-rose-500" },
-              { icon: Waves, label: "Water Sports", desc: "Jet ski & flyboard", color: "text-cyan-500" },
-              { icon: Ship, label: "Cruises", desc: "Dhow & yacht tours", color: "text-blue-500" },
-              { icon: Mountain, label: "Adventure", desc: "Skydive & hot air", color: "text-violet-500" },
-              { icon: MapPin, label: "City Tours", desc: "Explore Dubai landmarks", color: "text-orange-500" },
-              { icon: Eye, label: "Observation", desc: "Burj Khalifa & more", color: "text-emerald-500" },
-              { icon: Utensils, label: "Dining", desc: "Unique culinary", color: "text-pink-500" },
+              { icon: Sun, label: "Desert Safari", desc: "Dune bashing & BBQ", color: "text-amber-500", slug: "desert-safari" },
+              { icon: Ticket, label: "Theme Parks", desc: "World-class attractions", color: "text-rose-500", slug: "theme-parks" },
+              { icon: Waves, label: "Water Sports", desc: "Jet ski & flyboard", color: "text-cyan-500", slug: "water-sports" },
+              { icon: Ship, label: "Cruises", desc: "Dhow & yacht tours", color: "text-blue-500", slug: "sightseeing-cruises" },
+              { icon: Mountain, label: "Adventure", desc: "Skydive & hot air", color: "text-violet-500", slug: "adventure-sports" },
+              { icon: MapPin, label: "City Tours", desc: "Explore Dubai landmarks", color: "text-orange-500", slug: "city-tours" },
+              { icon: Eye, label: "Observation", desc: "Burj Khalifa & more", color: "text-emerald-500", slug: "observation-decks" },
+              { icon: Utensils, label: "Dining", desc: "Unique culinary", color: "text-pink-500", slug: "dining-experiences" },
             ].map((item, index) => (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 + index * 0.05 }}
-                whileHover={{ y: -4, scale: 1.02 }}
-                className="bg-white dark:bg-card rounded-xl p-4 md:p-5 shadow-xl border border-border/30 cursor-pointer text-center group hover:shadow-2xl transition-all duration-300"
-              >
-                <div className={`${item.color} mb-3 flex justify-center`}>
-                  <item.icon className="w-7 h-7 md:w-8 md:h-8" />
-                </div>
-                <h3 className="text-xs md:text-sm font-bold text-foreground mb-1">{item.label}</h3>
-                <p className="text-[10px] md:text-xs text-muted-foreground line-clamp-1 hidden md:block">{item.desc}</p>
-              </motion.div>
+              <Link key={item.label} to={`/experiences?category=${item.slug}`}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 + index * 0.05 }}
+                  whileHover={{ y: -4, scale: 1.02 }}
+                  className="bg-white dark:bg-card rounded-xl p-4 md:p-5 shadow-xl border border-border/30 cursor-pointer text-center group hover:shadow-2xl transition-all duration-300"
+                >
+                  <div className={`${item.color} mb-3 flex justify-center`}>
+                    <item.icon className="w-7 h-7 md:w-8 md:h-8" />
+                  </div>
+                  <h3 className="text-xs md:text-sm font-bold text-foreground mb-1">{item.label}</h3>
+                  <p className="text-[10px] md:text-xs text-muted-foreground line-clamp-1 hidden md:block">{item.desc}</p>
+                </motion.div>
+              </Link>
             ))}
           </div>
         </div>
