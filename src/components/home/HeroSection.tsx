@@ -364,30 +364,43 @@ const HeroSection = memo(() => {
       {/* Category Quick Cards - Overlapping bottom */}
       <div className="absolute left-0 right-0 z-20 px-4" style={{ bottom: '-60px' }}>
         <div className="container mx-auto">
-          <div className="grid grid-cols-4 md:grid-cols-8 gap-2 md:gap-4">
+          <div className="grid grid-cols-4 md:grid-cols-8 gap-2 md:gap-3">
             {[
-              { icon: Sun, label: "Desert Safari", desc: "Dune bashing & BBQ", color: "text-amber-500", slug: "desert-safari" },
-              { icon: Ticket, label: "Theme Parks", desc: "World-class attractions", color: "text-rose-500", slug: "theme-parks" },
-              { icon: Waves, label: "Water Sports", desc: "Jet ski & flyboard", color: "text-cyan-500", slug: "water-sports" },
-              { icon: Ship, label: "Cruises", desc: "Dhow & yacht tours", color: "text-blue-500", slug: "sightseeing-cruises" },
-              { icon: Mountain, label: "Adventure", desc: "Skydive & hot air", color: "text-violet-500", slug: "adventure-sports" },
-              { icon: MapPin, label: "City Tours", desc: "Explore Dubai landmarks", color: "text-orange-500", slug: "city-tours" },
-              { icon: Eye, label: "Observation", desc: "Burj Khalifa & more", color: "text-emerald-500", slug: "observation-decks" },
-              { icon: Utensils, label: "Dining", desc: "Unique culinary", color: "text-pink-500", slug: "dining-experiences" },
+              { icon: Sun, label: "Desert Safari", desc: "Dune bashing & BBQ", color: "text-amber-500", bgColor: "bg-amber-50 dark:bg-amber-500/10", slug: "desert-safari" },
+              { icon: Ticket, label: "Theme Parks", desc: "World-class attractions", color: "text-rose-500", bgColor: "bg-rose-50 dark:bg-rose-500/10", slug: "theme-parks" },
+              { icon: Waves, label: "Water Sports", desc: "Jet ski & flyboard", color: "text-cyan-500", bgColor: "bg-cyan-50 dark:bg-cyan-500/10", slug: "water-sports" },
+              { icon: Ship, label: "Cruises", desc: "Dhow & yacht tours", color: "text-blue-500", bgColor: "bg-blue-50 dark:bg-blue-500/10", slug: "sightseeing-cruises" },
+              { icon: Mountain, label: "Adventure", desc: "Skydive & hot air", color: "text-violet-500", bgColor: "bg-violet-50 dark:bg-violet-500/10", slug: "adventure-sports" },
+              { icon: MapPin, label: "City Tours", desc: "Explore Dubai landmarks", color: "text-orange-500", bgColor: "bg-orange-50 dark:bg-orange-500/10", slug: "city-tours" },
+              { icon: Eye, label: "Observation", desc: "Burj Khalifa & more", color: "text-emerald-500", bgColor: "bg-emerald-50 dark:bg-emerald-500/10", slug: "observation-decks" },
+              { icon: Utensils, label: "Dining", desc: "Unique culinary", color: "text-pink-500", bgColor: "bg-pink-50 dark:bg-pink-500/10", slug: "dining-experiences" },
             ].map((item, index) => (
-              <Link key={item.label} to={`/experiences?category=${item.slug}`}>
+              <Link key={item.label} to={`/experiences?category=${item.slug}`} className="block h-full">
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 + index * 0.05 }}
-                  whileHover={{ y: -4, scale: 1.02 }}
-                  className="bg-white dark:bg-card rounded-xl p-4 md:p-5 shadow-xl border border-border/30 cursor-pointer text-center group hover:shadow-2xl transition-all duration-300"
+                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ 
+                    delay: 0.6 + index * 0.08,
+                    duration: 0.5,
+                    ease: [0.16, 1, 0.3, 1]
+                  }}
+                  whileHover={{ 
+                    y: -8, 
+                    scale: 1.05,
+                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-white dark:bg-card rounded-2xl p-3 md:p-5 shadow-lg border border-border/20 cursor-pointer text-center h-full flex flex-col items-center justify-center min-h-[100px] md:min-h-[130px] transition-colors duration-300 hover:border-primary/30"
                 >
-                  <div className={`${item.color} mb-3 flex justify-center`}>
-                    <item.icon className="w-7 h-7 md:w-8 md:h-8" />
-                  </div>
-                  <h3 className="text-xs md:text-sm font-bold text-foreground mb-1">{item.label}</h3>
-                  <p className="text-[10px] md:text-xs text-muted-foreground line-clamp-1 hidden md:block">{item.desc}</p>
+                  <motion.div 
+                    className={`${item.bgColor} ${item.color} w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center mb-2 md:mb-3`}
+                    whileHover={{ rotate: [0, -10, 10, 0] }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <item.icon className="w-5 h-5 md:w-6 md:h-6" />
+                  </motion.div>
+                  <h3 className="text-[10px] md:text-sm font-bold text-foreground mb-0.5 md:mb-1 leading-tight">{item.label}</h3>
+                  <p className="text-[8px] md:text-xs text-muted-foreground line-clamp-2 hidden md:block leading-tight">{item.desc}</p>
                 </motion.div>
               </Link>
             ))}
