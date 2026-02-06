@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import { motion } from 'framer-motion';
 import {
   Calendar,
   Clock,
@@ -11,7 +12,6 @@ import {
   Plane,
   Star,
   Plus,
-  Minus,
   Share2,
   Download,
   MessageCircle,
@@ -19,7 +19,9 @@ import {
   ChevronUp,
   Sparkles,
   Check,
-  Loader2,
+  UtensilsCrossed,
+  Navigation,
+  Activity,
 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
@@ -111,7 +113,6 @@ const TripItinerary = () => {
         setTrip(tripData);
         setItems(itemsData || []);
         
-        // Expand first day by default
         if (tripData?.total_days > 0) {
           setExpandedDays([1]);
         }
@@ -126,7 +127,6 @@ const TripItinerary = () => {
     loadTrip();
   }, [tripId, navigate]);
 
-  // Group items by day
   const itemsByDay = items.reduce<Record<number, TripItem[]>>((acc, item) => {
     const day = item.day_number;
     if (!acc[day]) acc[day] = [];
@@ -134,13 +134,11 @@ const TripItinerary = () => {
     return acc;
   }, {});
 
-  // Get hotel, transport, visa, upsells
   const hotelItem = items.find(i => i.item_type === 'hotel');
   const transportItem = items.find(i => i.item_type === 'car');
   const visaItem = items.find(i => i.item_type === 'visa');
   const upsells = items.filter(i => i.item_type === 'upsell');
 
-  // Calculate total with optional upsells
   const baseTotal = trip?.total_price_aed || 0;
   const upsellTotal = upsells
     .filter(u => includedUpsells.has(u.id))
@@ -156,56 +154,62 @@ const TripItinerary = () => {
   const toggleUpsell = (id: string) => {
     setIncludedUpsells(prev => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
 
   const handleDownloadPDF = () => {
-    // Store current expanded state
     const previousExpanded = [...expandedDays];
-    
-    // Expand all days before printing
     const allDays = Array.from({ length: trip?.total_days || 0 }, (_, i) => i + 1);
     setExpandedDays(allDays);
-    
-    // Wait for DOM update, then print
     setTimeout(() => {
       window.print();
-      
-      // Restore state after print dialog closes
-      setTimeout(() => {
-        setExpandedDays(previousExpanded);
-      }, 500);
+      setTimeout(() => setExpandedDays(previousExpanded), 500);
     }, 150);
   };
 
   const getItemIcon = (type: string) => {
     switch (type) {
       case 'transfer':
-        return <Car className="w-4 h-4" />;
+        return <Navigation className="w-4 h-4" />;
       case 'activity':
+        return <Activity className="w-4 h-4" />;
       case 'tour':
         return <Star className="w-4 h-4" />;
       case 'meal':
-        return <MapPin className="w-4 h-4" />;
+        return <UtensilsCrossed className="w-4 h-4" />;
       default:
-        return <Clock className="w-4 h-4" />;
+        return <MapPin className="w-4 h-4" />;
+    }
+  };
+
+  const getItemColor = (type: string) => {
+    switch (type) {
+      case 'transfer':
+        return 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400';
+      case 'activity':
+        return 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400';
+      case 'tour':
+        return 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400';
+      case 'meal':
+        return 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400';
+      default:
+        return 'bg-muted text-muted-foreground';
     }
   };
 
   if (isLoading) {
     return (
       <Layout>
-        <div className="container py-10">
-          <Skeleton className="h-12 w-64 mb-6" />
-          <Skeleton className="h-48 w-full mb-4" />
-          <Skeleton className="h-48 w-full mb-4" />
-          <Skeleton className="h-48 w-full" />
+        <div className="container py-10 space-y-6">
+          <Skeleton className="h-48 w-full rounded-2xl" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Skeleton className="h-36 rounded-xl" />
+            <Skeleton className="h-36 rounded-xl" />
+          </div>
+          <Skeleton className="h-64 w-full rounded-xl" />
         </div>
       </Layout>
     );
@@ -225,68 +229,82 @@ const TripItinerary = () => {
   return (
     <Layout>
       <div className="min-h-screen bg-muted/30">
-        {/* Header */}
-        <div className="bg-primary text-primary-foreground py-8">
-          <div className="container">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        {/* Hero Header */}
+        <div className="relative bg-gradient-to-br from-primary via-primary to-primary/80 text-primary-foreground overflow-hidden">
+          {/* Background decorations */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/3" />
+          </div>
+
+          <div className="container relative py-10 md:py-14">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col md:flex-row md:items-end md:justify-between gap-6"
+            >
               <div>
-                <Badge variant="secondary" className="mb-2">
+                <Badge className="bg-white/20 text-white border-white/30 hover:bg-white/30 mb-3 text-xs font-semibold tracking-wide">
                   {trip.budget_tier.charAt(0).toUpperCase() + trip.budget_tier.slice(1)} • {trip.travel_style.charAt(0).toUpperCase() + trip.travel_style.slice(1)}
                 </Badge>
-                <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 leading-tight">
                   Your {trip.total_days}-Day Dubai Adventure
                 </h1>
-                <div className="flex flex-wrap items-center gap-4 text-primary-foreground/80 text-sm">
-                  <span className="flex items-center gap-1">
+                <div className="flex flex-wrap items-center gap-4 text-white/80 text-sm">
+                  <span className="flex items-center gap-2 bg-white/10 rounded-full px-3 py-1.5">
                     <Calendar className="w-4 h-4" />
                     {format(new Date(trip.arrival_date), 'MMM d')} - {format(new Date(trip.departure_date), 'MMM d, yyyy')}
                   </span>
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-2 bg-white/10 rounded-full px-3 py-1.5">
                     <Users className="w-4 h-4" />
                     {trip.travelers_adults + trip.travelers_children} Travelers
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <CurrencySelector compact />
-                <Button variant="secondary" size="sm" className="gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <CurrencySelector compact variant="hero" />
+                <Button variant="secondary" size="sm" className="gap-2 rounded-xl h-10">
                   <Share2 className="w-4 h-4" />
                   Share
                 </Button>
                 <Button 
                   variant="secondary" 
                   size="sm" 
-                  className="gap-2 print-visible"
+                  className="gap-2 rounded-xl h-10 print-visible"
                   onClick={handleDownloadPDF}
                 >
                   <Download className="w-4 h-4" />
                   PDF
                 </Button>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
 
         <div className="container py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content - Itinerary */}
+            {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
               {/* Essentials Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Hotel */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              >
                 {hotelItem && (
-                  <div className="bg-card rounded-xl p-5 border">
+                  <div className="bg-card rounded-2xl p-6 border shadow-sm hover:shadow-md transition-shadow group">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <Hotel className="w-6 h-6 text-primary" />
+                      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <Hotel className="w-7 h-7 text-primary" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm text-muted-foreground">Accommodation</p>
-                        <h3 className="font-semibold">{hotelItem.title}</h3>
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Accommodation</p>
+                        <h3 className="font-bold text-lg mt-0.5">{hotelItem.title}</h3>
                         <p className="text-sm text-muted-foreground mt-1">
                           {hotelItem.quantity} nights
                         </p>
-                        <p className="text-secondary font-medium mt-2">
+                        <p className="text-secondary font-bold text-lg mt-2">
                           {formatPrice(hotelItem.price_aed)}
                         </p>
                       </div>
@@ -294,47 +312,62 @@ const TripItinerary = () => {
                   </div>
                 )}
 
-                {/* Transport */}
                 {transportItem && (
-                  <div className="bg-card rounded-xl p-5 border">
+                  <div className="bg-card rounded-2xl p-6 border shadow-sm hover:shadow-md transition-shadow group">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <Car className="w-6 h-6 text-primary" />
+                      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <Car className="w-7 h-7 text-primary" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm text-muted-foreground">Transport</p>
-                        <h3 className="font-semibold">{transportItem.title}</h3>
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Transport</p>
+                        <h3 className="font-bold text-lg mt-0.5">{transportItem.title}</h3>
                         <p className="text-sm text-muted-foreground mt-1">
                           {transportItem.quantity} days
                         </p>
-                        <p className="text-secondary font-medium mt-2">
+                        <p className="text-secondary font-bold text-lg mt-2">
                           {formatPrice(transportItem.price_aed)}
                         </p>
                       </div>
                     </div>
                   </div>
                 )}
-              </div>
+              </motion.div>
 
               {/* Visa Notice */}
               {visaItem && (
-                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 flex items-center gap-4">
-                  <Plane className="w-6 h-6 text-amber-600" />
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-5 flex items-center gap-4"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
+                    <Plane className="w-6 h-6 text-amber-600" />
+                  </div>
                   <div className="flex-1">
-                    <h3 className="font-medium text-amber-800 dark:text-amber-200">
+                    <h3 className="font-semibold text-amber-800 dark:text-amber-200">
                       {visaItem.title}
                     </h3>
                     <p className="text-sm text-amber-700 dark:text-amber-300">
                       Included in your trip • {formatPrice(visaItem.price_aed)}
                     </p>
                   </div>
-                  <Check className="w-5 h-5 text-amber-600" />
-                </div>
+                  <div className="w-8 h-8 rounded-full bg-amber-200 dark:bg-amber-800 flex items-center justify-center">
+                    <Check className="w-4 h-4 text-amber-700 dark:text-amber-300" />
+                  </div>
+                </motion.div>
               )}
 
               {/* Day-by-Day Itinerary */}
-              <div>
-                <h2 className="text-xl font-bold mb-4">Your Day-by-Day Itinerary</h2>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <h2 className="text-2xl font-bold mb-5 flex items-center gap-2">
+                  <span className="w-1.5 h-7 bg-secondary rounded-full" />
+                  Your Day-by-Day Itinerary
+                </h2>
                 <div className="space-y-4">
                   {Array.from({ length: trip.total_days }, (_, i) => i + 1).map((day) => {
                     const dayItems = itemsByDay[day]?.filter(i => 
@@ -346,18 +379,18 @@ const TripItinerary = () => {
 
                     return (
                       <Collapsible key={day} open={isExpanded}>
-                        <div className="bg-card rounded-xl border overflow-hidden">
+                        <div className="bg-card rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                           <CollapsibleTrigger
                             onClick={() => toggleDay(day)}
-                            className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors"
+                            className="w-full p-5 flex items-center justify-between hover:bg-muted/30 transition-colors"
                           >
                             <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 rounded-xl bg-secondary text-secondary-foreground flex flex-col items-center justify-center">
-                                <span className="text-xs font-medium">Day</span>
-                                <span className="text-lg font-bold">{day}</span>
+                              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground flex flex-col items-center justify-center shadow-md shadow-secondary/20">
+                                <span className="text-[10px] font-semibold uppercase tracking-wider opacity-80">Day</span>
+                                <span className="text-xl font-bold -mt-0.5">{day}</span>
                               </div>
                               <div className="text-left">
-                                <h3 className="font-semibold">
+                                <h3 className="font-bold text-base">
                                   {day === 1
                                     ? 'Arrival Day'
                                     : day === trip.total_days
@@ -365,59 +398,70 @@ const TripItinerary = () => {
                                     : format(dayDate, 'EEEE')}
                                 </h3>
                                 <p className="text-sm text-muted-foreground">
-                                  {format(dayDate, 'MMM d, yyyy')} • {dayItems.length} activities
+                                  {format(dayDate, 'MMM d, yyyy')} • {dayItems.length} {dayItems.length === 1 ? 'activity' : 'activities'}
                                 </p>
                               </div>
                             </div>
-                            {isExpanded ? (
-                              <ChevronUp className="w-5 h-5 text-muted-foreground" />
-                            ) : (
-                              <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                            )}
+                            <div className={cn(
+                              "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
+                              isExpanded ? "bg-primary/10" : "bg-muted"
+                            )}>
+                              {isExpanded ? (
+                                <ChevronUp className="w-4 h-4 text-primary" />
+                              ) : (
+                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                              )}
+                            </div>
                           </CollapsibleTrigger>
 
                           <CollapsibleContent>
-                            <div className="px-4 pb-4 pt-2 space-y-3 border-t">
+                            <div className="px-5 pb-5 pt-2 space-y-3 border-t">
                               {dayItems.length === 0 ? (
-                                <p className="text-sm text-muted-foreground py-4 text-center">
+                                <p className="text-sm text-muted-foreground py-6 text-center italic">
                                   {day === trip.total_days
                                     ? 'Free time for packing & airport transfer'
                                     : 'Free day to explore on your own'}
                                 </p>
                               ) : (
-                                dayItems.map((item) => (
-                                  <div
+                                dayItems.map((item, idx) => (
+                                  <motion.div
                                     key={item.id}
-                                    className="flex items-start gap-4 p-3 rounded-lg bg-muted/50"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                    className="flex items-start gap-4 p-4 rounded-xl bg-muted/40 border border-transparent hover:border-border/50 transition-all"
                                   >
-                                    <div className="w-10 h-10 rounded-lg bg-background flex items-center justify-center shrink-0">
+                                    <div className={cn(
+                                      "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
+                                      getItemColor(item.item_type)
+                                    )}>
                                       {getItemIcon(item.item_type)}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <div className="flex items-start justify-between gap-2">
                                         <div>
-                                          <h4 className="font-medium">{item.title}</h4>
+                                          <h4 className="font-semibold text-sm">{item.title}</h4>
                                           {item.description && (
-                                            <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                                            <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
                                               {item.description}
                                             </p>
                                           )}
                                         </div>
                                         {item.price_aed > 0 && (
-                                          <span className="text-sm font-medium text-secondary shrink-0">
+                                          <span className="text-sm font-bold text-secondary shrink-0">
                                             {formatPrice(item.price_aed)}
                                           </span>
                                         )}
                                       </div>
                                       {item.start_time && (
-                                        <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                                          <Clock className="w-3 h-3" />
+                                        <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
+                                          <Clock className="w-3.5 h-3.5" />
                                           {item.start_time}
                                           {item.end_time && ` - ${item.end_time}`}
                                         </div>
                                       )}
                                     </div>
-                                  </div>
+                                  </motion.div>
                                 ))
                               )}
                             </div>
@@ -427,31 +471,39 @@ const TripItinerary = () => {
                     );
                   })}
                 </div>
-              </div>
+              </motion.div>
             </div>
 
-            {/* Sidebar - Pricing & Upsells */}
+            {/* Sidebar */}
             <div className="space-y-6">
               {/* Price Summary */}
-              <div className="bg-card rounded-xl border p-6 sticky top-24">
-                <h3 className="font-bold text-lg mb-4">Trip Summary</h3>
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
+                className="bg-card rounded-2xl border shadow-sm p-6 sticky top-24"
+              >
+                <h3 className="font-bold text-lg mb-5 flex items-center gap-2">
+                  <span className="w-1.5 h-5 bg-primary rounded-full" />
+                  Trip Summary
+                </h3>
                 
                 <div className="space-y-3 text-sm">
                   {hotelItem && (
-                    <div className="flex justify-between">
+                    <div className="flex justify-between py-1">
                       <span className="text-muted-foreground">Hotel ({hotelItem.quantity} nights)</span>
-                      <span>{formatPrice(hotelItem.price_aed)}</span>
+                      <span className="font-medium">{formatPrice(hotelItem.price_aed)}</span>
                     </div>
                   )}
                   {transportItem && (
-                    <div className="flex justify-between">
+                    <div className="flex justify-between py-1">
                       <span className="text-muted-foreground">Transport</span>
-                      <span>{formatPrice(transportItem.price_aed)}</span>
+                      <span className="font-medium">{formatPrice(transportItem.price_aed)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between">
+                  <div className="flex justify-between py-1">
                     <span className="text-muted-foreground">Activities & Tours</span>
-                    <span>
+                    <span className="font-medium">
                       {formatPrice(
                         items
                           .filter(i => ['activity', 'tour', 'transfer'].includes(i.item_type))
@@ -460,45 +512,52 @@ const TripItinerary = () => {
                     </span>
                   </div>
                   {visaItem && (
-                    <div className="flex justify-between">
+                    <div className="flex justify-between py-1">
                       <span className="text-muted-foreground">Visa</span>
-                      <span>{formatPrice(visaItem.price_aed)}</span>
+                      <span className="font-medium">{formatPrice(visaItem.price_aed)}</span>
                     </div>
                   )}
                   
                   {includedUpsells.size > 0 && (
-                    <div className="flex justify-between text-secondary">
+                    <div className="flex justify-between text-secondary py-1">
                       <span>Add-ons</span>
-                      <span>+{formatPrice(upsellTotal)}</span>
+                      <span className="font-medium">+{formatPrice(upsellTotal)}</span>
                     </div>
                   )}
 
-                  <div className="border-t pt-3 mt-3">
-                    <div className="flex justify-between text-lg font-bold">
+                  <div className="border-t pt-4 mt-4">
+                    <div className="flex justify-between text-xl font-bold">
                       <span>Total</span>
                       <span className="text-secondary">{formatPrice(grandTotal)}</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground mt-1.5">
                       Per person: {formatPrice(grandTotal / (trip.travelers_adults + trip.travelers_children))}
                     </p>
                   </div>
                 </div>
 
-                <Button className="w-full mt-6 bg-secondary hover:bg-secondary/90 text-secondary-foreground" size="lg">
+                <Button className="w-full mt-6 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-xl h-12 text-base font-semibold shadow-lg shadow-secondary/20" size="lg">
                   Book This Trip
                 </Button>
 
-                <Button variant="outline" className="w-full mt-3 gap-2">
+                <Button variant="outline" className="w-full mt-3 gap-2 rounded-xl h-11">
                   <MessageCircle className="w-4 h-4" />
                   Chat with Agent
                 </Button>
-              </div>
+              </motion.div>
 
               {/* Upsells */}
               {upsells.length > 0 && (
-                <div className="bg-card rounded-xl border p-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Sparkles className="w-5 h-5 text-secondary" />
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-card rounded-2xl border shadow-sm p-6"
+                >
+                  <div className="flex items-center gap-2 mb-5">
+                    <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-secondary" />
+                    </div>
                     <h3 className="font-bold">Recommended for You</h3>
                   </div>
                   
@@ -510,27 +569,27 @@ const TripItinerary = () => {
                           key={upsell.id}
                           onClick={() => toggleUpsell(upsell.id)}
                           className={cn(
-                            'w-full p-4 rounded-lg border text-left transition-all',
+                            'w-full p-4 rounded-xl border-2 text-left transition-all',
                             isIncluded
-                              ? 'border-secondary bg-secondary/5'
-                              : 'border-border hover:border-secondary/50'
+                              ? 'border-secondary bg-secondary/5 shadow-sm'
+                              : 'border-border hover:border-secondary/40 hover:bg-muted/30'
                           )}
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1">
-                              <h4 className="font-medium">{upsell.title}</h4>
-                              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                              <h4 className="font-semibold text-sm">{upsell.title}</h4>
+                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                                 {upsell.description}
                               </p>
-                              <p className="text-secondary font-medium mt-2">
+                              <p className="text-secondary font-bold text-sm mt-2">
                                 +{formatPrice(upsell.price_aed)}
                               </p>
                             </div>
                             <div
                               className={cn(
-                                'w-6 h-6 rounded-full flex items-center justify-center shrink-0',
+                                'w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all',
                                 isIncluded
-                                  ? 'bg-secondary text-secondary-foreground'
+                                  ? 'bg-secondary text-secondary-foreground scale-110'
                                   : 'border-2 border-muted-foreground/30'
                               )}
                             >
@@ -545,7 +604,7 @@ const TripItinerary = () => {
                       );
                     })}
                   </div>
-                </div>
+                </motion.div>
               )}
             </div>
           </div>

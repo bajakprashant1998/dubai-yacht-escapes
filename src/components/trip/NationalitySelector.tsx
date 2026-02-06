@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Check, ChevronsUpDown, AlertCircle, CheckCircle } from 'lucide-react';
+import { Check, ChevronsUpDown, AlertCircle, CheckCircle, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -38,17 +38,28 @@ const NationalitySelector = ({ value, onChange }: NationalitySelectorProps) => {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between h-12 text-base"
+            className="w-full justify-between h-14 text-base rounded-xl border-2 hover:border-primary/50 transition-all"
           >
             {selectedCountry ? (
-              <span className="flex items-center gap-2">
-                <span className="text-xl">
+              <span className="flex items-center gap-3">
+                <span className="text-3xl leading-none">
                   {getFlagEmoji(selectedCountry.code)}
                 </span>
-                {selectedCountry.name}
+                <div className="flex flex-col items-start">
+                  <span className="text-xs text-muted-foreground">Nationality</span>
+                  <span className="font-semibold">{selectedCountry.name}</span>
+                </div>
               </span>
             ) : (
-              <span className="text-muted-foreground">Select your nationality...</span>
+              <span className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Globe className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="text-xs text-muted-foreground">Nationality</span>
+                  <span className="text-muted-foreground">Select your country...</span>
+                </div>
+              </span>
             )}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
@@ -69,6 +80,7 @@ const NationalitySelector = ({ value, onChange }: NationalitySelectorProps) => {
                       onChange(country.code);
                       setOpen(false);
                     }}
+                    className="py-2.5"
                   >
                     <Check
                       className={cn(
@@ -76,10 +88,10 @@ const NationalitySelector = ({ value, onChange }: NationalitySelectorProps) => {
                         value === country.code ? 'opacity-100' : 'opacity-0'
                       )}
                     />
-                    <span className="mr-2 text-lg">{getFlagEmoji(country.code)}</span>
-                    {country.name}
+                    <span className="mr-3 text-2xl leading-none">{getFlagEmoji(country.code)}</span>
+                    <span className="font-medium">{country.name}</span>
                     {!country.visaRequired && (
-                      <span className="ml-auto text-xs text-emerald-600 font-medium">
+                      <span className="ml-auto text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">
                         No Visa
                       </span>
                     )}
