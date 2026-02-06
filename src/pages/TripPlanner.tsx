@@ -58,6 +58,8 @@ const TripPlanner = () => {
   const [travelStyle, setTravelStyle] = useState<'family' | 'couple' | 'adventure' | 'relax' | 'luxury'>('relax');
   const [specialOccasion, setSpecialOccasion] = useState<'none' | 'birthday' | 'honeymoon' | 'anniversary'>('none');
   const [showComboSuggestion, setShowComboSuggestion] = useState(true);
+  const [arrivalCalendarOpen, setArrivalCalendarOpen] = useState(false);
+  const [departureCalendarOpen, setDepartureCalendarOpen] = useState(false);
 
   // Calculate total days for matching
   const totalDays = arrivalDate && departureDate
@@ -283,7 +285,7 @@ const TripPlanner = () => {
                         className="space-y-2"
                       >
                         <label className="text-sm font-medium text-muted-foreground">Arrival Date</label>
-                        <Popover>
+                        <Popover open={arrivalCalendarOpen} onOpenChange={setArrivalCalendarOpen}>
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
@@ -311,6 +313,7 @@ const TripPlanner = () => {
                                 if (date && (!departureDate || departureDate < date)) {
                                   setDepartureDate(addDays(date, 4));
                                 }
+                                setArrivalCalendarOpen(false);
                               }}
                               disabled={(date) => date < new Date()}
                               initialFocus
@@ -328,7 +331,7 @@ const TripPlanner = () => {
                         className="space-y-2"
                       >
                         <label className="text-sm font-medium text-muted-foreground">Departure Date</label>
-                        <Popover>
+                        <Popover open={departureCalendarOpen} onOpenChange={setDepartureCalendarOpen}>
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
@@ -351,7 +354,10 @@ const TripPlanner = () => {
                             <Calendar
                               mode="single"
                               selected={departureDate}
-                              onSelect={setDepartureDate}
+                              onSelect={(date) => {
+                                setDepartureDate(date);
+                                setDepartureCalendarOpen(false);
+                              }}
                               disabled={(date) => date < (arrivalDate || new Date())}
                               initialFocus
                               className="pointer-events-auto"
