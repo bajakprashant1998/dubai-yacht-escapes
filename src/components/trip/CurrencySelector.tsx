@@ -69,7 +69,7 @@ const CurrencySelector = ({ compact = false, variant = 'default' }: CurrencySele
         </motion.button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-64 p-2 bg-card/95 backdrop-blur-xl border-border/50 shadow-2xl" 
+        className="w-64 p-2 bg-card border-border shadow-2xl z-50" 
         align="center"
         sideOffset={8}
       >

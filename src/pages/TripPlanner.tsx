@@ -185,7 +185,7 @@ const TripPlanner = () => {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-card/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-border/50 overflow-hidden"
+            className="bg-card backdrop-blur-xl rounded-3xl shadow-2xl border border-border overflow-hidden"
           >
             {/* Enhanced Step Indicators */}
             <div className="px-4 md:px-8 py-6 border-b bg-gradient-to-r from-muted/30 to-muted/10">
@@ -609,7 +609,7 @@ const TripPlanner = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 + index * 0.1 }}
-                className="flex items-center gap-2 text-sm text-muted-foreground bg-card/50 backdrop-blur-sm px-4 py-2 rounded-full border border-border/50"
+                className="flex items-center gap-2 text-sm text-muted-foreground bg-card px-4 py-2 rounded-full border border-border"
               >
                 <badge.icon className="w-4 h-4 text-secondary" />
                 {badge.label}

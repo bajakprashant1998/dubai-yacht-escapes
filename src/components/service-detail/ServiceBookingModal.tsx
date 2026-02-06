@@ -249,7 +249,7 @@ const ServiceBookingModal = ({
     min?: number; 
     max?: number; 
   }) => (
-    <div className="flex-1 min-w-0 border border-border rounded-2xl p-4 transition-all duration-300 hover:border-secondary/50 hover:shadow-md bg-card/50">
+    <div className="flex-1 min-w-0 border border-border rounded-2xl p-4 transition-all duration-300 hover:border-secondary/50 hover:shadow-md bg-card">
       <div className="flex items-center justify-between sm:block">
         <div className="sm:mb-4">
           <p className="font-bold text-foreground text-sm sm:text-base">{label}</p>
