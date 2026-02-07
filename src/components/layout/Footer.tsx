@@ -195,15 +195,15 @@ const Footer = () => {
           {/* Brand & Newsletter - Takes 4 columns */}
           <div className="lg:col-span-4 space-y-6">
             {/* Brand */}
-            <Link to="/" className="inline-flex items-center gap-3 group">
+            <Link to="/" className="inline-flex items-center gap-4 group">
               <img
                 src={betterviewLogo}
                 alt="Betterview Tourism"
-                className="w-14 h-14 object-contain rounded-xl transition-transform group-hover:scale-105"
+                className="w-20 h-20 object-contain rounded-2xl transition-transform group-hover:scale-105"
               />
               <div className="flex flex-col">
-                <span className="font-display font-bold text-2xl text-secondary leading-tight">Betterview</span>
-                <span className="text-xs text-primary-foreground/60 tracking-widest uppercase">Tourism L.L.C</span>
+                <span className="font-display font-bold text-3xl text-secondary leading-tight">Betterview</span>
+                <span className="text-sm text-primary-foreground/60 tracking-widest uppercase">Tourism L.L.C</span>
               </div>
             </Link>
             
