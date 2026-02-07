@@ -234,25 +234,58 @@ const ValuePillars = memo(() => {
                   `bg-gradient-to-br ${activePillar.color}`
                 )} />
                 
-                {/* Stats Card */}
+                {/* Main Visual */}
                 <div className="relative z-10">
-                  <div className="text-8xl mb-6">{activePillar.image}</div>
+                  {/* Large gradient icon instead of emoji */}
+                  <motion.div 
+                    className={cn(
+                      "w-24 h-24 md:w-28 md:h-28 rounded-3xl flex items-center justify-center bg-gradient-to-br mb-8 shadow-xl",
+                      activePillar.color
+                    )}
+                    animate={{ rotate: [0, 2, -2, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <activePillar.icon className="w-12 h-12 md:w-14 md:h-14 text-white" />
+                  </motion.div>
                   
-                  <div className={cn(
-                    "inline-flex items-center gap-4 px-6 py-4 rounded-2xl border",
-                    "bg-gradient-to-r from-card to-transparent backdrop-blur-sm"
-                  )}>
+                  {/* Primary stat card */}
+                  <motion.div 
+                    className={cn(
+                      "inline-flex items-center gap-4 px-6 py-4 rounded-2xl border bg-card shadow-lg"
+                    )}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
                     <div className={cn(
-                      "w-16 h-16 rounded-xl flex items-center justify-center bg-gradient-to-br",
+                      "w-14 h-14 rounded-xl flex items-center justify-center bg-gradient-to-br",
                       activePillar.color
                     )}>
-                      <Star className="w-8 h-8 text-white fill-white" />
+                      <Star className="w-7 h-7 text-white fill-white" />
                     </div>
                     <div>
                       <p className="text-3xl font-bold">{activePillar.stats.value}</p>
                       <p className="text-sm text-muted-foreground">{activePillar.stats.label}</p>
                     </div>
-                  </div>
+                  </motion.div>
+
+                  {/* Testimonial micro-quote */}
+                  <motion.div
+                    className="mt-6 bg-card border rounded-2xl p-4 shadow-md max-w-xs"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <div className="flex items-center gap-1 mb-2">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground italic leading-relaxed">
+                      "Absolutely seamless from start to finish. Best way to experience Dubai!"
+                    </p>
+                    <p className="text-[11px] font-medium mt-2 text-foreground">— Sarah M., London</p>
+                  </motion.div>
                 </div>
                 
                 {/* Floating elements */}
