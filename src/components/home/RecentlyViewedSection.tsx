@@ -23,10 +23,10 @@ const RecentlyViewedSection = memo(() => {
   };
 
   return (
-    <section className="py-12 bg-muted/30">
+    <section className="py-20 bg-muted/30">
       <div className="container">
         <motion.div
-          className="flex items-center justify-between mb-6"
+          className="flex items-center justify-between mb-8"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -36,12 +36,12 @@ const RecentlyViewedSection = memo(() => {
               <Clock className="w-5 h-5 text-secondary" />
             </div>
             <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-secondary/10 text-secondary rounded-full text-xs font-medium mb-1">
+                Recently Viewed
+              </div>
               <h2 className="font-display text-xl md:text-2xl font-bold text-foreground">
                 Continue Exploring
               </h2>
-              <p className="text-sm text-muted-foreground">
-                Pick up where you left off
-              </p>
             </div>
           </div>
           <Button

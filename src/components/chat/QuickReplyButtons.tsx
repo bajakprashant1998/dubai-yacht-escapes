@@ -18,7 +18,7 @@ const icons = {
 
 const QuickReplyButtons = ({ onSelect }: QuickReplyButtonsProps) => {
   return (
-    <div className="flex flex-wrap gap-2 px-4 py-3 border-t border-border/30 bg-gradient-to-b from-muted/20 to-muted/40">
+    <div className="flex flex-wrap gap-2 px-4 py-3 border-t border-border bg-muted/50">
       {quickReplies.map((reply, index) => {
         const Icon = icons[reply.id as keyof typeof icons];
         return (

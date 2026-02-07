@@ -178,6 +178,9 @@ const Contact = () => {
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
         </div>
+        {/* Decorative orbs */}
+        <div className="absolute top-16 right-[10%] w-72 h-72 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 left-[5%] w-56 h-56 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="container relative z-10">
           <motion.div
@@ -473,8 +476,14 @@ const Contact = () => {
       </section>
 
       {/* Map Section */}
-      <section className="py-8">
+      <section className="py-12">
         <div className="container">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-secondary/10 text-secondary rounded-full text-xs font-medium">
+              <MapPin className="w-3 h-3" />
+              Our Location
+            </div>
+          </div>
           <motion.div
             className="rounded-2xl overflow-hidden shadow-xl border border-border"
             initial={{ opacity: 0, y: 30 }}
@@ -529,7 +538,7 @@ const Contact = () => {
                 <AccordionItem
                   key={index}
                   value={`item-${index}`}
-                  className="bg-card rounded-xl border border-border px-6 shadow-sm"
+                  className="bg-card rounded-xl border border-border px-6 shadow-sm hover:border-secondary/30 transition-colors"
                 >
                   <AccordionTrigger className="text-left font-semibold text-foreground hover:text-secondary py-5">
                     {faq.question}

@@ -31,7 +31,7 @@ const ChatInput = ({ onSend, disabled, placeholder = "Type your message..." }: C
   const hasText = message.trim().length > 0;
 
   return (
-    <form onSubmit={handleSubmit} className="p-3 border-t border-border/30 bg-gradient-to-t from-card to-card/80">
+    <form onSubmit={handleSubmit} className="p-3 border-t border-border bg-card">
       <div className="flex items-end gap-2">
         <div className="flex-1 relative">
           <Textarea
