@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Mail, Phone, Calendar, X } from "lucide-react";
+import { User, Mail, Phone, Calendar, X, Sparkles } from "lucide-react";
 
 interface LeadCaptureFormProps {
   onSubmit: (data: {
@@ -39,11 +40,24 @@ const LeadCaptureForm = ({ onSubmit, onClose }: LeadCaptureFormProps) => {
   };
 
   return (
-    <div className="p-4 bg-muted/50 border-t border-border">
+    <motion.div
+      className="p-4 bg-card border-t-2 border-secondary"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25 }}
+    >
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-foreground">
-          Get personalized assistance
-        </h4>
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full bg-secondary/10 flex items-center justify-center">
+            <Sparkles className="w-3.5 h-3.5 text-secondary" />
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-foreground">
+              Get personalized assistance
+            </h4>
+            <p className="text-[10px] text-muted-foreground">Share your details for tailored recommendations</p>
+          </div>
+        </div>
         <Button
           variant="ghost"
           size="icon"
@@ -128,12 +142,12 @@ const LeadCaptureForm = ({ onSubmit, onClose }: LeadCaptureFormProps) => {
         <Button
           type="submit"
           disabled={!formData.name || !formData.email || isSubmitting}
-          className="w-full h-9 bg-secondary hover:bg-secondary/90 text-primary text-sm font-medium"
+          className="w-full h-9 bg-secondary hover:bg-secondary/90 text-secondary-foreground text-sm font-medium"
         >
           {isSubmitting ? "Saving..." : "Continue Chat"}
         </Button>
       </form>
-    </div>
+    </motion.div>
   );
 };
 

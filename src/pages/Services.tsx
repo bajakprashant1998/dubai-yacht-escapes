@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Search, Grid3X3, List, Star, MapPin, TrendingUp, ArrowUpDown, ThumbsUp } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import ServiceCardRedesigned from "@/components/ServiceCardRedesigned";
@@ -171,32 +172,52 @@ const Services = () => {
   return (
     <Layout>
       {/* Hero Section with Dynamic Banner */}
-      <section className="relative pt-32 pb-16 bg-gradient-to-br from-primary via-primary/95 to-primary/90 overflow-hidden">
+      <section className="relative pt-32 pb-16 bg-primary overflow-hidden">
         <div 
-          className="absolute inset-0 opacity-20 bg-cover bg-center transition-all duration-500"
+          className="absolute inset-0 opacity-15 bg-cover bg-center transition-all duration-500"
           style={{ backgroundImage: `url(${bannerImage})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/50 to-primary/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/60 to-primary" />
+        {/* Decorative orbs */}
+        <div className="absolute top-20 right-[10%] w-64 h-64 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 left-[5%] w-48 h-48 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
         <div className="container relative z-10">
           <div className="max-w-3xl">
-            <Badge className="mb-4 bg-secondary/20 text-secondary border-secondary/30">
-              Dubai Experiences
-            </Badge>
-            <h1 className="text-4xl lg:text-5xl font-display font-bold text-primary-foreground mb-4">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+              <Badge className="mb-4 bg-secondary/20 text-secondary border-secondary/30">
+                Dubai Experiences
+              </Badge>
+            </motion.div>
+            <motion.h1
+              className="text-4xl lg:text-5xl font-display font-bold text-primary-foreground mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
               {activeCategory ? activeCategory.name : "All Experiences"}
-            </h1>
-            <p className="text-lg text-primary-foreground/80 mb-6">
+            </motion.h1>
+            <motion.p
+              className="text-lg text-primary-foreground/80 mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               {activeCategory?.description ||
                 "Discover the best activities and tours in Dubai - from thrilling desert safaris to world-class theme parks"}
-            </p>
-            <div className="flex items-center gap-4 text-primary-foreground/70 text-sm">
+            </motion.p>
+            <motion.div
+              className="flex items-center gap-4 text-primary-foreground/70 text-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
               <span className="flex items-center gap-1">
                 <Star className="w-4 h-4 text-secondary fill-secondary" />
                 4.8 avg rating
               </span>
               <span>•</span>
               <span>{sortedServices?.length || 0} experiences</span>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>

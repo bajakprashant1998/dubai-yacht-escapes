@@ -22,26 +22,26 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
         isVisitor ? "flex-row-reverse" : "flex-row"
       )}
     >
-      {/* Avatar with enhanced styling */}
+      {/* Avatar */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ delay: 0.1, type: "spring", stiffness: 400 }}
         className={cn(
-          "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-md",
+          "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm",
           isVisitor
-            ? "bg-gradient-to-br from-secondary to-secondary/80"
+            ? "bg-secondary"
             : isAgent
-            ? "bg-gradient-to-br from-emerald-500 to-emerald-600"
-            : "bg-gradient-to-br from-primary to-primary/80"
+            ? "bg-emerald-600"
+            : "bg-primary"
         )}
       >
         {isVisitor ? (
-          <User className="w-4 h-4 text-primary" />
+          <User className="w-4 h-4 text-primary-foreground" />
         ) : isAgent ? (
           <Headset className="w-4 h-4 text-white" />
         ) : (
-          <Bot className="w-4 h-4 text-secondary" />
+          <span className="text-xs font-bold text-secondary">BT</span>
         )}
       </motion.div>
 

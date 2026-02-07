@@ -13,7 +13,7 @@ const partners = [
 
 const PartnersStrip = () => {
   return (
-    <section className="py-12 bg-muted/30 overflow-hidden">
+    <section className="py-16 bg-muted/30 border-t border-border/50 overflow-hidden">
       <div className="container mb-8">
         <motion.div
           className="text-center"
@@ -21,6 +21,9 @@ const PartnersStrip = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-secondary/10 text-secondary rounded-full text-xs font-medium mb-3">
+            Our Partners
+          </div>
           <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">
             Trusted By Industry Leaders
           </p>
@@ -42,7 +45,7 @@ const PartnersStrip = () => {
               className="flex-shrink-0 mx-8 sm:mx-12"
             >
               <div className="flex items-center justify-center h-12 px-6 py-2 bg-background/50 rounded-lg border border-border/50 hover:border-secondary/30 transition-colors group cursor-default">
-                <span className="text-muted-foreground/60 font-semibold text-sm sm:text-base whitespace-nowrap group-hover:text-secondary transition-colors">
+                <span className="text-muted-foreground/60 font-semibold text-base sm:text-lg whitespace-nowrap group-hover:text-secondary transition-colors">
                   {partner.display}
                 </span>
               </div>
@@ -55,7 +58,7 @@ const PartnersStrip = () => {
               className="flex-shrink-0 mx-8 sm:mx-12"
             >
               <div className="flex items-center justify-center h-12 px-6 py-2 bg-background/50 rounded-lg border border-border/50 hover:border-secondary/30 transition-colors group cursor-default">
-                <span className="text-muted-foreground/60 font-semibold text-sm sm:text-base whitespace-nowrap group-hover:text-secondary transition-colors">
+                <span className="text-muted-foreground/60 font-semibold text-base sm:text-lg whitespace-nowrap group-hover:text-secondary transition-colors">
                   {partner.display}
                 </span>
               </div>

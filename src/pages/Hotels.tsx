@@ -1,12 +1,14 @@
 import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
+import { motion } from "framer-motion";
 import Layout from "@/components/layout/Layout";
 import { useHotels } from "@/hooks/useHotels";
 import HotelCard from "@/components/hotels/HotelCard";
 import HotelFilters from "@/components/hotels/HotelFilters";
 import HotelFiltersDrawer from "@/components/hotels/HotelFiltersDrawer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Building, Grid3X3, List, MapPin } from "lucide-react";
+import { Building, Grid3X3, List, Star, MapPin } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { SortingTabs } from "@/components/ui/sorting-tabs";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -37,7 +39,6 @@ const Hotels = () => {
       return true;
     });
     
-    // Apply sorting
     switch (sortBy) {
       case "price-low":
         result = [...result].sort((a, b) => (a.price_from || 0) - (b.price_from || 0));
@@ -49,7 +50,6 @@ const Hotels = () => {
         result = [...result].sort((a, b) => b.star_rating - a.star_rating);
         break;
       default:
-        // Recommended: featured first, then by rating
         result = [...result].sort((a, b) => {
           if (a.is_featured && !b.is_featured) return -1;
           if (!a.is_featured && b.is_featured) return 1;
@@ -68,20 +68,64 @@ const Hotels = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-muted/30 pt-28 pb-16">
+      {/* Hero Section */}
+      <section className="relative bg-primary py-20 md:py-28 overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
+        </div>
+        <div className="absolute top-20 left-[15%] w-72 h-72 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 right-[10%] w-48 h-48 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
+        
+        <div className="container relative z-10">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
+          >
+            <Badge className="mb-4 bg-secondary/20 text-secondary border-secondary/30 text-sm px-4 py-2">
+              <Building className="w-4 h-4 mr-2" />
+              Luxury Stays
+            </Badge>
+          </motion.div>
+          <motion.h1
+            className="text-4xl md:text-5xl font-display font-bold text-primary-foreground mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            Hotels in Dubai
+          </motion.h1>
+          <motion.p
+            className="text-lg text-primary-foreground/80 mb-6 max-w-2xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            Discover {hotels.length} exceptional hotels for your Dubai stay
+          </motion.p>
+          <motion.div
+            className="flex items-center gap-4 text-primary-foreground/70 text-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <span className="flex items-center gap-1">
+              <MapPin className="w-4 h-4 text-secondary" />
+              Dubai, UAE
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1">
+              <Star className="w-4 h-4 text-secondary fill-secondary" />
+              3–5 Star Properties
+            </span>
+            <span>•</span>
+            <span>{hotels.length} properties</span>
+          </motion.div>
+        </div>
+      </section>
+
+      <div className="min-h-screen bg-muted/30 py-8 pb-16">
         <div className="container">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-              <MapPin className="w-4 h-4" />
-              <span>Dubai, United Arab Emirates</span>
-            </div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">Hotels in Dubai</h1>
-            <p className="text-muted-foreground">
-              Discover {hotels.length} exceptional hotels for your Dubai stay
-            </p>
-          </div>
-          
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Mobile Filter Drawer */}
             <div className="lg:hidden mb-4">
@@ -112,7 +156,12 @@ const Hotels = () => {
             {/* Hotel Grid */}
             <div className="lg:col-span-3">
               {/* Toolbar */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-4 bg-card rounded-xl border border-border">
+              <motion.div
+                className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-4 bg-card rounded-xl border border-border"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
                 <div className="flex items-center gap-4">
                   <p className="text-sm text-muted-foreground">
                     <span className="font-semibold text-foreground">{filteredAndSortedHotels.length}</span> hotels found
@@ -144,7 +193,7 @@ const Hotels = () => {
                     </Button>
                   </div>
                 </div>
-              </div>
+              </motion.div>
               
               {/* Mobile Sorting */}
               <div className="md:hidden mb-4">
@@ -171,7 +220,11 @@ const Hotels = () => {
                   ))}
                 </div>
               ) : filteredAndSortedHotels.length === 0 ? (
-                <div className="text-center py-16 bg-card rounded-xl border border-border">
+                <motion.div
+                  className="text-center py-16 bg-card rounded-xl border border-border"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
                   <Building className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-xl font-semibold mb-2">No hotels found</h3>
                   <p className="text-muted-foreground mb-4">
@@ -180,7 +233,7 @@ const Hotels = () => {
                   <Button variant="outline" onClick={handleClearFilters}>
                     Clear all filters
                   </Button>
-                </div>
+                </motion.div>
               ) : (
                 <div className={cn(
                   "grid gap-6",
