@@ -67,19 +67,6 @@ const HowItWorks = memo(() => {
         </motion.div>
 
         <div className="relative max-w-6xl mx-auto">
-          {/* Timeline connector - Desktop */}
-          <div className="hidden md:block absolute top-1/2 left-[10%] right-[10%] h-1 -translate-y-1/2 z-0">
-            <div className="w-full h-full bg-primary-foreground/10 rounded-full relative overflow-hidden">
-              <motion.div 
-                className="absolute inset-0 bg-gradient-to-r from-blue-500 via-emerald-500 to-amber-500"
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1.2, delay: 0.5 }}
-                style={{ transformOrigin: "left" }}
-              />
-            </div>
-          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
             {steps.map((step, index) => (

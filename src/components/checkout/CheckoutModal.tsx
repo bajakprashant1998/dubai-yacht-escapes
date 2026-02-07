@@ -83,6 +83,7 @@ const CheckoutModal = ({
 }: CheckoutModalProps) => {
   const [step, setStep] = useState(1);
   const [bookingDate, setBookingDate] = useState<Date>();
+  const [dateCalOpen, setDateCalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"later" | "online">("later");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingId, setBookingId] = useState<string | null>(null);
@@ -203,7 +204,7 @@ const CheckoutModal = ({
             {/* Date Selection */}
             <div className="space-y-2">
               <Label>Select Date</Label>
-              <Popover>
+              <Popover open={dateCalOpen} onOpenChange={setDateCalOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -220,7 +221,7 @@ const CheckoutModal = ({
                   <Calendar
                     mode="single"
                     selected={bookingDate}
-                    onSelect={setBookingDate}
+                    onSelect={(date) => { setBookingDate(date); setDateCalOpen(false); }}
                     disabled={(date) => date < new Date()}
                     initialFocus
                   />

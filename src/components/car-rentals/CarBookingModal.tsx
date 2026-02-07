@@ -24,6 +24,8 @@ const CarBookingModal = ({ car, open, onOpenChange }: CarBookingModalProps) => {
   const { whatsapp } = useContactConfig();
   const [pickupDate, setPickupDate] = useState<Date>();
   const [dropoffDate, setDropoffDate] = useState<Date>();
+  const [pickupCalOpen, setPickupCalOpen] = useState(false);
+  const [dropoffCalOpen, setDropoffCalOpen] = useState(false);
   const [rentalType, setRentalType] = useState<"self" | "driver">("self");
   const [formData, setFormData] = useState({
     name: "",
@@ -111,7 +113,7 @@ const CarBookingModal = ({ car, open, onOpenChange }: CarBookingModalProps) => {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Pickup Date</Label>
-              <Popover>
+              <Popover open={pickupCalOpen} onOpenChange={setPickupCalOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -128,7 +130,7 @@ const CarBookingModal = ({ car, open, onOpenChange }: CarBookingModalProps) => {
                   <Calendar
                     mode="single"
                     selected={pickupDate}
-                    onSelect={setPickupDate}
+                    onSelect={(date) => { setPickupDate(date); setPickupCalOpen(false); }}
                     disabled={(date) => date < new Date()}
                   />
                 </PopoverContent>
@@ -137,7 +139,7 @@ const CarBookingModal = ({ car, open, onOpenChange }: CarBookingModalProps) => {
             
             <div className="space-y-2">
               <Label>Return Date</Label>
-              <Popover>
+              <Popover open={dropoffCalOpen} onOpenChange={setDropoffCalOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
@@ -154,7 +156,7 @@ const CarBookingModal = ({ car, open, onOpenChange }: CarBookingModalProps) => {
                   <Calendar
                     mode="single"
                     selected={dropoffDate}
-                    onSelect={setDropoffDate}
+                    onSelect={(date) => { setDropoffDate(date); setDropoffCalOpen(false); }}
                     disabled={(date) => date < (pickupDate || new Date())}
                   />
                 </PopoverContent>
