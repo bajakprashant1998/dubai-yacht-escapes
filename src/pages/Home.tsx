@@ -1,5 +1,6 @@
 import Layout from "@/components/layout/Layout";
 import HeroSection from "@/components/home/HeroSection";
+import CategoryCards from "@/components/home/CategoryCards";
 import FeaturedCombos from "@/components/home/FeaturedCombos";
 import RecentlyViewedSection from "@/components/home/RecentlyViewedSection";
 import PopularDestinations from "@/components/home/PopularDestinations";
@@ -9,6 +10,7 @@ import NewsletterSection from "@/components/home/NewsletterSection";
 import PartnersStrip from "@/components/home/PartnersStrip";
 import CTASection from "@/components/home/CTASection";
 import QuickServices from "@/components/home/QuickServices";
+import PopularActivities from "@/components/home/PopularActivities";
 import ValuePillars from "@/components/home/ValuePillars";
 import SEOHead, { createLocalBusinessSchema } from "@/components/SEOHead";
 
@@ -22,12 +24,12 @@ const Home = () => {
         keywords={["Dubai tours", "yacht charter Dubai", "desert safari", "theme parks Dubai", "Dubai experiences"]}
       />
       <HeroSection />
-      {/* Spacer for overlapping hero cards */}
-      <div className="pt-32 sm:pt-28 md:pt-32" />
+      <CategoryCards />
       <ValuePillars />
       <FeaturedCombos />
       <RecentlyViewedSection />
       <QuickServices />
+      <PopularActivities />
       <PopularDestinations />
       <HowItWorks />
       <TestimonialsCarousel />

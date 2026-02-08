@@ -20,7 +20,7 @@ const HeroSearchBar = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/services?q=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/experiences?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
