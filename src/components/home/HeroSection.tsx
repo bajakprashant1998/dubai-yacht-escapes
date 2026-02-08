@@ -32,7 +32,6 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: easeOut } },
 };
 
-// Live counter component
 const LiveRevenueCounter = memo(() => {
   const [pulse, setPulse] = useState(false);
   useEffect(() => {
@@ -51,15 +50,8 @@ const LiveRevenueCounter = memo(() => {
       transition={{ delay: 0.8 }}
     >
       <div className="relative flex items-center gap-1.5">
-        <motion.div
-          className="w-2 h-2 rounded-full bg-secondary"
-          animate={pulse ? { scale: [1, 1.5, 1] } : {}}
-        />
-        <motion.div
-          className="absolute w-2 h-2 rounded-full bg-secondary"
-          animate={{ scale: [1, 2.5], opacity: [0.6, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        />
+        <motion.div className="w-2 h-2 rounded-full bg-secondary" animate={pulse ? { scale: [1, 1.5, 1] } : {}} />
+        <motion.div className="absolute w-2 h-2 rounded-full bg-secondary" animate={{ scale: [1, 2.5], opacity: [0.6, 0] }} transition={{ duration: 1.5, repeat: Infinity }} />
       </div>
       <TrendingUp className="w-3.5 h-3.5 text-secondary" />
       <span className="text-xs font-medium">
@@ -70,8 +62,7 @@ const LiveRevenueCounter = memo(() => {
 });
 LiveRevenueCounter.displayName = "LiveRevenueCounter";
 
-// Category cards data - exported for use in Home.tsx
-export const categoryCardsData = [
+const categoryCardsData = [
   { icon: Sun, label: "Desert Safari", image: desertSafariImg, overlay: "from-amber-600/80 to-orange-500/60", slug: "desert-safari" },
   { icon: Ticket, label: "Theme Parks", image: themeParksImg, overlay: "from-rose-600/80 to-pink-500/60", slug: "theme-parks" },
   { icon: Waves, label: "Water Sports", image: waterSportsImg, overlay: "from-cyan-600/80 to-blue-500/60", slug: "water-sports" },
@@ -93,18 +84,27 @@ const HeroSection = memo(() => {
   ];
 
   return (
-    <section className="relative min-h-[95vh] flex items-center overflow-hidden">
-      {/* Static Background Image with subtle zoom */}
+    <section className="relative min-h-screen flex flex-col overflow-hidden">
+      {/* Cinematic background with slow pan + zoom animation */}
       <motion.div
-        className="absolute inset-0"
-        initial={{ scale: 1 }}
-        animate={{ scale: 1.03 }}
-        transition={{ duration: 20, ease: "easeOut" }}
+        className="absolute inset-0 will-change-transform"
+        animate={{
+          scale: [1, 1.08, 1.04, 1.1],
+          x: ["0%", "2%", "-1%", "1%"],
+          y: ["0%", "-1%", "1%", "-0.5%"],
+        }}
+        transition={{
+          duration: 30,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: "easeInOut",
+        }}
       >
         <img
           src={heroImage}
           alt="Dubai skyline with Burj Khalifa at sunset evening view"
           className="absolute inset-0 w-full h-full object-cover"
+          style={{ transformOrigin: "center center" }}
           loading="eager"
           fetchPriority="high"
         />
@@ -112,16 +112,17 @@ const HeroSection = memo(() => {
 
       {/* Gradient overlays */}
       <div className="absolute inset-0 bg-gradient-to-r from-primary/85 via-primary/60 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-primary/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-primary/10" />
 
-      {/* Animated gradient sweep */}
+      {/* Slow light sweep */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-secondary/10 via-transparent to-secondary/5"
-        animate={{ opacity: [0.3, 0.6, 0.3] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-foreground/5 to-transparent"
+        animate={{ x: ["-100%", "100%"] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", repeatDelay: 4 }}
+        style={{ width: "200%" }}
       />
 
-      {/* Floating Light Particles */}
+      {/* Floating particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           className="absolute top-20 right-[15%] w-96 h-96 bg-gradient-radial from-amber-400/20 via-orange-500/10 to-transparent rounded-full blur-3xl"
@@ -145,9 +146,9 @@ const HeroSection = memo(() => {
         />
       </div>
 
-      {/* Content - no parallax for stability */}
-      <div className="container relative z-10 py-20">
-        <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
+      {/* Main content area */}
+      <div className="container relative z-10 flex-1 flex items-center py-24 sm:py-28 md:py-32">
+        <div className="flex flex-col items-center text-center max-w-4xl mx-auto w-full">
           <motion.div className="text-primary-foreground" variants={containerVariants} initial="hidden" animate="visible">
             <motion.div variants={itemVariants} className="mb-4">
               <LiveRevenueCounter />
@@ -222,6 +223,41 @@ const HeroSection = memo(() => {
               ))}
             </motion.div>
           </motion.div>
+        </div>
+      </div>
+
+      {/* Category Cards - inside hero, at the bottom */}
+      <div className="relative z-10 pb-8 sm:pb-10 md:pb-12">
+        <div className="container mx-auto px-3 md:px-4">
+          <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-1.5 sm:gap-2 md:gap-3">
+            {categoryCardsData.map((item, index) => (
+              <Link key={item.label} to={`/experiences?category=${item.slug}`} className="block h-full">
+                <motion.div
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: 0.8 + index * 0.06, duration: 0.5, ease: easeOut }}
+                  whileHover={{ y: -8, scale: 1.05, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.35)" }}
+                  whileTap={{ scale: 0.98 }}
+                  className="relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg cursor-pointer h-full min-h-[100px] sm:min-h-[120px] md:min-h-[150px] group"
+                >
+                  <div className="absolute inset-0">
+                    <img src={item.image} alt={item.label} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />
+                  </div>
+                  <div className={`absolute inset-0 bg-gradient-to-t ${item.overlay}`} />
+                  <div className="relative z-10 h-full flex flex-col items-center justify-center p-2 sm:p-3 md:p-4 text-center">
+                    <motion.div
+                      className="w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-1.5 sm:mb-2 md:mb-3 border border-white/30"
+                      whileHover={{ rotate: [0, -10, 10, 0] }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <item.icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white" />
+                    </motion.div>
+                    <h3 className="text-[10px] sm:text-xs md:text-sm font-bold text-white leading-tight drop-shadow-md">{item.label}</h3>
+                  </div>
+                </motion.div>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </section>
