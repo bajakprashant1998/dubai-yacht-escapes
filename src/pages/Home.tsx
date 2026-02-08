@@ -1,6 +1,5 @@
 import Layout from "@/components/layout/Layout";
 import HeroSection from "@/components/home/HeroSection";
-import CategoryCards from "@/components/home/CategoryCards";
 import FeaturedCombos from "@/components/home/FeaturedCombos";
 import RecentlyViewedSection from "@/components/home/RecentlyViewedSection";
 import PopularDestinations from "@/components/home/PopularDestinations";
@@ -24,7 +23,6 @@ const Home = () => {
         keywords={["Dubai tours", "yacht charter Dubai", "desert safari", "theme parks Dubai", "Dubai experiences"]}
       />
       <HeroSection />
-      <CategoryCards />
       <ValuePillars />
       <FeaturedCombos />
       <RecentlyViewedSection />
