@@ -1,56 +1,75 @@
 
-# Enhancement & Bug Fix Plan
+# Home Page Overhaul & Booking Verification Plan
 
 ## Overview
-This plan covers 4 areas: enhancing the "Built for Exceptional Experiences" (ValuePillars) section, removing the timeline connector line behind cards in "How It Works", fixing remaining calendar auto-close bugs, and general quality checks.
+Four interconnected tasks: fix mobile layout stability, replace hero background with the uploaded image, add an Activities section, and verify booking flows.
 
-## 1. Enhance "Built for Exceptional Experiences" (ValuePillars)
+---
 
-The current section uses emoji placeholders (desert, phone, chat bubble) in the right-side visual card. This will be upgraded to a more polished, professional look.
+## 1. Fix Mobile Layout Stability
 
-**Changes to `src/components/home/ValuePillars.tsx`:**
-- Replace emoji-based visuals with richer illustrated content: use gradient icon containers instead of raw emoji, add a secondary floating stat card, and a subtle animated progress bar or rating stars visual
-- Improve the right-side card layout with a more structured visual hierarchy -- larger gradient icon instead of emoji, better stat card arrangement, and a testimonial-style micro-quote floating element
-- Add a subtle shimmer/gradient animation to the active stat card
-- Improve mobile layout so the right visual stacks cleanly below the content
+**Root cause**: The hero section uses `overflow-visible` combined with absolutely positioned category cards at `bottom: -80px`, plus parallax transforms (`useScroll`/`useTransform`) that shift content during scroll. On mobile, this creates layout jumping.
 
-## 2. Remove Background Timeline Line in "How It Works"
+**Changes to `src/components/home/HeroSection.tsx`:**
+- Change the section from `overflow-visible` to `overflow-hidden` (the overlapping cards will move outside the hero)
+- Remove the parallax `useScroll`/`useTransform` on mobile -- these cause the shifting. Use `style={{ y: backgroundY }}` only on larger screens, or remove parallax entirely for a stable experience
+- Remove the Ken Burns `scale` animation on the background image (infinite scale 1.1 to 1 causes repaints and jank on mobile)
 
-The horizontal timeline connector line (lines 71-82 in HowItWorks.tsx) runs behind the cards on desktop. This will be removed entirely.
+**Changes to `src/pages/Home.tsx`:**
+- Move the category quick cards OUT of HeroSection into Home.tsx as a standalone component rendered after the hero, removing the absolute positioning hack and the spacer div `pt-32`
+- This eliminates the overflow/positioning conflict entirely
 
-**Changes to `src/components/home/HowItWorks.tsx`:**
-- Remove the entire timeline connector `div` block (the `hidden md:block absolute top-1/2` element with the animated gradient line)
-- Keep the mobile arrow connectors between cards as they are
+## 2. Replace Hero Background with Uploaded Image
 
-## 3. Fix Calendar Auto-Close (Remaining Instances)
+**Changes to `src/components/home/HeroSection.tsx`:**
+- Copy the uploaded image to `src/assets/hero-dubai-skyline.png`
+- Remove all video-related code: the `<video>` element, `videoRef`, `videoLoaded`, `videoError`, `prefersReducedMotion`, the IntersectionObserver for video, and the `showVideo` logic
+- Remove imports for `useRef` (if no longer needed), video-related state
+- Replace the background with a single static `<img>` tag using the new uploaded image, with `object-cover` and a subtle CSS-only zoom animation (using Tailwind `animate-` or a simple framer-motion scale from 1 to 1.03 over 20s, non-repeating)
+- Keep the gradient overlays and floating light particles (they are lightweight)
 
-Two components still have calendars that stay open after date selection:
+## 3. Add "Activities" Section (6 Cards)
 
-**`src/components/car-rentals/CarBookingModal.tsx`:**
-- Add controlled `open`/`setOpen` state for both pickup and return date Popovers
-- Close popover on date selection by wrapping `onSelect` to call `setOpen(false)` after setting the date
+**New component: `src/components/home/PopularActivities.tsx`**
 
-**`src/components/checkout/CheckoutModal.tsx`:**
-- Add controlled `open`/`setOpen` state for the booking date Popover
-- Close popover on date selection
+A section with 6 activity cards using existing category images from `src/assets/services/`. Layout:
+- Section header with badge ("Top Activities") and title "Popular Activities"
+- Grid: `grid-cols-2 sm:grid-cols-3` for 6 cards in a clean 2x3 / 3x2 layout
+- Each card: image background, gradient overlay, icon, title, short description, and a "From AED X" price tag
+- Cards link to `/experiences?category={slug}`
+- Activities: Desert Safari, Theme Parks, Water Sports, Dhow Cruises, City Tours, Adventure Sports
+- Uses existing imported images (desert-safari.jpg, theme-parks.jpg, etc.)
+- Framer Motion staggered entrance animations
+- Consistent with the luxury card style: `rounded-2xl`, `hover:-translate-y-1`, `shadow-lg`
 
-## 4. Bug Fixes Summary
+**Changes to `src/pages/Home.tsx`:**
+- Import and add `PopularActivities` between `QuickServices` and `PopularDestinations`
 
-- **CarBookingModal calendar stays open** -- fixed as described above
-- **CheckoutModal calendar stays open** -- fixed as described above
-- **No console errors** detected -- clean
-- **No network errors** detected -- clean
-- All other calendar instances (BookingModal, ServiceBookingModal, BookingSidebar, TripPlanner) already have controlled auto-close -- confirmed working
+## 4. Verify Booking Flows
+
+Based on code review, the booking components (`BookingModal`, `ServiceBookingModal`, `CheckoutModal`, `CarBookingModal`) all properly:
+- Insert into the `bookings` table with correct fields
+- Have controlled calendar auto-close (already fixed)
+- Show toast notifications on success/failure
+
+**One issue found**: `HeroSearchBar` navigates to `/services?q=...` on search but the services page route is `/experiences` based on the category card links. This mismatch means the hero search may not work correctly. Fix: update the search navigation to `/experiences?q=...`.
+
+**Additional check**: The `ComboBookingCard` component should be verified to ensure it passes correct data to `CheckoutModal`.
 
 ---
 
 ## Technical Details
 
-### Files to modify (4 files):
-1. `src/components/home/ValuePillars.tsx` -- visual enhancement of right-side card
-2. `src/components/home/HowItWorks.tsx` -- remove timeline connector line (lines 70-82)
-3. `src/components/car-rentals/CarBookingModal.tsx` -- add calendar auto-close
-4. `src/components/checkout/CheckoutModal.tsx` -- add calendar auto-close
+### Files to create (1 file):
+1. `src/components/home/PopularActivities.tsx` -- new Activities section with 6 cards
+
+### Files to modify (3 files):
+1. `src/components/home/HeroSection.tsx` -- remove video, use uploaded image, remove parallax, extract category cards
+2. `src/pages/Home.tsx` -- add PopularActivities, restructure category cards placement, remove spacer div
+3. `src/components/home/HeroSearchBar.tsx` -- fix search navigation path from `/services` to `/experiences`
+
+### Asset to copy:
+- `user-uploads://Gemini_Generated_Image_pvc7ltpvc7ltpvc7.png` to `src/assets/hero-dubai-skyline.png`
 
 ### No new dependencies required
-All changes use existing Framer Motion, Tailwind, Lucide, and Radix Popover patterns already in the codebase.
+All changes use existing Framer Motion, Tailwind, Lucide icons, and local image assets.
