@@ -86,7 +86,7 @@ const CheckoutModal = ({
   const [dateCalOpen, setDateCalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"later" | "online">("later");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [bookingId, setBookingId] = useState<string | null>(null);
+  
   const { toast } = useToast();
 
   const form = useForm<CustomerFormValues>({
@@ -118,7 +118,7 @@ const CheckoutModal = ({
     setIsSubmitting(true);
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("bookings")
         .insert({
           tour_id: item.id,
@@ -135,13 +135,10 @@ const CheckoutModal = ({
           status: "pending",
           booking_type: item.type,
           booking_source: "website",
-        })
-        .select()
-        .single();
+        });
 
       if (error) throw error;
 
-      setBookingId(data.id);
       setStep(4);
       
       toast({
@@ -456,10 +453,6 @@ const CheckoutModal = ({
             <Card className="bg-muted/50">
               <CardContent className="p-4 space-y-2 text-left">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Booking ID</span>
-                  <span className="font-mono">{bookingId?.slice(0, 8).toUpperCase()}</span>
-                </div>
-                <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Package</span>
                   <span>{item.name}</span>
                 </div>
@@ -495,7 +488,6 @@ const CheckoutModal = ({
       setStep(1);
       setBookingDate(undefined);
       setPaymentMethod("later");
-      setBookingId(null);
       form.reset();
     }, 300);
   };

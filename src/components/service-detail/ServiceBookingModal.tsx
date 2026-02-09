@@ -195,7 +195,7 @@ const ServiceBookingModal = ({
         booking_type: service.bookingType,
       };
 
-      const { data: savedBooking, error } = await supabase.from("bookings").insert(bookingData).select().single();
+      const { error } = await supabase.from("bookings").insert(bookingData);
 
       if (error) {
         console.error("Booking error:", error);
@@ -203,17 +203,6 @@ const ServiceBookingModal = ({
           throw new Error("Unable to create booking. Please try again or contact support.");
         }
         throw new Error(error.message);
-      }
-
-      // Send confirmation email (don't block on failure)
-      if (savedBooking?.id) {
-        sendBookingEmail(savedBooking.id, "pending")
-          .then(result => {
-            if (!result.success) {
-              console.warn("Email notification failed, but booking was created");
-            }
-          })
-          .catch(console.warn);
       }
 
       toast({ 
