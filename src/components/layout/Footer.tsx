@@ -159,13 +159,13 @@ const Footer = () => {
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-secondary/50 to-transparent" />
       
       {/* Floating Decorative Elements */}
-      <div className="absolute top-20 right-10 w-64 h-64 bg-secondary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-40 left-10 w-48 h-48 bg-secondary/5 rounded-full blur-2xl" />
+      <div className="absolute top-20 right-10 w-64 h-64 bg-secondary/5 rounded-full blur-3xl hidden md:block" />
+      <div className="absolute bottom-40 left-10 w-48 h-48 bg-secondary/5 rounded-full blur-2xl hidden md:block" />
 
       {/* Trust Badges Strip */}
       <div className="relative border-b border-primary-foreground/10">
-        <div className="container py-8 px-4 sm:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        <div className="container py-6 sm:py-8 px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             {trustBadges.map((badge, index) => (
               <motion.div
                 key={badge.label}
@@ -173,14 +173,14 @@ const Footer = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="flex items-center gap-3 sm:gap-4"
+                className="flex items-center gap-2.5 sm:gap-4"
               >
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-secondary/10 border border-secondary/20 flex items-center justify-center">
-                  <badge.icon className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
+                <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-secondary/10 border border-secondary/20 flex items-center justify-center flex-shrink-0">
+                  <badge.icon className="w-4 h-4 sm:w-6 sm:h-6 text-secondary" />
                 </div>
-                <div>
-                  <p className="text-primary-foreground font-semibold text-sm sm:text-base">{badge.label}</p>
-                  <p className="text-primary-foreground/60 text-xs sm:text-sm">{badge.description}</p>
+                <div className="min-w-0">
+                  <p className="text-primary-foreground font-semibold text-xs sm:text-base leading-tight">{badge.label}</p>
+                  <p className="text-primary-foreground/60 text-[10px] sm:text-sm">{badge.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -189,21 +189,21 @@ const Footer = () => {
       </div>
 
       {/* Main Footer Content */}
-      <div className="relative container py-12 sm:py-16 px-4 sm:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8">
+      <div className="relative container py-10 sm:py-16 px-4 sm:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8">
           
-          {/* Brand & Newsletter - Takes 4 columns */}
-          <div className="lg:col-span-4 space-y-6">
+          {/* Brand & Newsletter */}
+          <div className="lg:col-span-4 space-y-5">
             {/* Brand */}
-            <Link to="/" className="inline-flex items-center gap-4 group">
+            <Link to="/" className="inline-flex items-center gap-3 group">
               <img
                 src={betterviewLogo}
                 alt="Betterview Tourism"
-                className="w-20 h-20 object-contain rounded-2xl transition-transform group-hover:scale-105"
+                className="w-14 h-14 sm:w-20 sm:h-20 object-contain rounded-xl sm:rounded-2xl transition-transform group-hover:scale-105"
               />
               <div className="flex flex-col">
-                <span className="font-display font-bold text-3xl text-secondary leading-tight">Betterview</span>
-                <span className="text-sm text-primary-foreground/60 tracking-widest uppercase">Tourism L.L.C</span>
+                <span className="font-display font-bold text-2xl sm:text-3xl text-secondary leading-tight">Betterview</span>
+                <span className="text-xs sm:text-sm text-primary-foreground/60 tracking-widest uppercase">Tourism L.L.C</span>
               </div>
             </Link>
             
@@ -213,12 +213,12 @@ const Footer = () => {
             </p>
 
             {/* Newsletter */}
-            <div className="bg-primary-foreground/5 border border-primary-foreground/10 rounded-2xl p-5">
-              <div className="flex items-center gap-2 mb-3">
+            <div className="bg-primary-foreground/5 border border-primary-foreground/10 rounded-2xl p-4 sm:p-5">
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
                 <Sparkles className="w-4 h-4 text-secondary" />
                 <span className="text-secondary font-semibold text-sm">Get Exclusive Deals</span>
               </div>
-              <p className="text-primary-foreground/60 text-xs mb-4">
+              <p className="text-primary-foreground/60 text-xs mb-3 sm:mb-4">
                 Subscribe for special offers and travel tips
               </p>
               <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
@@ -227,150 +227,153 @@ const Footer = () => {
                   placeholder="Enter your email"
                   value={emailInput}
                   onChange={(e) => setEmailInput(e.target.value)}
-                  className="h-11 bg-primary-foreground/5 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40 flex-1"
+                  className="h-10 sm:h-11 bg-primary-foreground/5 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40 flex-1 text-sm"
                 />
-                <Button type="submit" className="h-11 px-4 bg-secondary text-secondary-foreground hover:bg-secondary/90">
+                <Button type="submit" className="h-10 sm:h-11 px-4 bg-secondary text-secondary-foreground hover:bg-secondary/90">
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </form>
             </div>
 
             {/* Social Links */}
-            <div className="flex gap-3">
+            <div className="flex gap-2.5 sm:gap-3">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-11 h-11 rounded-xl bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center text-primary-foreground/70 hover:bg-secondary hover:text-secondary-foreground hover:border-secondary transition-all duration-300 hover:scale-110"
+                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center text-primary-foreground/70 hover:bg-secondary hover:text-secondary-foreground hover:border-secondary transition-all duration-300 hover:scale-110"
                   aria-label={social.label}
                 >
-                  <social.icon className="w-5 h-5" />
+                  <social.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Links Grid - Takes 8 columns */}
-          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
-            {/* Quick Links */}
-            <div>
-              <h4 className="font-display text-secondary font-semibold text-sm uppercase tracking-wider mb-5">
-                Quick Links
-              </h4>
-              <ul className="space-y-3">
-                {quickLinks.map((link) => (
-                  <li key={link.path}>
-                    <Link
-                      to={link.path}
-                      className="text-primary-foreground/70 hover:text-secondary text-sm transition-colors inline-flex items-center gap-1 group"
-                    >
-                      <span className="w-0 group-hover:w-2 h-px bg-secondary transition-all duration-200" />
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {/* Links Grid */}
+          <div className="lg:col-span-8">
+            {/* Mobile: accordion-style collapsible sections */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
+              {/* Quick Links */}
+              <div>
+                <h4 className="font-display text-secondary font-semibold text-xs sm:text-sm uppercase tracking-wider mb-3 sm:mb-5">
+                  Quick Links
+                </h4>
+                <ul className="space-y-2 sm:space-y-3">
+                  {quickLinks.map((link) => (
+                    <li key={link.path}>
+                      <Link
+                        to={link.path}
+                        className="text-primary-foreground/70 hover:text-secondary text-xs sm:text-sm transition-colors inline-flex items-center gap-1 group"
+                      >
+                        <span className="w-0 group-hover:w-2 h-px bg-secondary transition-all duration-200" />
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-            {/* Services */}
-            <div>
-              <h4 className="font-display text-secondary font-semibold text-sm uppercase tracking-wider mb-5">
-                Services
-              </h4>
-              <ul className="space-y-3">
-                {services.map((link) => (
-                  <li key={link.path}>
-                    <Link
-                      to={link.path}
-                      className="text-primary-foreground/70 hover:text-secondary text-sm transition-colors inline-flex items-center gap-1 group"
-                    >
-                      <span className="w-0 group-hover:w-2 h-px bg-secondary transition-all duration-200" />
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-                {isAdmin && (
+              {/* Services */}
+              <div>
+                <h4 className="font-display text-secondary font-semibold text-xs sm:text-sm uppercase tracking-wider mb-3 sm:mb-5">
+                  Services
+                </h4>
+                <ul className="space-y-2 sm:space-y-3">
+                  {services.map((link) => (
+                    <li key={link.path}>
+                      <Link
+                        to={link.path}
+                        className="text-primary-foreground/70 hover:text-secondary text-xs sm:text-sm transition-colors inline-flex items-center gap-1 group"
+                      >
+                        <span className="w-0 group-hover:w-2 h-px bg-secondary transition-all duration-200" />
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                  {isAdmin && (
+                    <li>
+                      <Link
+                        to="/admin"
+                        className="text-primary-foreground/70 hover:text-secondary text-xs sm:text-sm transition-colors inline-flex items-center gap-1 group"
+                      >
+                        <span className="w-0 group-hover:w-2 h-px bg-secondary transition-all duration-200" />
+                        Admin Panel
+                      </Link>
+                    </li>
+                  )}
+                </ul>
+              </div>
+
+              {/* Activities */}
+              <div>
+                <h4 className="font-display text-secondary font-semibold text-xs sm:text-sm uppercase tracking-wider mb-3 sm:mb-5">
+                  Activities
+                </h4>
+                <ul className="space-y-2 sm:space-y-3">
+                  {activities.map((link) => (
+                    <li key={link.path}>
+                      <Link
+                        to={link.path}
+                        className="text-primary-foreground/70 hover:text-secondary text-xs sm:text-sm transition-colors inline-flex items-center gap-1 group"
+                      >
+                        <span className="w-0 group-hover:w-2 h-px bg-secondary transition-all duration-200" />
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Contact */}
+              <div>
+                <h4 className="font-display text-secondary font-semibold text-xs sm:text-sm uppercase tracking-wider mb-3 sm:mb-5">
+                  Contact Us
+                </h4>
+                <ul className="space-y-3 sm:space-y-4">
                   <li>
-                    <Link
-                      to="/admin"
-                      className="text-primary-foreground/70 hover:text-secondary text-sm transition-colors inline-flex items-center gap-1 group"
+                    <a 
+                      href={`tel:${phone}`} 
+                      className="flex items-start gap-2.5 sm:gap-3 text-primary-foreground/70 hover:text-secondary transition-colors group"
                     >
-                      <span className="w-0 group-hover:w-2 h-px bg-secondary transition-all duration-200" />
-                      Admin Panel
-                    </Link>
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center flex-shrink-0 group-hover:border-secondary/50 transition-colors">
+                        <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] sm:text-xs text-primary-foreground/50 mb-0.5">Call us</p>
+                        <p className="text-xs sm:text-sm font-medium">{phoneFormatted}</p>
+                      </div>
+                    </a>
                   </li>
-                )}
-              </ul>
-            </div>
-
-            {/* Activities */}
-            <div>
-              <h4 className="font-display text-secondary font-semibold text-sm uppercase tracking-wider mb-5">
-                Activities
-              </h4>
-              <ul className="space-y-3">
-                {activities.map((link) => (
-                  <li key={link.path}>
-                    <Link
-                      to={link.path}
-                      className="text-primary-foreground/70 hover:text-secondary text-sm transition-colors inline-flex items-center gap-1 group"
+                  <li>
+                    <a 
+                      href={`mailto:${email}`} 
+                      className="flex items-start gap-2.5 sm:gap-3 text-primary-foreground/70 hover:text-secondary transition-colors group"
                     >
-                      <span className="w-0 group-hover:w-2 h-px bg-secondary transition-all duration-200" />
-                      {link.name}
-                    </Link>
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center flex-shrink-0 group-hover:border-secondary/50 transition-colors">
+                        <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] sm:text-xs text-primary-foreground/50 mb-0.5">Email</p>
+                        <p className="text-xs sm:text-sm font-medium break-all">{email}</p>
+                      </div>
+                    </a>
                   </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Contact */}
-            <div>
-              <h4 className="font-display text-secondary font-semibold text-sm uppercase tracking-wider mb-5">
-                Contact Us
-              </h4>
-              <ul className="space-y-4">
-                <li>
-                  <a 
-                    href={`tel:${phone}`} 
-                    className="flex items-start gap-3 text-primary-foreground/70 hover:text-secondary transition-colors group"
-                  >
-                    <div className="w-9 h-9 rounded-lg bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center flex-shrink-0 group-hover:border-secondary/50 transition-colors">
-                      <Phone className="w-4 h-4" />
+                  <li>
+                    <div className="flex items-start gap-2.5 sm:gap-3 text-primary-foreground/70">
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center flex-shrink-0">
+                        <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] sm:text-xs text-primary-foreground/50 mb-0.5">Address</p>
+                        <p className="text-xs sm:text-sm">{address}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs text-primary-foreground/50 mb-0.5">Call us</p>
-                      <p className="text-sm font-medium">{phoneFormatted}</p>
-                    </div>
-                  </a>
-                </li>
-                <li>
-                  <a 
-                    href={`mailto:${email}`} 
-                    className="flex items-start gap-3 text-primary-foreground/70 hover:text-secondary transition-colors group"
-                  >
-                    <div className="w-9 h-9 rounded-lg bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center flex-shrink-0 group-hover:border-secondary/50 transition-colors">
-                      <Mail className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-primary-foreground/50 mb-0.5">Email</p>
-                      <p className="text-sm font-medium break-all">{email}</p>
-                    </div>
-                  </a>
-                </li>
-                <li>
-                  <div className="flex items-start gap-3 text-primary-foreground/70">
-                    <div className="w-9 h-9 rounded-lg bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center flex-shrink-0">
-                      <MapPin className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-primary-foreground/50 mb-0.5">Address</p>
-                      <p className="text-sm">{address}</p>
-                    </div>
-                  </div>
-                </li>
-              </ul>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -378,21 +381,21 @@ const Footer = () => {
 
       {/* Payment & Security Strip */}
       <div className="relative border-t border-primary-foreground/10">
-        <div className="container py-6 px-4 sm:px-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <Lock className="w-4 h-4 text-secondary" />
-              <span className="text-primary-foreground/60 text-sm">Secured by 256-bit SSL Encryption</span>
+        <div className="container py-4 sm:py-6 px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-secondary" />
+              <span className="text-primary-foreground/60 text-xs sm:text-sm">Secured by 256-bit SSL Encryption</span>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-primary-foreground/40 text-xs uppercase tracking-wider">We Accept</span>
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <span className="text-primary-foreground/40 text-[10px] sm:text-xs uppercase tracking-wider">We Accept</span>
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 {["Visa", "Mastercard", "Amex", "Apple Pay"].map((method) => (
                   <div 
                     key={method} 
-                    className="h-8 px-3 rounded-md bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center"
+                    className="h-6 sm:h-8 px-2 sm:px-3 rounded-md bg-primary-foreground/5 border border-primary-foreground/10 flex items-center justify-center"
                   >
-                    <span className="text-primary-foreground/70 text-xs font-medium">{method}</span>
+                    <span className="text-primary-foreground/70 text-[10px] sm:text-xs font-medium">{method}</span>
                   </div>
                 ))}
               </div>
@@ -403,12 +406,12 @@ const Footer = () => {
 
       {/* Bottom Bar */}
       <div className="relative border-t border-primary-foreground/10 bg-primary-foreground/5">
-        <div className="container py-5 px-4 sm:px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-primary-foreground/50 text-sm text-center md:text-left">
+        <div className="container py-4 sm:py-5 px-4 sm:px-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
+            <p className="text-primary-foreground/50 text-xs sm:text-sm text-center md:text-left">
               © {new Date().getFullYear()} Betterview Tourism L.L.C. All rights reserved.
             </p>
-            <div className="flex flex-wrap justify-center gap-6 text-sm">
+            <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-xs sm:text-sm">
               <Link to="/privacy-policy" className="text-primary-foreground/50 hover:text-secondary transition-colors">
                 Privacy Policy
               </Link>
@@ -431,7 +434,7 @@ const Footer = () => {
                 href="https://www.dibull.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-secondary hover:text-secondary/80 transition-colors font-medium"
+                className="text-secondary/70 hover:text-secondary transition-colors"
               >
                 Dibull
               </a>
