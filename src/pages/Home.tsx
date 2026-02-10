@@ -23,14 +23,14 @@ const Home = () => {
         keywords={["Dubai tours", "yacht charter Dubai", "desert safari", "theme parks Dubai", "Dubai experiences"]}
       />
       <HeroSection />
-      <ValuePillars />
+      <PopularDestinations />
+      <PopularActivities />
       <FeaturedCombos />
+      <ValuePillars />
       <RecentlyViewedSection />
       <QuickServices />
-      <PopularActivities />
-      <PopularDestinations />
-      <HowItWorks />
       <TestimonialsCarousel />
+      <HowItWorks />
       <NewsletterSection />
       <PartnersStrip />
       <CTASection />
