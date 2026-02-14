@@ -1,5 +1,3 @@
-import { NextRequest, NextResponse } from "next/server";
-
 // Social crawler bot user agents
 const CRAWLER_USER_AGENTS = [
   "facebookexternalhit",
@@ -37,18 +35,19 @@ function isCrawler(userAgent: string): boolean {
   return CRAWLER_USER_AGENTS.some((bot) => ua.includes(bot.toLowerCase()));
 }
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+export default async function middleware(request: Request) {
+  const url = new URL(request.url);
+  const { pathname } = url;
 
   // Skip asset/API/admin paths
   if (SKIP_PATTERNS.some((pattern) => pattern.test(pathname))) {
-    return NextResponse.next();
+    return;
   }
 
   const userAgent = request.headers.get("user-agent") || "";
 
   if (!isCrawler(userAgent)) {
-    return NextResponse.next();
+    return;
   }
 
   // Redirect crawler to the OG metadata edge function
@@ -57,7 +56,9 @@ export function middleware(request: NextRequest) {
   );
   ogUrl.searchParams.set("path", pathname);
 
-  return NextResponse.rewrite(ogUrl);
+  // Use fetch to proxy the request (rewrite behavior)
+  const response = await fetch(ogUrl);
+  return response;
 }
 
 export const config = {
