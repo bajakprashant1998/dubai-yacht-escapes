@@ -1410,6 +1410,41 @@ export type Database = {
         }
         Relationships: []
       }
+      review_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          image_url: string
+          review_id: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_url: string
+          review_id?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string
+          review_id?: string | null
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_photos_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           booking_id: string | null
@@ -1645,6 +1680,60 @@ export type Database = {
           value?: Json
         }
         Relationships: []
+      }
+      tour_availability: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          is_available: boolean
+          service_id: string | null
+          slots_booked: number
+          slots_total: number
+          special_price: number | null
+          tour_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          is_available?: boolean
+          service_id?: string | null
+          slots_booked?: number
+          slots_total?: number
+          special_price?: number | null
+          tour_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          is_available?: boolean
+          service_id?: string | null
+          slots_booked?: number
+          slots_total?: number
+          special_price?: number | null
+          tour_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_availability_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tour_availability_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tours: {
         Row: {
@@ -2128,6 +2217,54 @@ export type Database = {
           visa_type?: string
         }
         Relationships: []
+      }
+      wishlists: {
+        Row: {
+          alert_price: number | null
+          created_at: string
+          id: string
+          notified_at: string | null
+          price_alert: boolean
+          service_id: string | null
+          tour_id: string | null
+          user_id: string
+        }
+        Insert: {
+          alert_price?: number | null
+          created_at?: string
+          id?: string
+          notified_at?: string | null
+          price_alert?: boolean
+          service_id?: string | null
+          tour_id?: string | null
+          user_id: string
+        }
+        Update: {
+          alert_price?: number | null
+          created_at?: string
+          id?: string
+          notified_at?: string | null
+          price_alert?: boolean
+          service_id?: string | null
+          tour_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlists_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wishlists_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

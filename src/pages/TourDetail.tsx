@@ -34,6 +34,8 @@ import QuickInfoCards from "@/components/tour-detail/QuickInfoCards";
 import BookingSidebar from "@/components/tour-detail/BookingSidebar";
 import ReviewsSection from "@/components/tour-detail/ReviewsSection";
 import MobileBookingBar from "@/components/tour-detail/MobileBookingBar";
+import AvailabilityCalendar from "@/components/tour-detail/AvailabilityCalendar";
+import PhotoReviewsGallery from "@/components/tour-detail/PhotoReviewsGallery";
 
 import BookingModal from "@/components/tour-detail/BookingModal";
 import { useTour, useRelatedTours } from "@/hooks/useTours";
@@ -433,8 +435,14 @@ const TourDetail = () => {
                 </motion.div>
               )}
 
+              {/* Photo Reviews Gallery */}
+              <PhotoReviewsGallery tourId={tour.id} />
+
               {/* Reviews Section */}
               <ReviewsSection rating={tour.rating} reviewCount={tour.reviewCount} />
+
+              {/* Availability Calendar */}
+              <AvailabilityCalendar tourId={tour.id} />
 
               {/* FAQs */}
               {tour.faqs.length > 0 && (

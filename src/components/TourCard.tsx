@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Tour } from "@/lib/tourMapper";
 import { getTourUrl } from "@/lib/seoUtils";
+import WishlistButton from "@/components/WishlistButton";
 
 interface TourCardProps {
   tour: Tour;
@@ -41,9 +42,11 @@ const TourCard = memo(({ tour, featured = false }: TourCardProps) => {
               {discount}% OFF
             </div>
           )}
+          {/* Wishlist Button */}
+          <WishlistButton tourId={tour.id} className="absolute top-4 right-4" size="sm" />
           {/* Private Charter Badge */}
           {isPrivateCharter && (
-            <div className="absolute top-4 right-4 bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1 z-10 shadow-lg">
+            <div className="absolute top-14 right-4 bg-secondary text-secondary-foreground px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1 z-10 shadow-lg">
               <Ship className="w-3 h-3" />
               Private
             </div>

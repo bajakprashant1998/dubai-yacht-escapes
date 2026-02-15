@@ -1,6 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import HeroSection from "@/components/home/HeroSection";
 import FeaturedCombos from "@/components/home/FeaturedCombos";
+import FeaturedToursCarousel from "@/components/home/FeaturedToursCarousel";
 import RecentlyViewedSection from "@/components/home/RecentlyViewedSection";
 import PopularDestinations from "@/components/home/PopularDestinations";
 import HowItWorks from "@/components/home/HowItWorks";
@@ -25,6 +26,7 @@ const Home = () => {
       <HeroSection />
       <PopularDestinations />
       <PopularActivities />
+      <FeaturedToursCarousel />
       <FeaturedCombos />
       <QuickServices />
       <ValuePillars />
