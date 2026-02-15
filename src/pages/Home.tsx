@@ -26,9 +26,9 @@ const Home = () => {
       <PopularDestinations />
       <PopularActivities />
       <FeaturedCombos />
+      <QuickServices />
       <ValuePillars />
       <RecentlyViewedSection />
-      <QuickServices />
       <TestimonialsCarousel />
       <HowItWorks />
       <NewsletterSection />
