@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useContactConfig } from "@/hooks/useContactConfig";
 import { cn } from "@/lib/utils";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 type DropdownType = "activities" | "services" | null;
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -280,6 +281,9 @@ const Header = () => {
                   </Button>}
               </AnimatePresence>
             </div>
+
+            {/* Language Switcher */}
+            <LanguageSwitcher />
 
             {/* Phone - Simple icon */}
             <a href={`tel:${phone}`} className="flex items-center justify-center h-9 w-9 rounded-full text-foreground/70 hover:text-foreground hover:bg-muted transition-colors" title={phoneFormatted}>
