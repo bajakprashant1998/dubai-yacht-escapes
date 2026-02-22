@@ -26,6 +26,8 @@ import {
   BookOpen,
   Plane,
   Mail,
+  Megaphone,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -116,6 +118,8 @@ const navItems: NavItem[] = [
     ],
   },
   { title: "Newsletter", href: "/admin/newsletter", icon: Mail },
+  { title: "Banners", href: "/admin/banners", icon: Megaphone },
+  { title: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { title: "User Management", href: "/admin/users", icon: Users },
   { title: "User Roles", href: "/admin/roles", icon: Shield },
   { title: "Legal Pages", href: "/admin/legal-pages", icon: Scale },

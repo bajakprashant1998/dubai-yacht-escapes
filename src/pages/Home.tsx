@@ -1,5 +1,6 @@
 import Layout from "@/components/layout/Layout";
 import HeroSection from "@/components/home/HeroSection";
+import PromotionalBanner from "@/components/home/PromotionalBanner";
 import FeaturedCombos from "@/components/home/FeaturedCombos";
 import FeaturedToursCarousel from "@/components/home/FeaturedToursCarousel";
 import RecentlyViewedSection from "@/components/home/RecentlyViewedSection";
@@ -23,6 +24,7 @@ const Home = () => {
         structuredData={structuredData}
         keywords={["Dubai tours", "yacht charter Dubai", "desert safari", "theme parks Dubai", "Dubai experiences"]}
       />
+      <PromotionalBanner />
       <HeroSection />
       <PopularDestinations />
       <PopularActivities />
