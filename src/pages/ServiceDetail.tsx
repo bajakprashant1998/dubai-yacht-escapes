@@ -16,12 +16,15 @@ import {
   Shield,
   Zap,
   Phone,
+  Camera,
+  ArrowRight,
+  Sparkles,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
@@ -33,6 +36,8 @@ import { useService } from "@/hooks/useServices";
 import { useContactConfig } from "@/hooks/useContactConfig";
 import ServiceBookingModal from "@/components/service-detail/ServiceBookingModal";
 import { addToRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 const ServiceDetail = () => {
   const { slug, categoryPath } = useParams();
@@ -41,8 +46,9 @@ const ServiceDetail = () => {
   const { whatsappLink } = useContactConfig();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const { toast } = useToast();
 
-  // Track recently viewed
   useEffect(() => {
     if (service) {
       addToRecentlyViewed({
@@ -62,14 +68,14 @@ const ServiceDetail = () => {
       <Layout>
         <div className="pt-28 pb-16 container">
           <Skeleton className="h-8 w-64 mb-4" />
-          <Skeleton className="h-[400px] w-full rounded-xl mb-8" />
+          <Skeleton className="h-[500px] w-full rounded-2xl mb-8" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-4">
+              <Skeleton className="h-10 w-3/4" />
               <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-3/4" />
               <Skeleton className="h-32 w-full" />
             </div>
-            <Skeleton className="h-96 rounded-xl" />
+            <Skeleton className="h-96 rounded-2xl" />
           </div>
         </div>
       </Layout>
@@ -95,12 +101,16 @@ const ServiceDetail = () => {
     ? Math.round(((service.originalPrice - service.price) / service.originalPrice) * 100)
     : null;
 
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
-  };
+  const nextImage = () => setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+  const prevImage = () => setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
 
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  const handleShare = async () => {
+    try {
+      await navigator.share({ title: service.title, url: window.location.href });
+    } catch {
+      await navigator.clipboard.writeText(window.location.href);
+      toast({ title: "Link copied!" });
+    }
   };
 
   return (
@@ -109,314 +119,430 @@ const ServiceDetail = () => {
         {/* Breadcrumb */}
         <div className="container mb-6">
           <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Link to="/" className="hover:text-foreground">Home</Link>
-            <span>/</span>
-            <Link to="/services" className="hover:text-foreground">Experiences</Link>
+            <Link to="/" className="hover:text-secondary transition-colors">Home</Link>
+            <span className="text-border">/</span>
+            <Link to="/services" className="hover:text-secondary transition-colors">Experiences</Link>
             {service.categoryName && (
               <>
-                <span>/</span>
+                <span className="text-border">/</span>
                 <Link
                   to={`/dubai/services/${service.categorySlug}`}
-                  className="hover:text-foreground"
+                  className="hover:text-secondary transition-colors"
                 >
                   {service.categoryName}
                 </Link>
               </>
             )}
-            <span>/</span>
-            <span className="text-foreground truncate max-w-[200px]">{service.title}</span>
+            <span className="text-border">/</span>
+            <span className="text-foreground font-medium truncate max-w-[200px]">{service.title}</span>
           </nav>
         </div>
 
         <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Image Gallery */}
-              <div className="relative aspect-[16/9] rounded-2xl overflow-hidden bg-muted">
+          {/* Immersive Image Gallery */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
+            <div className="relative rounded-3xl overflow-hidden bg-muted group">
+              {/* Main Image */}
+              <div className="relative aspect-[16/9] lg:aspect-[21/9]">
                 <img
                   src={allImages[currentImageIndex]}
                   alt={service.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
+                {/* Gradient overlays */}
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-primary/20" />
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent" />
+
+                {/* Top-right action buttons */}
+                <div className="absolute top-4 right-4 flex gap-2">
+                  <button
+                    onClick={handleShare}
+                    className="w-10 h-10 rounded-full bg-card/60 backdrop-blur-md flex items-center justify-center text-card-foreground hover:bg-card/90 transition-all shadow-lg"
+                  >
+                    <Share2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setIsSaved(!isSaved)}
+                    className={cn(
+                      "w-10 h-10 rounded-full backdrop-blur-md flex items-center justify-center transition-all shadow-lg",
+                      isSaved ? "bg-destructive text-destructive-foreground" : "bg-card/60 text-card-foreground hover:bg-card/90"
+                    )}
+                  >
+                    <Heart className={cn("w-4 h-4", isSaved && "fill-current")} />
+                  </button>
+                </div>
+
+                {/* Top-left badges */}
+                <div className="absolute top-4 left-4 flex gap-2">
+                  {service.categoryName && (
+                    <Badge className="bg-card/80 backdrop-blur-md text-card-foreground border-0 shadow-lg px-3 py-1">
+                      {service.categoryName}
+                    </Badge>
+                  )}
+                  {discount && discount > 0 && (
+                    <Badge className="bg-destructive text-destructive-foreground border-0 shadow-lg shadow-destructive/30 px-3 py-1">
+                      {discount}% OFF
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Navigation arrows */}
                 {allImages.length > 1 && (
                   <>
                     <Button
-                      variant="secondary"
+                      variant="ghost"
                       size="icon"
-                      className="absolute left-4 top-1/2 -translate-y-1/2"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-card/40 backdrop-blur-md hover:bg-card/80 text-card-foreground rounded-full w-11 h-11 shadow-lg"
                       onClick={prevImage}
                     >
                       <ChevronLeft className="w-5 h-5" />
                     </Button>
                     <Button
-                      variant="secondary"
+                      variant="ghost"
                       size="icon"
-                      className="absolute right-4 top-1/2 -translate-y-1/2"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-card/40 backdrop-blur-md hover:bg-card/80 text-card-foreground rounded-full w-11 h-11 shadow-lg"
                       onClick={nextImage}
                     >
                       <ChevronRight className="w-5 h-5" />
                     </Button>
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                      {allImages.map((_, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setCurrentImageIndex(idx)}
-                          className={`w-2 h-2 rounded-full transition-colors ${
-                            idx === currentImageIndex ? "bg-white" : "bg-white/50"
-                          }`}
-                        />
-                      ))}
-                    </div>
                   </>
                 )}
-                {/* Badges */}
-                <div className="absolute top-4 left-4 flex gap-2">
-                  {service.categoryName && (
-                    <Badge className="bg-primary/90 text-primary-foreground">
-                      {service.categoryName}
-                    </Badge>
-                  )}
-                  {discount && discount > 0 && (
-                    <Badge className="bg-destructive text-destructive-foreground">
-                      {discount}% OFF
-                    </Badge>
-                  )}
+
+                {/* Bottom overlay info */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
+                  <div className="flex items-end justify-between">
+                    {/* Image counter */}
+                    {allImages.length > 1 && (
+                      <div className="flex items-center gap-1.5 bg-card/50 backdrop-blur-md px-3 py-1.5 rounded-full text-card-foreground text-sm">
+                        <Camera className="w-3.5 h-3.5" />
+                        {currentImageIndex + 1} / {allImages.length}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
+              {/* Thumbnail strip */}
+              {allImages.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                  {allImages.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentImageIndex(idx)}
+                      className={cn(
+                        "w-14 h-10 rounded-lg overflow-hidden border-2 transition-all duration-300 shadow-md",
+                        idx === currentImageIndex
+                          ? "border-secondary scale-110 shadow-secondary/30"
+                          : "border-card/50 opacity-70 hover:opacity-100"
+                      )}
+                    >
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
+            {/* Main Content */}
+            <div className="lg:col-span-2 space-y-8">
               {/* Title & Quick Info */}
-              <div>
-                <h1 className="text-3xl lg:text-4xl font-display font-bold mb-4">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, duration: 0.4 }}
+              >
+                <h1 className="text-3xl lg:text-4xl font-display font-bold mb-3 tracking-tight">
                   {service.title}
                 </h1>
                 {service.subtitle && (
-                  <p className="text-lg text-muted-foreground mb-4">{service.subtitle}</p>
+                  <p className="text-lg text-muted-foreground mb-5">{service.subtitle}</p>
                 )}
-                <div className="flex flex-wrap items-center gap-4">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-                    <span className="font-semibold">{service.rating.toFixed(1)}</span>
-                    <span className="text-muted-foreground">
-                      ({service.reviewCount.toLocaleString()} reviews)
+
+                {/* Rating & Quick Pills */}
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-1.5 bg-secondary/10 px-3 py-1.5 rounded-full">
+                    <Star className="w-4 h-4 text-secondary fill-secondary" />
+                    <span className="font-bold text-secondary">{service.rating.toFixed(1)}</span>
+                    <span className="text-sm text-muted-foreground">
+                      ({service.reviewCount.toLocaleString()})
                     </span>
                   </div>
                   {service.duration && (
-                    <Badge variant="outline" className="text-sm">
-                      <Clock className="w-4 h-4 mr-1" />
-                      {service.duration}
-                    </Badge>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/60 text-sm">
+                      <Clock className="w-4 h-4 text-secondary" />
+                      <span>{service.duration}</span>
+                    </div>
                   )}
                   {service.hotelPickup && (
-                    <Badge variant="outline" className="text-sm">
-                      <Car className="w-4 h-4 mr-1" />
-                      Hotel Pickup
-                    </Badge>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/60 text-sm">
+                      <Car className="w-4 h-4 text-secondary" />
+                      <span>Hotel Pickup</span>
+                    </div>
                   )}
                   {service.instantConfirmation && (
-                    <Badge variant="outline" className="text-sm text-green-600 border-green-600">
-                      <Zap className="w-4 h-4 mr-1" />
-                      Instant Confirmation
-                    </Badge>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/10 text-sm text-green-700 dark:text-green-400">
+                      <Zap className="w-4 h-4" />
+                      <span className="font-medium">Instant Confirmation</span>
+                    </div>
                   )}
                 </div>
-              </div>
+              </motion.div>
 
               {/* Tabs */}
-              <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="w-full justify-start">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="included">What's Included</TabsTrigger>
-                  <TabsTrigger value="details">Details</TabsTrigger>
-                </TabsList>
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, duration: 0.4 }}
+              >
+                <Tabs defaultValue="overview" className="w-full">
+                  <TabsList className="w-full justify-start bg-muted/50 rounded-xl p-1 h-auto">
+                    <TabsTrigger value="overview" className="rounded-lg px-5 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-sm font-medium">Overview</TabsTrigger>
+                    <TabsTrigger value="included" className="rounded-lg px-5 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-sm font-medium">What's Included</TabsTrigger>
+                    <TabsTrigger value="details" className="rounded-lg px-5 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-sm font-medium">Details</TabsTrigger>
+                  </TabsList>
 
-                <TabsContent value="overview" className="pt-6 space-y-6">
-                  {service.description && (
-                    <div>
-                      <h3 className="text-xl font-semibold mb-3">About This Experience</h3>
-                      <p className="text-muted-foreground leading-relaxed">
-                        {service.description}
-                      </p>
-                    </div>
-                  )}
-                  {service.longDescription && (
-                    <div
-                      className="prose prose-sm max-w-none text-muted-foreground"
-                      dangerouslySetInnerHTML={{ __html: service.longDescription }}
-                    />
-                  )}
-                  {service.highlights && service.highlights.length > 0 && (
-                    <div>
-                      <h3 className="text-xl font-semibold mb-3">Highlights</h3>
-                      <ul className="space-y-2">
-                        {service.highlights.map((highlight, idx) => (
-                          <li key={idx} className="flex items-start gap-3">
-                            <CheckCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-                            <span>{highlight}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="included" className="pt-6 space-y-6">
-                  {service.included && service.included.length > 0 && (
-                    <div>
-                      <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                        What's Included
-                      </h3>
-                      <ul className="space-y-2">
-                        {service.included.map((item, idx) => (
-                          <li key={idx} className="flex items-center gap-3">
-                            <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {service.excluded && service.excluded.length > 0 && (
-                    <div>
-                      <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
-                        <XCircle className="w-5 h-5 text-destructive" />
-                        What's Not Included
-                      </h3>
-                      <ul className="space-y-2">
-                        {service.excluded.map((item, idx) => (
-                          <li key={idx} className="flex items-center gap-3">
-                            <XCircle className="w-4 h-4 text-destructive flex-shrink-0" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="details" className="pt-6 space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {service.duration && (
-                      <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
-                        <Clock className="w-5 h-5 text-primary" />
-                        <div>
-                          <p className="text-sm text-muted-foreground">Duration</p>
-                          <p className="font-medium">{service.duration}</p>
-                        </div>
-                      </div>
-                    )}
-                    {service.meetingPoint && (
-                      <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
-                        <MapPin className="w-5 h-5 text-primary" />
-                        <div>
-                          <p className="text-sm text-muted-foreground">Meeting Point</p>
-                          <p className="font-medium">{service.meetingPoint}</p>
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
-                      <Users className="w-5 h-5 text-primary" />
+                  <TabsContent value="overview" className="pt-8 space-y-8">
+                    {service.description && (
                       <div>
-                        <p className="text-sm text-muted-foreground">Group Size</p>
-                        <p className="font-medium">
-                          {service.minParticipants}
-                          {service.maxParticipants && ` - ${service.maxParticipants}`} guests
+                        <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
+                          <Sparkles className="w-5 h-5 text-secondary" />
+                          About This Experience
+                        </h3>
+                        <p className="text-muted-foreground leading-relaxed text-[15px]">
+                          {service.description}
                         </p>
                       </div>
-                    </div>
-                    {service.cancellationPolicy && (
-                      <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
-                        <Shield className="w-5 h-5 text-primary" />
-                        <div>
-                          <p className="text-sm text-muted-foreground">Cancellation</p>
-                          <p className="font-medium">{service.cancellationPolicy}</p>
+                    )}
+                    {service.longDescription && (
+                      <div
+                        className="prose prose-sm max-w-none text-muted-foreground [&_h2]:text-foreground [&_h3]:text-foreground [&_strong]:text-foreground"
+                        dangerouslySetInnerHTML={{ __html: service.longDescription }}
+                      />
+                    )}
+                    {service.highlights && service.highlights.length > 0 && (
+                      <div>
+                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                          <Star className="w-5 h-5 text-secondary" />
+                          Highlights
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {service.highlights.map((highlight, idx) => (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, x: -10 }}
+                              whileInView={{ opacity: 1, x: 0 }}
+                              viewport={{ once: true }}
+                              transition={{ delay: idx * 0.05 }}
+                              className="flex items-start gap-3 p-3 rounded-xl bg-secondary/5 border border-secondary/10"
+                            >
+                              <div className="w-6 h-6 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <CheckCircle className="w-3.5 h-3.5 text-secondary" />
+                              </div>
+                              <span className="text-sm">{highlight}</span>
+                            </motion.div>
+                          ))}
                         </div>
                       </div>
                     )}
-                  </div>
-                </TabsContent>
-              </Tabs>
+                  </TabsContent>
+
+                  <TabsContent value="included" className="pt-8 space-y-8">
+                    {service.included && service.included.length > 0 && (
+                      <div>
+                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                          What's Included
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {service.included.map((item, idx) => (
+                            <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-green-500/5 border border-green-500/10">
+                              <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                                <CheckCircle className="w-3 h-3 text-green-600" />
+                              </div>
+                              <span className="text-sm">{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {service.excluded && service.excluded.length > 0 && (
+                      <div>
+                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                          <XCircle className="w-5 h-5 text-destructive" />
+                          What's Not Included
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {service.excluded.map((item, idx) => (
+                            <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-destructive/5 border border-destructive/10">
+                              <div className="w-5 h-5 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                                <XCircle className="w-3 h-3 text-destructive" />
+                              </div>
+                              <span className="text-sm">{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="details" className="pt-8 space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {service.duration && (
+                        <div className="flex items-center gap-4 p-5 rounded-2xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-shadow">
+                          <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                            <Clock className="w-6 h-6 text-secondary" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Duration</p>
+                            <p className="font-bold text-foreground">{service.duration}</p>
+                          </div>
+                        </div>
+                      )}
+                      {service.meetingPoint && (
+                        <div className="flex items-center gap-4 p-5 rounded-2xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-shadow">
+                          <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                            <MapPin className="w-6 h-6 text-secondary" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Meeting Point</p>
+                            <p className="font-bold text-foreground">{service.meetingPoint}</p>
+                          </div>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-4 p-5 rounded-2xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                          <Users className="w-6 h-6 text-secondary" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Group Size</p>
+                          <p className="font-bold text-foreground">
+                            {service.minParticipants}
+                            {service.maxParticipants && ` - ${service.maxParticipants}`} guests
+                          </p>
+                        </div>
+                      </div>
+                      {service.cancellationPolicy && (
+                        <div className="flex items-center gap-4 p-5 rounded-2xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-shadow">
+                          <div className="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                            <Shield className="w-6 h-6 text-green-600" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Cancellation</p>
+                            <p className="font-bold text-foreground">{service.cancellationPolicy}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </motion.div>
             </div>
 
             {/* Booking Sidebar */}
             <div className="lg:col-span-1">
-              <Card className="sticky top-28 shadow-lg border-border">
-                <CardHeader className="pb-4">
-                  <div className="flex items-baseline justify-between">
-                    <div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.4 }}
+              >
+                <div className="sticky top-28 rounded-3xl border border-border/50 bg-card shadow-xl overflow-hidden">
+                  {/* Price header with gradient */}
+                  <div className="bg-gradient-to-br from-secondary/10 via-card to-card p-6 pb-5">
+                    <div className="flex items-start justify-between mb-1">
                       <p className="text-sm text-muted-foreground">From</p>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-bold text-primary">
-                          AED {service.price.toLocaleString()}
-                        </span>
-                        {service.originalPrice && (
-                          <span className="text-lg text-muted-foreground line-through">
-                            AED {service.originalPrice.toLocaleString()}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {service.bookingType === "per_person" && "per person"}
-                        {service.bookingType === "per_group" && "per group"}
-                        {service.bookingType === "per_vehicle" && "per vehicle"}
-                      </p>
+                      {discount && discount > 0 && (
+                        <Badge className="bg-destructive text-destructive-foreground shadow-lg shadow-destructive/20 text-xs font-bold">
+                          Save {discount}%
+                        </Badge>
+                      )}
                     </div>
-                    {discount && discount > 0 && (
-                      <Badge className="bg-destructive text-destructive-foreground text-sm">
-                        Save {discount}%
-                      </Badge>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Trust Badges */}
-                  <div className="flex flex-wrap gap-2">
-                    {service.instantConfirmation && (
-                      <Badge variant="outline" className="text-xs">
-                        <Zap className="w-3 h-3 mr-1 text-green-500" />
-                        Instant Confirmation
-                      </Badge>
-                    )}
-                    <Badge variant="outline" className="text-xs">
-                      <Shield className="w-3 h-3 mr-1" />
-                      Best Price Guarantee
-                    </Badge>
+                    <div className="flex items-baseline gap-2.5">
+                      <span className="text-4xl font-extrabold text-secondary">
+                        AED {service.price.toLocaleString()}
+                      </span>
+                      {service.originalPrice && (
+                        <span className="text-lg text-muted-foreground line-through">
+                          AED {service.originalPrice.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {service.bookingType === "per_person" && "per person"}
+                      {service.bookingType === "per_group" && "per group"}
+                      {service.bookingType === "per_vehicle" && "per vehicle"}
+                    </p>
                   </div>
 
-                  {/* Action Buttons */}
-                  <Button 
-                    onClick={() => setIsBookingOpen(true)}
-                    className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 h-12 text-lg font-semibold"
-                  >
-                    <Calendar className="w-5 h-5 mr-2" />
-                    Check Availability
-                  </Button>
+                  <div className="p-6 pt-4 space-y-4">
+                    {/* Trust Badges */}
+                    <div className="flex flex-wrap gap-2">
+                      {service.instantConfirmation && (
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/10 text-xs font-medium text-green-700 dark:text-green-400">
+                          <Zap className="w-3 h-3" />
+                          Instant Confirmation
+                        </div>
+                      )}
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/10 text-xs font-medium text-secondary">
+                        <Shield className="w-3 h-3" />
+                        Best Price Guarantee
+                      </div>
+                    </div>
 
-                  <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" className="w-full h-12">
-                      <Phone className="w-5 h-5 mr-2" />
-                      WhatsApp Inquiry
+                    {/* CTA Buttons */}
+                    <Button
+                      onClick={() => setIsBookingOpen(true)}
+                      className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 h-13 text-base font-bold rounded-xl shadow-lg shadow-secondary/20 transition-all hover:shadow-xl hover:shadow-secondary/30 gap-2"
+                    >
+                      <Calendar className="w-5 h-5" />
+                      Check Availability
+                      <ArrowRight className="w-4 h-4 ml-auto" />
                     </Button>
-                  </a>
 
-                  {/* Features */}
-                  <div className="pt-4 border-t border-border space-y-3">
-                    {service.hotelPickup && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Car className="w-4 h-4 text-secondary" />
-                        <span>Free hotel pickup included</span>
+                    <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="block">
+                      <Button variant="outline" className="w-full h-12 rounded-xl border-2 gap-2 font-semibold hover:border-secondary/50">
+                        <Phone className="w-4 h-4" />
+                        WhatsApp Inquiry
+                      </Button>
+                    </a>
+
+                    {/* Divider */}
+                    <div className="border-t border-dashed border-border/60" />
+
+                    {/* Features */}
+                    <div className="space-y-3">
+                      {service.hotelPickup && (
+                        <div className="flex items-center gap-3 text-sm">
+                          <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                            <Car className="w-4 h-4 text-secondary" />
+                          </div>
+                          <span>Free hotel pickup included</span>
+                        </div>
+                      )}
+                      {service.cancellationPolicy && (
+                        <div className="flex items-center gap-3 text-sm">
+                          <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                            <CheckCircle className="w-4 h-4 text-green-600" />
+                          </div>
+                          <span>{service.cancellationPolicy}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                          <Shield className="w-4 h-4 text-secondary" />
+                        </div>
+                        <span>Secure online booking</span>
                       </div>
-                    )}
-                    {service.cancellationPolicy && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <CheckCircle className="w-4 h-4 text-green-500" />
-                        <span>{service.cancellationPolicy}</span>
-                      </div>
-                    )}
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </motion.div>
             </div>
           </div>
         </div>
