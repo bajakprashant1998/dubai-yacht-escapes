@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, Grid3X3, List, Star, MapPin, TrendingUp, ArrowUpDown, ThumbsUp } from "lucide-react";
+import { Search, Grid3X3, List, Star, MapPin, TrendingUp, ArrowUpDown, ThumbsUp, Sparkles, Compass, SlidersHorizontal } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import ServiceCardRedesigned from "@/components/ServiceCardRedesigned";
 import { Input } from "@/components/ui/input";
@@ -31,23 +31,17 @@ const sortOptions: SortOption[] = [
 const parseDurationToHours = (duration: string | null): number | null => {
   if (!duration) return null;
   const lower = duration.toLowerCase();
-  
-  // Match patterns like "2 hours", "2-3 hours", "30 minutes", "1.5 hours"
   const hoursMatch = lower.match(/(\d+(?:\.\d+)?)\s*(?:hour|hr)/);
   const minutesMatch = lower.match(/(\d+)\s*(?:minute|min)/);
-  
   let hours = 0;
   if (hoursMatch) hours += parseFloat(hoursMatch[1]);
   if (minutesMatch) hours += parseInt(minutesMatch[1]) / 60;
-  
   return hours > 0 ? hours : null;
 };
 
-// Check if duration falls within a range
 const isDurationInRange = (duration: string | null, range: string): boolean => {
   const hours = parseDurationToHours(duration);
   if (hours === null) return false;
-  
   switch (range) {
     case "1-2": return hours >= 1 && hours <= 2;
     case "2-4": return hours > 2 && hours <= 4;
@@ -66,7 +60,6 @@ const Services = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
 
-  // Update search when URL param changes
   useEffect(() => {
     const urlQuery = searchParams.get("q");
     if (urlQuery && urlQuery !== searchQuery) {
@@ -80,16 +73,13 @@ const Services = () => {
 
   const services = categoryPath ? categoryServices : allServices;
   const isLoading = categoryPath ? loadingCategory : loadingAll;
-
   const activeCategory = categories?.find((c) => c.slug === categoryPath);
 
-  // Calculate max price for filter
   const maxPrice = useMemo(() => {
     if (!services) return 2000;
     return Math.max(...services.map((s) => s.price), 2000);
   }, [services]);
 
-  // Count active filters
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (filters.priceRange[0] > 0 || filters.priceRange[1] < maxPrice) count++;
@@ -100,155 +90,156 @@ const Services = () => {
     return count;
   }, [filters, maxPrice]);
 
-  // Apply all filters
   const filteredServices = useMemo(() => {
     if (!services) return [];
-
     return services.filter((service) => {
-      // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
-        if (
-          !service.title.toLowerCase().includes(query) &&
-          !service.description?.toLowerCase().includes(query)
-        ) {
-          return false;
-        }
+        if (!service.title.toLowerCase().includes(query) && !service.description?.toLowerCase().includes(query)) return false;
       }
-
-      // Price filter
-      if (service.price < filters.priceRange[0] || service.price > filters.priceRange[1]) {
-        return false;
-      }
-
-      // Duration filter
+      if (service.price < filters.priceRange[0] || service.price > filters.priceRange[1]) return false;
       if (filters.durations.length > 0) {
-        const matchesDuration = filters.durations.some((range) =>
-          isDurationInRange(service.duration, range)
-        );
+        const matchesDuration = filters.durations.some((range) => isDurationInRange(service.duration, range));
         if (!matchesDuration) return false;
       }
-
-      // Rating filter
-      if (filters.minRating && service.rating < filters.minRating) {
-        return false;
-      }
-
-      // Hotel pickup filter
-      if (filters.hotelPickup && !service.hotelPickup) {
-        return false;
-      }
-
-      // Instant confirmation filter
-      if (filters.instantConfirmation && !service.instantConfirmation) {
-        return false;
-      }
-
+      if (filters.minRating && service.rating < filters.minRating) return false;
+      if (filters.hotelPickup && !service.hotelPickup) return false;
+      if (filters.instantConfirmation && !service.instantConfirmation) return false;
       return true;
     });
   }, [services, searchQuery, filters]);
 
-  // Sort services
   const sortedServices = useMemo(() => {
     if (!filteredServices) return [];
     return [...filteredServices].sort((a, b) => {
       switch (sortBy) {
-        case "price-low":
-          return a.price - b.price;
-        case "price-high":
-          return b.price - a.price;
-        case "rating":
-          return b.rating - a.rating;
+        case "price-low": return a.price - b.price;
+        case "price-high": return b.price - a.price;
+        case "rating": return b.rating - a.rating;
         case "popular":
-        default:
-          return b.reviewCount - a.reviewCount;
+        default: return b.reviewCount - a.reviewCount;
       }
     });
   }, [filteredServices, sortBy]);
 
-  // Dynamic banner based on selected category
   const bannerImage = activeCategory?.imageUrl || "/assets/services/city-tours.jpg";
 
   return (
     <Layout>
-      {/* Hero Section with Dynamic Banner */}
-      <section className="relative pt-32 pb-16 bg-primary overflow-hidden">
-        <div 
-          className="absolute inset-0 opacity-15 bg-cover bg-center transition-all duration-500"
+      {/* Premium Hero Section */}
+      <section className="relative pt-28 pb-20 lg:pt-32 lg:pb-24 bg-primary overflow-hidden">
+        {/* Background image with parallax feel */}
+        <div
+          className="absolute inset-0 opacity-20 bg-cover bg-center transition-all duration-700 scale-105"
           style={{ backgroundImage: `url(${bannerImage})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/60 to-primary" />
-        {/* Decorative orbs */}
-        <div className="absolute top-20 right-[10%] w-64 h-64 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-10 left-[5%] w-48 h-48 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/40 via-primary/80 to-primary" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary via-transparent to-primary/60" />
+
+        {/* Decorative elements */}
+        <div className="absolute top-16 right-[8%] w-80 h-80 bg-secondary/8 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-0 left-[5%] w-60 h-60 bg-secondary/5 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute top-1/2 right-[20%] w-2 h-2 bg-secondary/40 rounded-full" />
+        <div className="absolute top-1/3 right-[30%] w-1.5 h-1.5 bg-secondary/30 rounded-full" />
+
         <div className="container relative z-10">
           <div className="max-w-3xl">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <Badge className="mb-4 bg-secondary/20 text-secondary border-secondary/30">
-                Dubai Experiences
-              </Badge>
-            </motion.div>
-            <motion.h1
-              className="text-4xl lg:text-5xl font-display font-bold text-primary-foreground mb-4"
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              transition={{ duration: 0.5 }}
             >
-              {activeCategory ? activeCategory.name : "All Experiences"}
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/15 border border-secondary/20 rounded-full mb-5 backdrop-blur-sm">
+                <Sparkles className="w-4 h-4 text-secondary" />
+                <span className="text-sm font-medium text-secondary">Dubai Experiences</span>
+              </div>
+            </motion.div>
+
+            <motion.h1
+              className="text-4xl lg:text-6xl font-display font-bold text-primary-foreground mb-4 tracking-tight"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              {activeCategory ? activeCategory.name : (
+                <>Explore Dubai's <span className="text-secondary">Best Adventures</span></>
+              )}
             </motion.h1>
+
             <motion.p
-              className="text-lg text-primary-foreground/80 mb-6"
+              className="text-lg lg:text-xl text-primary-foreground/70 mb-8 leading-relaxed max-w-2xl"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               {activeCategory?.description ||
-                "Discover the best activities and tours in Dubai - from thrilling desert safaris to world-class theme parks"}
+                "From thrilling desert safaris to world-class theme parks — discover 100+ curated experiences"}
             </motion.p>
+
+            {/* Stats row */}
             <motion.div
-              className="flex items-center gap-4 text-primary-foreground/70 text-sm"
+              className="flex items-center gap-6 text-primary-foreground/60"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              transition={{ duration: 0.5, delay: 0.35 }}
             >
-              <span className="flex items-center gap-1">
-                <Star className="w-4 h-4 text-secondary fill-secondary" />
-                4.8 avg rating
-              </span>
-              <span>•</span>
-              <span>{sortedServices?.length || 0} experiences</span>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-secondary/15 flex items-center justify-center">
+                  <Star className="w-4 h-4 text-secondary fill-secondary" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-primary-foreground">4.8</p>
+                  <p className="text-[11px] text-primary-foreground/50">Avg Rating</p>
+                </div>
+              </div>
+              <div className="w-px h-8 bg-primary-foreground/10" />
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-secondary/15 flex items-center justify-center">
+                  <Compass className="w-4 h-4 text-secondary" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-primary-foreground">{sortedServices?.length || 0}</p>
+                  <p className="text-[11px] text-primary-foreground/50">Experiences</p>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Category Tabs */}
-      <section className="sticky top-[72px] z-30 bg-background border-b border-border shadow-sm">
-        <div className="container py-4 overflow-x-auto">
-          <div className="flex items-center gap-2 min-w-max">
-            <Button
-              variant={!categoryPath ? "default" : "outline"}
-              size="sm"
+      {/* Category Tabs - Scrollable pill navigation */}
+      <section className="sticky top-[72px] z-30 bg-background/95 backdrop-blur-md border-b border-border/50 shadow-sm">
+        <div className="container py-3">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
+            <button
               onClick={() => navigate("/services")}
-              className={!categoryPath ? "bg-secondary text-secondary-foreground" : ""}
+              className={cn(
+                "flex-shrink-0 px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 border",
+                !categoryPath
+                  ? "bg-secondary text-secondary-foreground border-secondary shadow-md shadow-secondary/20"
+                  : "bg-transparent text-muted-foreground border-border hover:border-secondary/40 hover:text-foreground"
+              )}
             >
-              All
-            </Button>
+              All Experiences
+            </button>
             {loadingCategories ? (
               [...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-9 w-24" />
+                <Skeleton key={i} className="h-9 w-28 rounded-full flex-shrink-0" />
               ))
             ) : (
               categories?.map((category) => (
-                <Button
+                <button
                   key={category.id}
-                  variant={categoryPath === category.slug ? "default" : "outline"}
-                  size="sm"
                   onClick={() => navigate(`/dubai/services/${category.slug}`)}
-                  className={categoryPath === category.slug ? "bg-secondary text-secondary-foreground" : ""}
+                  className={cn(
+                    "flex-shrink-0 px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 border whitespace-nowrap",
+                    categoryPath === category.slug
+                      ? "bg-secondary text-secondary-foreground border-secondary shadow-md shadow-secondary/20"
+                      : "bg-transparent text-muted-foreground border-border hover:border-secondary/40 hover:text-foreground"
+                  )}
                 >
                   {category.name}
-                </Button>
+                </button>
               ))
             )}
           </div>
@@ -256,7 +247,7 @@ const Services = () => {
       </section>
 
       {/* Filters & Content */}
-      <section className="py-8 lg:py-12">
+      <section className="py-8 lg:py-12 bg-muted/20">
         <div className="container">
           <div className="flex gap-8">
             {/* Desktop Sidebar */}
@@ -270,22 +261,22 @@ const Services = () => {
             {/* Main Content */}
             <div className="flex-1 min-w-0">
               {/* Results Header Bar */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-border">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 p-4 rounded-2xl bg-card border border-border/50 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <h2 className="text-lg font-semibold text-foreground">
+                  <h2 className="text-lg font-bold text-foreground">
                     {activeCategory ? activeCategory.name : "All Experiences"}
                   </h2>
-                  <Badge variant="secondary" className="text-xs font-medium">
+                  <Badge className="bg-secondary/10 text-secondary border-0 text-xs font-bold px-2.5">
                     {sortedServices?.length || 0} results
                   </Badge>
                 </div>
                 <div className="relative flex-1 max-w-xs">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search..."
+                    placeholder="Search experiences..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 h-9 text-sm"
+                    className="pl-10 h-10 text-sm rounded-xl border-border/60 bg-muted/30 focus:bg-card"
                   />
                 </div>
               </div>
@@ -305,25 +296,26 @@ const Services = () => {
                     maxPrice={maxPrice}
                     activeFilterCount={activeFilterCount}
                   />
-                  <div className="hidden sm:flex items-center border border-border rounded-lg bg-muted/30">
+                  <div className="hidden sm:flex items-center border border-border/50 rounded-xl bg-card shadow-sm overflow-hidden">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setViewMode("grid")}
                       className={cn(
-                        "h-8 px-3 rounded-r-none",
-                        viewMode === "grid" && "bg-background shadow-sm"
+                        "h-9 px-3 rounded-none",
+                        viewMode === "grid" && "bg-secondary/10 text-secondary"
                       )}
                     >
                       <Grid3X3 className="w-4 h-4" />
                     </Button>
+                    <div className="w-px h-5 bg-border/50" />
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setViewMode("list")}
                       className={cn(
-                        "h-8 px-3 rounded-l-none",
-                        viewMode === "list" && "bg-background shadow-sm"
+                        "h-9 px-3 rounded-none",
+                        viewMode === "list" && "bg-secondary/10 text-secondary"
                       )}
                     >
                       <List className="w-4 h-4" />
@@ -343,11 +335,14 @@ const Services = () => {
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {[...Array(6)].map((_, i) => (
-                    <Skeleton key={i} className="h-96 rounded-xl" />
+                    <Skeleton key={i} className="h-[420px] rounded-2xl" />
                   ))}
                 </div>
               ) : sortedServices && sortedServices.length > 0 ? (
-                <div
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4 }}
                   className={cn(
                     "grid gap-6",
                     viewMode === "grid"
@@ -356,25 +351,30 @@ const Services = () => {
                   )}
                 >
                   {sortedServices.map((service) => (
-                    <ServiceCardRedesigned 
-                      key={service.id} 
+                    <ServiceCardRedesigned
+                      key={service.id}
                       service={service}
                       viewMode={viewMode}
                     />
                   ))}
-                </div>
+                </motion.div>
               ) : (
-                <div className="text-center py-16">
-                  <MapPin className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">No experiences found</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Try adjusting your filters or search query
+                <div className="text-center py-20">
+                  <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-5">
+                    <MapPin className="w-10 h-10 text-muted-foreground/40" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">No experiences found</h3>
+                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                    Try adjusting your filters or search query to find what you're looking for
                   </p>
-                  <Button onClick={() => {
-                    setFilters(defaultFilters);
-                    setSearchQuery("");
-                  }}>
-                    Clear Filters
+                  <Button
+                    onClick={() => {
+                      setFilters(defaultFilters);
+                      setSearchQuery("");
+                    }}
+                    className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-xl"
+                  >
+                    Clear All Filters
                   </Button>
                 </div>
               )}
