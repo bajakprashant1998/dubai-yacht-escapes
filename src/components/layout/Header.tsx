@@ -10,7 +10,8 @@ import { useContactConfig } from "@/hooks/useContactConfig";
 import { cn } from "@/lib/utils";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import NotificationBell from "@/components/NotificationBell";
-import CurrencySelector from "@/components/checkout/CurrencySelector";
+import CurrencySelector from "@/components/trip/CurrencySelector";
+import { useI18n } from "@/lib/i18n";
 type DropdownType = "activities" | "services" | null;
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,6 +25,7 @@ const Header = () => {
     phoneFormatted,
     email
   } = useContactConfig();
+  const { t } = useI18n();
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -38,10 +40,10 @@ const Header = () => {
     setActiveDropdown(null);
   }, [location.pathname]);
   const navLinks = [{
-    name: "Home",
+    name: t("nav.home"),
     path: "/"
   }, {
-    name: "Plan Trip",
+    name: t("nav.plan_trip"),
     path: "/plan-trip",
     highlight: true
   }, {
@@ -49,14 +51,14 @@ const Header = () => {
     path: "/experiences",
     dropdown: "activities" as DropdownType
   }, {
-    name: "Services",
+    name: t("nav.services"),
     path: "/services",
     dropdown: "services" as DropdownType
   }, {
-    name: "Blog",
+    name: t("nav.blog"),
     path: "/blog"
   }, {
-    name: "Contact",
+    name: t("nav.contact"),
     path: "/contact"
   }];
   const activityCategories = [{
@@ -285,7 +287,7 @@ const Header = () => {
             </div>
 
             {/* Currency Selector */}
-            <CurrencySelector />
+            <CurrencySelector compact />
 
             {/* Language Switcher */}
             <LanguageSwitcher />
@@ -375,6 +377,17 @@ const Header = () => {
                           <span className="text-xs font-medium text-foreground/80 leading-tight">{category.name}</span>
                         </Link>
                       </motion.div>)}
+                  </div>
+                </div>
+
+                {/* Currency & Language - Mobile */}
+                <div className="border-t border-border/50 pt-4 mb-4">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-1 mb-3">
+                    Preferences
+                  </p>
+                  <div className="flex items-center gap-3 px-1">
+                    <CurrencySelector compact />
+                    <LanguageSwitcher />
                   </div>
                 </div>
 
