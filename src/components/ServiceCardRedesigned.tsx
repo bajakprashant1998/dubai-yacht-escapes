@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Service } from "@/lib/serviceMapper";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface ServiceCardRedesignedProps {
   service: Service;
@@ -13,6 +14,7 @@ interface ServiceCardRedesignedProps {
 }
 
 const ServiceCardRedesigned = ({ service, variant = "default", viewMode = "grid" }: ServiceCardRedesignedProps) => {
+  const { formatPrice } = useCurrency();
   const [isSaved, setIsSaved] = useState(false);
 
   const discount = service.originalPrice
@@ -132,11 +134,11 @@ const ServiceCardRedesigned = ({ service, variant = "default", viewMode = "grid"
                 <div className="flex items-baseline gap-2">
                   <span className="text-xs text-muted-foreground">From</span>
                   <span className="text-xl font-bold text-secondary">
-                    AED {service.price.toLocaleString()}
+                    {formatPrice(service.price)}
                   </span>
                   {service.originalPrice && service.originalPrice > service.price && (
                     <span className="text-sm text-muted-foreground line-through">
-                      AED {service.originalPrice.toLocaleString()}
+                      {formatPrice(service.originalPrice)}
                     </span>
                   )}
                 </div>
@@ -207,12 +209,12 @@ const ServiceCardRedesigned = ({ service, variant = "default", viewMode = "grid"
             <div className="flex items-baseline gap-1">
               <span className="text-xs text-muted-foreground">From</span>
               <span className="text-lg font-bold text-secondary">
-                AED {service.price.toLocaleString()}
+                {formatPrice(service.price)}
               </span>
             </div>
             {service.originalPrice && service.originalPrice > service.price && (
               <span className="text-xs text-muted-foreground line-through">
-                AED {service.originalPrice.toLocaleString()}
+                {formatPrice(service.originalPrice)}
               </span>
             )}
           </div>

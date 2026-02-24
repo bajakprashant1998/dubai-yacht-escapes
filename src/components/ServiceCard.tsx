@@ -6,12 +6,14 @@ import { Service } from "@/lib/serviceMapper";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface ServiceCardProps {
   service: Service;
 }
 
 const ServiceCard = ({ service }: ServiceCardProps) => {
+  const { formatPrice } = useCurrency();
   const [isSaved, setIsSaved] = useState(false);
 
   const discount = service.originalPrice
@@ -140,12 +142,12 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
                 <p className="text-[11px] text-muted-foreground mb-0.5">From</p>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-2xl font-extrabold text-secondary">
-                    AED {service.price.toLocaleString()}
+                    {formatPrice(service.price)}
                   </span>
                 </div>
                 {service.originalPrice && service.originalPrice > service.price && (
                   <span className="text-xs text-muted-foreground line-through">
-                    AED {service.originalPrice.toLocaleString()}
+                    {formatPrice(service.originalPrice)}
                   </span>
                 )}
               </div>
