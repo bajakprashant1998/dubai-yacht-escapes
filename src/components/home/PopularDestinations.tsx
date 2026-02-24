@@ -2,6 +2,7 @@ import { memo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MapPin, ArrowRight, Star, TrendingUp, Sparkles } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 const destinations = [
   {
@@ -43,6 +44,7 @@ const destinations = [
 ];
 
 const PopularDestinations = memo(() => {
+  const { t } = useI18n();
   return (
     <section className="py-20 relative overflow-hidden">
       {/* Background pattern */}
@@ -71,7 +73,7 @@ const PopularDestinations = memo(() => {
               <span className="text-sm font-semibold">Explore Dubai</span>
             </motion.div>
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-              Popular <span className="text-secondary">Destinations</span>
+              {t("home.popular_destinations")}
             </h2>
             <p className="text-muted-foreground text-lg max-w-xl">
               Discover the most iconic locations in Dubai with curated experiences
@@ -82,7 +84,7 @@ const PopularDestinations = memo(() => {
             to="/experiences" 
             className="inline-flex items-center gap-2 text-secondary font-semibold hover:gap-3 transition-all group"
           >
-            View All Destinations
+            {t("home.view_all")}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </motion.div>

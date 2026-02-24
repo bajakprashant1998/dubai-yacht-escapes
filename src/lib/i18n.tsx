@@ -22,6 +22,15 @@ const translations: Record<Locale, Record<string, string>> = {
     "nav.saved": "Saved",
     "nav.search": "Search",
 
+    // Hero
+    "hero.badge": "Dubai's Premier Experiences Marketplace",
+    "hero.title_line1": "Discover Dubai's",
+    "hero.title_line2": "Best Adventures",
+    "hero.subtitle": "Book unforgettable experiences including desert safaris, theme parks, water sports, dhow cruises, and 100+ activities across Dubai.",
+    "hero.cta_explore": "Explore Experiences",
+    "hero.cta_activities": "View All Activities",
+    "hero.revenue_badge": "in experiences booked",
+
     // Home sections
     "home.popular_destinations": "Popular Destinations",
     "home.popular_activities": "Popular Activities",
@@ -50,6 +59,8 @@ const translations: Record<Locale, Record<string, string>> = {
     "common.sort": "Sort",
     "common.all": "All",
     "common.off": "OFF",
+    "common.from": "From",
+    "common.activities": "Activities",
 
     // Auth
     "auth.sign_in": "Sign In",
@@ -80,6 +91,15 @@ const translations: Record<Locale, Record<string, string>> = {
     "nav.saved": "المحفوظات",
     "nav.search": "بحث",
 
+    // Hero
+    "hero.badge": "السوق الأول للتجارب في دبي",
+    "hero.title_line1": "اكتشف أفضل",
+    "hero.title_line2": "مغامرات دبي",
+    "hero.subtitle": "احجز تجارب لا تُنسى تشمل رحلات السفاري الصحراوية والمتنزهات الترفيهية والرياضات المائية ورحلات المراكب الشراعية وأكثر من 100 نشاط في دبي.",
+    "hero.cta_explore": "استكشف التجارب",
+    "hero.cta_activities": "عرض جميع الأنشطة",
+    "hero.revenue_badge": "من التجارب المحجوزة",
+
     // Home sections
     "home.popular_destinations": "الوجهات الشائعة",
     "home.popular_activities": "الأنشطة الشائعة",
@@ -108,6 +128,8 @@ const translations: Record<Locale, Record<string, string>> = {
     "common.sort": "ترتيب",
     "common.all": "الكل",
     "common.off": "خصم",
+    "common.from": "من",
+    "common.activities": "أنشطة",
 
     // Auth
     "auth.sign_in": "تسجيل الدخول",

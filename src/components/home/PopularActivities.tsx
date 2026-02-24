@@ -3,6 +3,7 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import { Sun, FerrisWheel, Waves, Ship, MapPin, Mountain } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useI18n } from "@/lib/i18n";
 
 import desertSafariImg from "@/assets/services/desert-safari.jpg";
 import themeParksImg from "@/assets/services/theme-parks.jpg";
@@ -21,6 +22,7 @@ const activities = [
 ];
 
 const PopularActivities = memo(() => {
+  const { t } = useI18n();
   return (
     <section className="py-16 sm:py-20 bg-muted/30">
       <div className="container">
@@ -33,10 +35,10 @@ const PopularActivities = memo(() => {
           transition={{ duration: 0.5 }}
         >
           <Badge className="mb-3 bg-secondary/10 text-secondary border-secondary/20 hover:bg-secondary/20">
-            Top Activities
+            {t("home.popular_experiences")}
           </Badge>
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-foreground mb-3">
-            Popular Activities
+            {t("home.popular_activities")}
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
             Handpicked experiences loved by thousands of travellers visiting Dubai

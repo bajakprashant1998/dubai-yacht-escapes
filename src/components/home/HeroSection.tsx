@@ -4,7 +4,9 @@ import { motion, type Easing } from "framer-motion";
 import { ArrowRight, Play, Sparkles, TrendingUp, Sun, Waves, Ship, Mountain, MapPin, Eye, Utensils, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
+import { useI18n } from "@/lib/i18n";
 import HeroSearchBar from "./HeroSearchBar";
+import CurrencySelector from "@/components/trip/CurrencySelector";
 import heroImage from "@/assets/hero-dubai-skyline.png";
 
 // Category images
@@ -33,6 +35,7 @@ const itemVariants = {
 };
 
 const LiveRevenueCounter = memo(() => {
+  const { t } = useI18n();
   const [pulse, setPulse] = useState(false);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -55,7 +58,7 @@ const LiveRevenueCounter = memo(() => {
       </div>
       <TrendingUp className="w-3.5 h-3.5 text-secondary" />
       <span className="text-xs font-medium">
-        <span className="font-bold text-orange-100">AED 10M+</span> in experiences booked
+        <span className="font-bold text-secondary">AED 10M+</span> {t("hero.revenue_badge")}
       </span>
     </motion.div>
   );
@@ -75,6 +78,7 @@ const categoryCardsData = [
 
 const HeroSection = memo(() => {
   const { stats } = useHomepageContent();
+  const { t } = useI18n();
 
   const statsDisplay = [
     { value: stats.guests, label: stats.guestsLabel },
@@ -161,33 +165,33 @@ const HeroSection = memo(() => {
               <motion.div animate={{ rotate: [0, 15, -15, 0] }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}>
                 <Sparkles className="w-4 h-4" />
               </motion.div>
-              <span className="text-sm font-semibold text-primary-foreground">Dubai's Premier Experiences Marketplace</span>
+              <span className="text-sm font-semibold text-primary-foreground">{t("hero.badge")}</span>
             </motion.div>
 
             <motion.h1 className="font-display text-fluid-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.05] mb-4" variants={itemVariants}>
-              Discover Dubai's
+              {t("hero.title_line1")}
               <motion.span
                 className="block text-shimmer mt-2"
                 animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
               >
-                Best Adventures
+                {t("hero.title_line2")}
               </motion.span>
             </motion.h1>
 
             <motion.p className="text-lg md:text-xl text-primary-foreground/90 mb-6 leading-relaxed max-w-2xl mx-auto" variants={itemVariants}>
-              Book unforgettable experiences including desert safaris, theme parks, water sports, dhow cruises, and 100+ activities across Dubai.
+              {t("hero.subtitle")}
             </motion.p>
 
             <motion.div className="mb-8 w-full flex justify-center" variants={itemVariants}>
               <HeroSearchBar />
             </motion.div>
 
-            <motion.div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12 justify-center" variants={itemVariants}>
+            <motion.div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12 justify-center items-center" variants={itemVariants}>
               <Link to="/experiences" className="w-full sm:w-auto">
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button size="lg" className="w-full sm:w-auto bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold text-base sm:text-lg px-6 sm:px-8 h-12 sm:h-14 shadow-lg hover:shadow-xl transition-all duration-300 group touch-target">
-                    Explore Experiences
+                    {t("hero.cta_explore")}
                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </motion.div>
@@ -196,10 +200,13 @@ const HeroSection = memo(() => {
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button size="lg" variant="outline" className="w-full sm:w-auto border-2 border-secondary/50 text-secondary bg-secondary/10 hover:bg-secondary/20 font-semibold text-base sm:text-lg px-6 sm:px-8 h-12 sm:h-14 backdrop-blur-sm touch-target">
                     <Play className="w-5 h-5 mr-2 fill-secondary" />
-                    View All Activities
+                    {t("hero.cta_activities")}
                   </Button>
                 </motion.div>
               </Link>
+              <div className="hidden sm:block">
+                <CurrencySelector variant="hero" />
+              </div>
             </motion.div>
 
             <motion.div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 w-full" variants={itemVariants}>
