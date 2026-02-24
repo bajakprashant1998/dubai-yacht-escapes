@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { ComboPackage } from "@/hooks/useComboPackages";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface ComboCardProps {
   combo: ComboPackage;
@@ -20,6 +21,7 @@ const comboTypeConfig: Record<string, { icon: LucideIcon; color: string; label: 
 };
 
 const ComboCard = ({ combo, className }: ComboCardProps) => {
+  const { formatPrice } = useCurrency();
   const typeConfig = comboTypeConfig[combo.combo_type] || comboTypeConfig.essentials;
   const TypeIcon = typeConfig.icon;
 
@@ -92,11 +94,11 @@ const ComboCard = ({ combo, className }: ComboCardProps) => {
               <div className="flex items-baseline gap-2">
                 {combo.base_price_aed > combo.final_price_aed && (
                   <span className="text-sm text-muted-foreground line-through">
-                    AED {combo.base_price_aed.toLocaleString()}
+                    {formatPrice(combo.base_price_aed)}
                   </span>
                 )}
                 <span className="text-2xl font-bold text-foreground">
-                  AED {combo.final_price_aed.toLocaleString()}
+                  {formatPrice(combo.final_price_aed)}
                 </span>
               </div>
               <p className="text-xs text-muted-foreground">per person</p>

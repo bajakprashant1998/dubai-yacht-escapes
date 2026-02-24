@@ -6,6 +6,7 @@ import { OptimizedImage } from "@/components/ui/optimized-image";
 import { Tour } from "@/lib/tourMapper";
 import { getTourUrl } from "@/lib/seoUtils";
 import WishlistButton from "@/components/WishlistButton";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface TourCardProps {
   tour: Tour;
@@ -20,6 +21,7 @@ const categoryLabels: Record<string, string> = {
 };
 
 const TourCard = memo(({ tour, featured = false }: TourCardProps) => {
+  const { formatPrice } = useCurrency();
   const discount = Math.round((1 - tour.price / tour.originalPrice) * 100);
   const isPrivateCharter = tour.fullYachtPrice && tour.fullYachtPrice > 0;
 
@@ -110,7 +112,7 @@ const TourCard = memo(({ tour, featured = false }: TourCardProps) => {
               {isPrivateCharter ? (
                 <>
                   <div className="flex items-baseline gap-1.5 sm:gap-2">
-                    <span className="text-lg sm:text-xl font-bold text-foreground">AED {tour.fullYachtPrice!.toLocaleString()}</span>
+                    <span className="text-lg sm:text-xl font-bold text-foreground">{formatPrice(tour.fullYachtPrice!)}</span>
                   </div>
                   <p className="text-secondary text-[10px] sm:text-xs font-medium flex items-center gap-1">
                     <Ship className="w-3 h-3" />
@@ -120,10 +122,10 @@ const TourCard = memo(({ tour, featured = false }: TourCardProps) => {
               ) : (
                 <>
                   <div className="flex items-baseline gap-1.5 sm:gap-2">
-                    <span className="text-lg sm:text-xl font-bold text-foreground">AED {tour.price.toLocaleString()}</span>
+                    <span className="text-lg sm:text-xl font-bold text-foreground">{formatPrice(tour.price)}</span>
                     {tour.originalPrice > tour.price && (
                       <span className="text-muted-foreground line-through text-xs sm:text-sm">
-                        AED {tour.originalPrice.toLocaleString()}
+                        {formatPrice(tour.originalPrice)}
                       </span>
                     )}
                   </div>
