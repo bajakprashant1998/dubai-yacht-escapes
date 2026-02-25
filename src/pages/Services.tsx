@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Search, Grid3X3, List, Star, MapPin, TrendingUp, ArrowUpDown, ThumbsUp, Sparkles, Compass, SlidersHorizontal } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, Grid3X3, List, Star, MapPin, TrendingUp, ArrowUpDown, ThumbsUp, Sparkles, Compass, SlidersHorizontal, Shield, Clock, Users } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import ServiceCardRedesigned from "@/components/ServiceCardRedesigned";
 import { Input } from "@/components/ui/input";
@@ -19,15 +19,15 @@ import {
   defaultFilters,
   type FilterState,
 } from "@/components/services/ServiceFilters";
+import SEOHead from "@/components/SEOHead";
 
 const sortOptions: SortOption[] = [
   { value: "popular", label: "Recommended", icon: TrendingUp },
-  { value: "price-low", label: "Price: Low to High", icon: ArrowUpDown },
-  { value: "price-high", label: "Price: High to Low", icon: ArrowUpDown },
-  { value: "rating", label: "Highest Rated", icon: ThumbsUp },
+  { value: "price-low", label: "Price: Low", icon: ArrowUpDown },
+  { value: "price-high", label: "Price: High", icon: ArrowUpDown },
+  { value: "rating", label: "Top Rated", icon: ThumbsUp },
 ];
 
-// Helper to parse duration string to hours
 const parseDurationToHours = (duration: string | null): number | null => {
   if (!duration) return null;
   const lower = duration.toLowerCase();
@@ -126,21 +126,23 @@ const Services = () => {
 
   return (
     <Layout>
-      {/* Premium Hero Section */}
-      <section className="relative pt-28 pb-20 lg:pt-32 lg:pb-24 bg-primary overflow-hidden">
-        {/* Background image with parallax feel */}
+      <SEOHead
+        title={activeCategory ? `${activeCategory.name} - Dubai Services` : "Dubai Services & Experiences"}
+        description="Explore 100+ curated Dubai experiences including desert safaris, theme parks, water sports, and more."
+      />
+
+      {/* Hero */}
+      <section className="relative pt-28 pb-20 lg:pt-36 lg:pb-28 bg-primary overflow-hidden">
         <div
           className="absolute inset-0 opacity-20 bg-cover bg-center transition-all duration-700 scale-105"
           style={{ backgroundImage: `url(${bannerImage})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/40 via-primary/80 to-primary" />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary via-transparent to-primary/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-primary/75 to-primary" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary via-transparent to-primary/50" />
 
-        {/* Decorative elements */}
-        <div className="absolute top-16 right-[8%] w-80 h-80 bg-secondary/8 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-0 left-[5%] w-60 h-60 bg-secondary/5 rounded-full blur-[80px] pointer-events-none" />
-        <div className="absolute top-1/2 right-[20%] w-2 h-2 bg-secondary/40 rounded-full" />
-        <div className="absolute top-1/3 right-[30%] w-1.5 h-1.5 bg-secondary/30 rounded-full" />
+        {/* Decorative */}
+        <div className="absolute top-16 right-[8%] w-96 h-96 bg-secondary/8 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-[5%] w-72 h-72 bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
 
         <div className="container relative z-10">
           <div className="max-w-3xl">
@@ -176,38 +178,35 @@ const Services = () => {
                 "From thrilling desert safaris to world-class theme parks — discover 100+ curated experiences"}
             </motion.p>
 
-            {/* Stats row */}
+            {/* Trust Stats */}
             <motion.div
-              className="flex items-center gap-6 text-primary-foreground/60"
+              className="flex items-center gap-5 flex-wrap"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.35 }}
             >
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-secondary/15 flex items-center justify-center">
-                  <Star className="w-4 h-4 text-secondary fill-secondary" />
+              {[
+                { icon: Star, label: "Avg Rating", value: "4.8", iconFill: true },
+                { icon: Compass, label: "Experiences", value: String(sortedServices?.length || 0) },
+                { icon: Shield, label: "Best Price", value: "Guaranteed" },
+              ].map((stat, i) => (
+                <div key={i} className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-secondary/15 flex items-center justify-center backdrop-blur-sm">
+                    <stat.icon className={cn("w-4 h-4 text-secondary", stat.iconFill && "fill-secondary")} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-primary-foreground">{stat.value}</p>
+                    <p className="text-[11px] text-primary-foreground/50">{stat.label}</p>
+                  </div>
+                  {i < 2 && <div className="w-px h-8 bg-primary-foreground/10 ml-3" />}
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-primary-foreground">4.8</p>
-                  <p className="text-[11px] text-primary-foreground/50">Avg Rating</p>
-                </div>
-              </div>
-              <div className="w-px h-8 bg-primary-foreground/10" />
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-secondary/15 flex items-center justify-center">
-                  <Compass className="w-4 h-4 text-secondary" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-primary-foreground">{sortedServices?.length || 0}</p>
-                  <p className="text-[11px] text-primary-foreground/50">Experiences</p>
-                </div>
-              </div>
+              ))}
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Category Tabs - Scrollable pill navigation */}
+      {/* Category Tabs */}
       <section className="sticky top-[72px] z-30 bg-background/95 backdrop-blur-md border-b border-border/50 shadow-sm">
         <div className="container py-3">
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
@@ -246,7 +245,7 @@ const Services = () => {
         </div>
       </section>
 
-      {/* Filters & Content */}
+      {/* Main Content */}
       <section className="py-8 lg:py-12 bg-muted/20">
         <div className="container">
           <div className="flex gap-8">
@@ -258,10 +257,10 @@ const Services = () => {
               activeFilterCount={activeFilterCount}
             />
 
-            {/* Main Content */}
+            {/* Results */}
             <div className="flex-1 min-w-0">
-              {/* Results Header Bar */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 p-4 rounded-2xl bg-card border border-border/50 shadow-sm">
+              {/* Results Bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 p-4 rounded-2xl bg-card border border-border/40 shadow-sm">
                 <div className="flex items-center gap-3">
                   <h2 className="text-lg font-bold text-foreground">
                     {activeCategory ? activeCategory.name : "All Experiences"}
@@ -276,12 +275,12 @@ const Services = () => {
                     placeholder="Search experiences..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 h-10 text-sm rounded-xl border-border/60 bg-muted/30 focus:bg-card"
+                    className="pl-10 h-10 text-sm rounded-xl border-border/50 bg-muted/30 focus:bg-card transition-colors"
                   />
                 </div>
               </div>
 
-              {/* Sorting Tabs & View Toggle */}
+              {/* Sort & View */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <SortingTabs
                   options={sortOptions}
@@ -296,25 +295,25 @@ const Services = () => {
                     maxPrice={maxPrice}
                     activeFilterCount={activeFilterCount}
                   />
-                  <div className="hidden sm:flex items-center border border-border/50 rounded-xl bg-card shadow-sm overflow-hidden">
+                  <div className="hidden sm:flex items-center border border-border/40 rounded-xl bg-card shadow-sm overflow-hidden">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setViewMode("grid")}
                       className={cn(
-                        "h-9 px-3 rounded-none",
+                        "h-9 px-3 rounded-none transition-colors",
                         viewMode === "grid" && "bg-secondary/10 text-secondary"
                       )}
                     >
                       <Grid3X3 className="w-4 h-4" />
                     </Button>
-                    <div className="w-px h-5 bg-border/50" />
+                    <div className="w-px h-5 bg-border/40" />
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setViewMode("list")}
                       className={cn(
-                        "h-9 px-3 rounded-none",
+                        "h-9 px-3 rounded-none transition-colors",
                         viewMode === "list" && "bg-secondary/10 text-secondary"
                       )}
                     >
@@ -324,59 +323,70 @@ const Services = () => {
                 </div>
               </div>
 
-              {/* Active Filter Pills */}
+              {/* Active Filters */}
               <ActiveFilterPills
                 filters={filters}
                 onFiltersChange={setFilters}
                 maxPrice={maxPrice}
               />
 
-              {/* Results */}
+              {/* Results Grid */}
               {isLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className={cn(
+                  "grid gap-6",
+                  viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3" : "grid-cols-1"
+                )}>
                   {[...Array(6)].map((_, i) => (
-                    <Skeleton key={i} className="h-[420px] rounded-2xl" />
+                    <Skeleton key={i} className={cn("rounded-2xl", viewMode === "grid" ? "h-[420px]" : "h-[200px]")} />
                   ))}
                 </div>
               ) : sortedServices && sortedServices.length > 0 ? (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4 }}
-                  className={cn(
-                    "grid gap-6",
-                    viewMode === "grid"
-                      ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
-                      : "grid-cols-1"
-                  )}
-                >
-                  {sortedServices.map((service) => (
-                    <ServiceCardRedesigned
-                      key={service.id}
-                      service={service}
-                      viewMode={viewMode}
-                    />
-                  ))}
-                </motion.div>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`${viewMode}-${sortBy}-${categoryPath}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className={cn(
+                      "grid gap-6",
+                      viewMode === "grid"
+                        ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
+                        : "grid-cols-1"
+                    )}
+                  >
+                    {sortedServices.map((service) => (
+                      <ServiceCardRedesigned
+                        key={service.id}
+                        service={service}
+                        viewMode={viewMode}
+                      />
+                    ))}
+                  </motion.div>
+                </AnimatePresence>
               ) : (
-                <div className="text-center py-20">
-                  <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-5">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center py-24"
+                >
+                  <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-5">
                     <MapPin className="w-10 h-10 text-muted-foreground/40" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">No experiences found</h3>
+                  <h3 className="text-xl font-bold mb-2 text-foreground">No experiences found</h3>
                   <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                    Try adjusting your filters or search query to find what you're looking for
+                    Try adjusting your filters or search query to discover amazing experiences
                   </p>
                   <Button
                     onClick={() => {
                       setFilters(defaultFilters);
                       setSearchQuery("");
                     }}
-                    className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-xl"
+                    className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-xl font-semibold"
                   >
                     Clear All Filters
                   </Button>
-                </div>
+                </motion.div>
               )}
             </div>
           </div>
