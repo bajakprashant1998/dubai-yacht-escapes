@@ -185,7 +185,8 @@ Return a JSON object with this exact structure:
         ],
         generationConfig: {
           temperature: 0.7,
-          maxOutputTokens: 4000,
+          maxOutputTokens: 16000,
+          responseMimeType: "application/json",
         },
       }),
     });
@@ -203,14 +204,18 @@ Return a JSON object with this exact structure:
       throw new Error('No content returned from AI');
     }
 
-    // Parse AI response (handle markdown code blocks)
+    // Parse AI response
     let tripPlan;
     try {
-      const jsonMatch = aiContent.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      const jsonStr = jsonMatch ? jsonMatch[1] : aiContent;
-      tripPlan = JSON.parse(jsonStr.trim());
+      // With responseMimeType: "application/json", response should be clean JSON
+      // But handle markdown code blocks as fallback
+      let jsonStr = aiContent.trim();
+      const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (jsonMatch) jsonStr = jsonMatch[1].trim();
+      tripPlan = JSON.parse(jsonStr);
     } catch (parseError) {
-      console.error('Failed to parse AI response:', aiContent);
+      console.error('Failed to parse AI response (first 500 chars):', aiContent.substring(0, 500));
+      console.error('Last 200 chars:', aiContent.substring(aiContent.length - 200));
       throw new Error('Failed to parse trip plan from AI');
     }
 
