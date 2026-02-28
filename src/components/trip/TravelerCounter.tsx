@@ -22,7 +22,7 @@ const TravelerCounter = ({
   return (
     <div className="space-y-4">
       {/* Adults */}
-      <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl">
+      <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/50 hover:border-border transition-colors">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
             <Users className="w-5 h-5 text-primary" />
@@ -58,7 +58,7 @@ const TravelerCounter = ({
       </div>
 
       {/* Children */}
-      <div className="flex items-center justify-between p-4 bg-muted/50 rounded-xl">
+      <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/50 hover:border-border transition-colors">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center">
             <Baby className="w-5 h-5 text-secondary" />
