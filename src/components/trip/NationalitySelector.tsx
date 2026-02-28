@@ -38,7 +38,10 @@ const NationalitySelector = ({ value, onChange }: NationalitySelectorProps) => {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between h-14 text-base rounded-xl border-2 hover:border-primary/50 transition-all"
+            className={cn(
+              'w-full justify-between h-14 text-base rounded-xl border-2 transition-all bg-card text-foreground',
+              value ? 'border-primary/30' : 'border-border hover:border-primary/50'
+            )}
           >
             {selectedCountry ? (
               <span className="flex items-center gap-3">
@@ -47,13 +50,13 @@ const NationalitySelector = ({ value, onChange }: NationalitySelectorProps) => {
                 </span>
                 <div className="flex flex-col items-start">
                   <span className="text-xs text-muted-foreground">Nationality</span>
-                  <span className="font-semibold">{selectedCountry.name}</span>
+                  <span className="font-semibold text-foreground">{selectedCountry.name}</span>
                 </div>
               </span>
             ) : (
               <span className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Globe className="w-5 h-5 text-primary" />
+                <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center">
+                  <Globe className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="text-xs text-muted-foreground">Nationality</span>
@@ -61,15 +64,22 @@ const NationalitySelector = ({ value, onChange }: NationalitySelectorProps) => {
                 </div>
               </span>
             )}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0" align="start">
-          <Command>
-            <CommandInput placeholder="Search country..." />
-            <CommandList>
+        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-card border-border" align="start">
+          <Command className="bg-card">
+            <CommandInput placeholder="Search country..." className="text-foreground" />
+            <CommandList className="max-h-[250px]">
               <CommandEmpty>
-                {isLoading ? 'Loading...' : 'No country found.'}
+                {isLoading ? (
+                  <div className="flex items-center justify-center gap-2 py-4 text-muted-foreground">
+                    <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-primary rounded-full animate-spin" />
+                    Loading countries...
+                  </div>
+                ) : (
+                  'No country found.'
+                )}
               </CommandEmpty>
               <CommandGroup>
                 {countries.map((country) => (
@@ -80,16 +90,16 @@ const NationalitySelector = ({ value, onChange }: NationalitySelectorProps) => {
                       onChange(country.code);
                       setOpen(false);
                     }}
-                    className="py-2.5"
+                    className="py-2.5 text-foreground"
                   >
                     <Check
                       className={cn(
                         'mr-2 h-4 w-4',
-                        value === country.code ? 'opacity-100' : 'opacity-0'
+                        value === country.code ? 'opacity-100 text-primary' : 'opacity-0'
                       )}
                     />
                     <span className="mr-3 text-2xl leading-none">{getFlagEmoji(country.code)}</span>
-                    <span className="font-medium">{country.name}</span>
+                    <span className="font-medium text-foreground">{country.name}</span>
                     {!country.visaRequired && (
                       <span className="ml-auto text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">
                         No Visa
