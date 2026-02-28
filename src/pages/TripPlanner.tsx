@@ -78,8 +78,8 @@ const TripPlanner = () => {
   const [generatingStep, setGeneratingStep] = useState(0);
 
   const handleLeadSubmit = async () => {
-    if (!leadName.trim() || !leadEmail.trim()) {
-      toast.error('Please fill in your name and email');
+    if (!leadName.trim() || !leadEmail.trim() || !leadPhone.trim()) {
+      toast.error('Please fill in all required fields');
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -309,7 +309,7 @@ const TripPlanner = () => {
                 <p className="text-sm text-muted-foreground">Tell us how to reach you so we can share your trip plan</p>
               </div>
 
-              <div className="space-y-4">
+              <form onSubmit={(e) => { e.preventDefault(); handleLeadSubmit(); }} className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Full Name *</label>
                   <div className="relative">
@@ -338,7 +338,7 @@ const TripPlanner = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Phone <span className="text-muted-foreground">(optional)</span></label>
+                  <label className="text-sm font-medium">Phone *</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
@@ -361,20 +361,20 @@ const TripPlanner = () => {
                     maxLength={500}
                   />
                 </div>
-              </div>
 
-              <Button
-                onClick={handleLeadSubmit}
-                disabled={isSubmittingLead || !leadName.trim() || !leadEmail.trim()}
-                className="w-full h-12 rounded-xl text-base font-semibold"
-                size="lg"
-              >
-                {isSubmittingLead ? (
-                  <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Submitting...</>
-                ) : (
-                  <>Continue to Plan My Trip <ArrowRight className="w-5 h-5 ml-2" /></>
-                )}
-              </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmittingLead || !leadName.trim() || !leadEmail.trim() || !leadPhone.trim()}
+                  className="w-full h-12 rounded-xl text-base font-semibold"
+                  size="lg"
+                >
+                  {isSubmittingLead ? (
+                    <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Submitting...</>
+                  ) : (
+                    <>Continue to Plan My Trip <ArrowRight className="w-5 h-5 ml-2" /></>
+                  )}
+                </Button>
+              </form>
 
               <p className="text-xs text-center text-muted-foreground">
                 Your information is secure and will only be used to assist with your trip planning.
