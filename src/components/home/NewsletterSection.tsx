@@ -1,6 +1,6 @@
 import { memo, useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Send, CheckCircle, Gift, Bell, Star } from "lucide-react";
+import { Mail, Send, CheckCircle, Gift, Bell, Star, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSubscribeNewsletter } from "@/hooks/useNewsletterSubscribers";
@@ -29,10 +29,23 @@ const NewsletterSection = memo(() => {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-br from-secondary/10 via-background to-secondary/5 relative overflow-hidden">
+    <section className="py-24 relative overflow-hidden">
+      {/* Full-width gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary" />
+      
       {/* Decorative elements */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-      <div className="absolute bottom-0 left-0 w-72 h-72 bg-primary/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+      <div className="absolute inset-0 pointer-events-none">
+        <motion.div
+          className="absolute top-0 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"
+          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-0 left-0 w-72 h-72 bg-secondary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"
+          animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.4, 0.2] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
+      </div>
 
       <div className="container relative z-10">
         <div className="max-w-3xl mx-auto text-center">
@@ -40,17 +53,23 @@ const NewsletterSection = memo(() => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-4 py-2 rounded-full mb-6">
-              <Mail className="w-4 h-4" />
+            <motion.div 
+              className="inline-flex items-center gap-2 bg-secondary/20 text-secondary px-4 py-2 rounded-full mb-6 border border-secondary/30"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+            >
+              <Sparkles className="w-4 h-4" />
               <span className="text-sm font-semibold">Stay Updated</span>
-            </div>
+            </motion.div>
 
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-4">
               Join Our Travel Community
             </h2>
-            <p className="text-muted-foreground text-lg mb-8">
+            <p className="text-primary-foreground/80 text-lg mb-10">
               Subscribe for exclusive deals, travel tips, and be the first to know about new experiences
             </p>
           </motion.div>
@@ -64,13 +83,17 @@ const NewsletterSection = memo(() => {
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             {benefits.map((benefit, index) => (
-              <div
+              <motion.div
                 key={index}
-                className="flex items-center gap-2 bg-card px-4 py-2 rounded-full border border-border shadow-sm"
+                className="flex items-center gap-2 bg-primary-foreground/10 backdrop-blur-sm px-4 py-2 rounded-full border border-primary-foreground/10"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 + index * 0.1 }}
               >
                 <benefit.icon className="w-4 h-4 text-secondary" />
-                <span className="text-sm font-medium text-foreground">{benefit.text}</span>
-              </div>
+                <span className="text-sm font-medium text-primary-foreground/90">{benefit.text}</span>
+              </motion.div>
             ))}
           </motion.div>
 
@@ -90,7 +113,7 @@ const NewsletterSection = memo(() => {
                 placeholder="Enter your email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-14 pl-12 pr-4 text-base rounded-xl border-2 border-border focus:border-secondary"
+                className="h-14 pl-12 pr-4 text-base rounded-xl border-2 border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground placeholder:text-primary-foreground/50 focus:border-secondary focus:bg-primary-foreground/15"
                 disabled={subscribe.isPending || isSubscribed}
               />
             </div>
@@ -118,7 +141,7 @@ const NewsletterSection = memo(() => {
 
           {/* Trust text */}
           <motion.p
-            className="text-sm text-muted-foreground mt-6"
+            className="text-sm text-primary-foreground/60 mt-6"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}

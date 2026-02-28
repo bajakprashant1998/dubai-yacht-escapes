@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { memo, useState, useEffect } from "react";
-import { motion, type Easing } from "framer-motion";
+import { memo, useState, useEffect, useRef } from "react";
+import { motion, type Easing, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Play, Sparkles, TrendingUp, Sun, Waves, Ship, Mountain, MapPin, Eye, Utensils, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
@@ -25,14 +25,57 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.12, delayChildren: 0.1 },
+    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: easeOut } },
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: easeOut } },
 };
+
+/* ── Animated counter that counts up from 0 ── */
+const AnimatedStat = memo(({ value, label, delay }: { value: string; label: string; delay: number }) => {
+  const [displayed, setDisplayed] = useState(value);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const num = parseFloat(value.replace(/[^0-9.]/g, ""));
+    const suffix = value.replace(/[0-9.]/g, "");
+    if (isNaN(num)) { setDisplayed(value); return; }
+
+    const duration = 1800;
+    const start = performance.now();
+    let raf: number;
+    const step = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 4);
+      const current = num * eased;
+      setDisplayed(
+        (Number.isInteger(num) ? Math.round(current).toString() : current.toFixed(1)) + suffix
+      );
+      if (progress < 1) raf = requestAnimationFrame(step);
+    };
+    const timer = setTimeout(() => { raf = requestAnimationFrame(step); }, delay);
+    return () => { clearTimeout(timer); cancelAnimationFrame(raf); };
+  }, [value, delay]);
+
+  return (
+    <motion.div
+      ref={ref}
+      className="text-center bg-primary-foreground/5 backdrop-blur-sm rounded-2xl p-4 sm:p-5 border border-primary-foreground/10 cursor-default group"
+      whileHover={{ scale: 1.06, y: -6, backgroundColor: "rgba(255,255,255,0.12)" }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    >
+      <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-secondary tabular-nums">
+        {displayed}
+      </p>
+      <p className="text-[10px] sm:text-xs text-primary-foreground/70 uppercase tracking-wider mt-1.5 group-hover:text-primary-foreground/90 transition-colors">{label}</p>
+    </motion.div>
+  );
+});
+AnimatedStat.displayName = "AnimatedStat";
 
 const LiveRevenueCounter = memo(() => {
   const { t } = useI18n();
@@ -79,6 +122,10 @@ const categoryCardsData = [
 const HeroSection = memo(() => {
   const { stats } = useHomepageContent();
   const { t } = useI18n();
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const overlayOpacity = useTransform(scrollYProgress, [0, 0.5], [0.6, 0.9]);
 
   const statsDisplay = [
     { value: stats.guests, label: stats.guestsLabel },
@@ -88,35 +135,30 @@ const HeroSection = memo(() => {
   ];
 
   return (
-    <section className="relative min-h-screen flex flex-col overflow-hidden">
-      {/* Cinematic background with slow pan + zoom animation */}
-      <motion.div
-        className="absolute inset-0 will-change-transform"
-        animate={{
-          scale: [1, 1.08, 1.04, 1.1],
-          x: ["0%", "2%", "-1%", "1%"],
-          y: ["0%", "-1%", "1%", "-0.5%"],
-        }}
-        transition={{
-          duration: 30,
-          repeat: Infinity,
-          repeatType: "reverse",
-          ease: "easeInOut",
-        }}
-      >
-        <img
-          src={heroImage}
-          alt="Dubai skyline with Burj Khalifa at sunset evening view"
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ transformOrigin: "center center" }}
-          loading="eager"
-          fetchPriority="high"
-        />
+    <section ref={sectionRef} className="relative min-h-screen flex flex-col overflow-hidden">
+      {/* Cinematic background with parallax */}
+      <motion.div className="absolute inset-0 will-change-transform" style={{ y: bgY }}>
+        <motion.div
+          className="absolute inset-0"
+          animate={{
+            scale: [1, 1.06, 1.03, 1.08],
+            x: ["0%", "1.5%", "-0.5%", "0.5%"],
+          }}
+          transition={{ duration: 30, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+        >
+          <img
+            src={heroImage}
+            alt="Dubai skyline with Burj Khalifa at sunset evening view"
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="eager"
+            fetchPriority="high"
+          />
+        </motion.div>
       </motion.div>
 
-      {/* Gradient overlays */}
+      {/* Gradient overlays with scroll-based opacity */}
       <div className="absolute inset-0 bg-gradient-to-r from-primary/85 via-primary/60 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-primary/10" />
+      <motion.div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/30 to-primary/10" style={{ opacity: overlayOpacity }} />
 
       {/* Slow light sweep */}
       <motion.div
@@ -138,16 +180,21 @@ const HeroSection = memo(() => {
           animate={{ y: [0, 30, 0], x: [0, -15, 0], scale: [1, 1.15, 1], opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
         />
-        <motion.div
-          className="absolute top-[30%] left-[20%] w-2 h-2 bg-secondary/60 rounded-full"
-          animate={{ y: [0, -20, 0], opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute top-[60%] right-[35%] w-3 h-3 bg-amber-300/50 rounded-full"
-          animate={{ y: [0, -30, 0], opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-        />
+        {/* Sparkle dots */}
+        {[
+          { top: "30%", left: "20%", size: 2, dur: 4, del: 0 },
+          { top: "60%", left: "65%", size: 3, dur: 5, del: 1.5 },
+          { top: "45%", left: "80%", size: 2, dur: 3.5, del: 0.8 },
+          { top: "20%", left: "50%", size: 1.5, dur: 4.5, del: 2 },
+        ].map((p, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full bg-secondary/60"
+            style={{ top: p.top, left: p.left, width: p.size * 4, height: p.size * 4 }}
+            animate={{ y: [0, -20, 0], opacity: [0, 1, 0], scale: [0.5, 1, 0.5] }}
+            transition={{ duration: p.dur, repeat: Infinity, ease: "easeInOut", delay: p.del }}
+          />
+        ))}
       </div>
 
       {/* Main content area */}
@@ -211,22 +258,7 @@ const HeroSection = memo(() => {
 
             <motion.div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 w-full" variants={itemVariants}>
               {statsDisplay.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  className="text-center bg-primary-foreground/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-primary-foreground/10 cursor-default"
-                  whileHover={{ scale: 1.05, y: -5, backgroundColor: "rgba(255,255,255,0.1)" }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                >
-                  <motion.p
-                    className="text-2xl sm:text-3xl lg:text-4xl font-bold text-secondary"
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
-                  >
-                    {stat.value}
-                  </motion.p>
-                  <p className="text-[10px] sm:text-xs text-primary-foreground/70 uppercase tracking-wider mt-1">{stat.label}</p>
-                </motion.div>
+                <AnimatedStat key={index} value={stat.value} label={stat.label} delay={600 + index * 150} />
               ))}
             </motion.div>
           </motion.div>
@@ -266,6 +298,13 @@ const HeroSection = memo(() => {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Bottom wave separator */}
+      <div className="absolute bottom-0 left-0 right-0 z-10">
+        <svg viewBox="0 0 1440 60" preserveAspectRatio="none" className="w-full h-8 sm:h-12 md:h-16 block" fill="hsl(var(--background))">
+          <path d="M0,40 C360,0 720,60 1080,20 C1260,0 1380,30 1440,20 L1440,60 L0,60Z" />
+        </svg>
       </div>
     </section>
   );
