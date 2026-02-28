@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Clock, Star, CheckCircle, Car, ArrowRight, Heart, Zap } from "lucide-react";
+import { Clock, Star, CheckCircle, Car, ArrowRight, Heart, Zap, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Service } from "@/lib/serviceMapper";
@@ -38,29 +38,29 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
       transition={{ duration: 0.4 }}
     >
       <Link to={detailUrl} className="group block h-full">
-        <div className="relative h-full bg-card rounded-2xl overflow-hidden border border-border/40 hover:border-secondary/40 shadow-sm hover:shadow-2xl hover:shadow-secondary/5 transition-all duration-500 hover:-translate-y-1.5 flex flex-col">
+        <div className="relative h-full card-elevated card-shine bg-card rounded-2xl overflow-hidden hover:-translate-y-2 transition-all duration-500 flex flex-col">
           {/* Image Section */}
           <div className="relative aspect-[4/3] overflow-hidden">
             <img
               src={service.imageUrl}
               alt={service.title}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
               loading="lazy"
             />
-
             {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/70 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent opacity-60 group-hover:opacity-70 transition-opacity duration-500" />
 
             {/* Top badges */}
             <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
               <div className="flex flex-col gap-1.5">
                 {discount && discount > 0 && (
-                  <Badge className="bg-destructive text-destructive-foreground text-[11px] font-bold shadow-lg shadow-destructive/25 px-2.5 py-0.5">
+                  <Badge className="bg-destructive text-destructive-foreground text-[11px] font-bold shadow-lg shadow-destructive/30 px-2.5 py-1 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
                     {discount}% OFF
                   </Badge>
                 )}
                 {service.isFeatured && (
-                  <Badge className="bg-secondary text-secondary-foreground text-[11px] font-bold shadow-lg shadow-secondary/25 px-2.5 py-0.5">
+                  <Badge className="bg-secondary text-secondary-foreground text-[11px] font-bold shadow-lg shadow-secondary/30 px-2.5 py-1">
                     <Zap className="w-3 h-3 mr-1" />
                     Best Seller
                   </Badge>
@@ -70,71 +70,71 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
               <button
                 onClick={handleSaveClick}
                 className={cn(
-                  "w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-md shadow-lg",
+                  "w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-md shadow-lg border border-white/10",
                   isSaved
                     ? "bg-destructive text-destructive-foreground scale-110"
-                    : "bg-card/60 text-card-foreground hover:bg-card/90 hover:text-destructive"
+                    : "bg-card/60 text-card-foreground hover:bg-card/90 hover:text-destructive hover:scale-110"
                 )}
               >
                 <Heart className={cn("w-4 h-4 transition-transform", isSaved && "fill-current scale-110")} />
               </button>
             </div>
 
-            {/* Bottom info pills on image */}
-            <div className="absolute bottom-3 left-3 flex items-center gap-2">
-              {service.duration && (
-                <span className="flex items-center gap-1 text-xs font-medium text-primary-foreground bg-primary/50 backdrop-blur-md px-2.5 py-1 rounded-full">
-                  <Clock className="w-3 h-3" />
-                  {service.duration}
-                </span>
-              )}
-              {service.instantConfirmation && (
-                <span className="flex items-center gap-1 text-xs font-medium text-primary-foreground bg-primary/50 backdrop-blur-md px-2.5 py-1 rounded-full">
-                  <CheckCircle className="w-3 h-3" />
-                  Instant
-                </span>
-              )}
+            {/* Bottom pills on image */}
+            <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+              <div className="flex items-center gap-2">
+                {service.duration && (
+                  <span className="flex items-center gap-1 text-xs font-medium text-primary-foreground bg-card/20 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-white/10">
+                    <Clock className="w-3 h-3" />
+                    {service.duration}
+                  </span>
+                )}
+                {service.instantConfirmation && (
+                  <span className="flex items-center gap-1 text-xs font-medium text-primary-foreground bg-card/20 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-white/10">
+                    <CheckCircle className="w-3 h-3" />
+                    Instant
+                  </span>
+                )}
+              </div>
+              {/* Rating pill */}
+              <div className="flex items-center gap-1 bg-card/90 backdrop-blur-md px-2.5 py-1.5 rounded-full shadow-md border border-border/30">
+                <Star className="w-3.5 h-3.5 fill-secondary text-secondary" />
+                <span className="text-xs font-bold text-foreground">{service.rating.toFixed(1)}</span>
+              </div>
             </div>
           </div>
 
           {/* Content */}
-          <div className="p-4 flex flex-col flex-1">
+          <div className="p-5 flex flex-col flex-1">
             {/* Category pill */}
             {service.categoryName && (
-              <span className="inline-block w-fit text-[11px] font-semibold uppercase tracking-wider text-secondary bg-secondary/10 px-2.5 py-1 rounded-full mb-2">
+              <span className="inline-block w-fit text-[11px] font-semibold uppercase tracking-wider text-secondary bg-secondary/10 px-2.5 py-1 rounded-full mb-2.5">
                 {service.categoryName}
               </span>
             )}
 
             {/* Title */}
-            <h3 className="font-bold text-base text-foreground line-clamp-2 group-hover:text-secondary transition-colors mb-1.5 min-h-[2.5rem]">
+            <h3 className="font-bold text-base text-foreground line-clamp-2 group-hover:text-secondary transition-colors duration-300 mb-1.5 min-h-[2.5rem]">
               {service.title}
             </h3>
 
-            {/* Rating */}
-            <div className="flex items-center gap-2 mb-3">
-              <div className="flex items-center gap-1 bg-secondary/10 px-2 py-0.5 rounded-full">
-                <Star className="w-3.5 h-3.5 fill-secondary text-secondary" />
-                <span className="font-bold text-sm text-secondary">{service.rating.toFixed(1)}</span>
-              </div>
-              <span className="text-xs text-muted-foreground">
-                ({service.reviewCount.toLocaleString()} reviews)
-              </span>
-            </div>
+            {/* Reviews */}
+            <p className="text-xs text-muted-foreground mb-3">
+              {service.reviewCount.toLocaleString()} reviews
+            </p>
 
             {/* Features */}
             {service.hotelPickup && (
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3 bg-muted/40 w-fit px-2.5 py-1.5 rounded-lg">
                 <Car className="w-3.5 h-3.5 text-secondary" />
                 <span>Hotel Pickup Included</span>
               </div>
             )}
 
-            {/* Spacer */}
             <div className="flex-1" />
 
             {/* Divider */}
-            <div className="border-t border-dashed border-border/60 my-3" />
+            <div className="border-t border-border/40 my-3" />
 
             {/* Price & CTA */}
             <div className="flex items-end justify-between">
@@ -154,7 +154,7 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
 
               <Button
                 size="sm"
-                className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-xl gap-1.5 font-semibold shadow-md shadow-secondary/15 transition-all duration-300 group-hover:gap-2.5"
+                className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-xl gap-1.5 font-semibold shadow-md shadow-secondary/15 transition-all duration-300 group-hover:gap-2.5 group-hover:shadow-lg group-hover:shadow-secondary/20"
               >
                 Details
                 <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />

@@ -42,7 +42,7 @@ const ServiceCardRedesigned = ({ service, variant = "default", viewMode = "grid"
         transition={{ duration: 0.35 }}
       >
         <Link to={detailUrl} className="group block">
-          <div className="relative bg-card rounded-2xl overflow-hidden border border-border/40 hover:border-secondary/30 shadow-sm hover:shadow-xl transition-all duration-400 flex flex-col sm:flex-row">
+          <div className="relative card-elevated card-shine bg-card rounded-2xl overflow-hidden transition-all duration-500 flex flex-col sm:flex-row">
             {/* Image */}
             <div className="relative w-full sm:w-80 h-52 sm:h-auto shrink-0 overflow-hidden">
               <img
@@ -166,7 +166,7 @@ const ServiceCardRedesigned = ({ service, variant = "default", viewMode = "grid"
       transition={{ duration: 0.35 }}
     >
       <Link to={detailUrl} className="group block h-full">
-        <div className="relative h-full bg-card rounded-2xl overflow-hidden border border-border/40 hover:border-secondary/30 shadow-sm hover:shadow-2xl hover:shadow-secondary/5 transition-all duration-500 hover:-translate-y-1.5 flex flex-col">
+        <div className="relative h-full card-elevated card-shine bg-card rounded-2xl overflow-hidden hover:-translate-y-2 transition-all duration-500 flex flex-col">
           {/* Image */}
           <div className="relative aspect-[4/3] overflow-hidden">
             <img
