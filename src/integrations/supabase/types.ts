@@ -2009,6 +2009,42 @@ export type Database = {
           },
         ]
       }
+      trip_leads: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          status: string
+          travel_date: string | null
+          trip_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          status?: string
+          travel_date?: string | null
+          trip_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          status?: string
+          travel_date?: string | null
+          trip_id?: string | null
+        }
+        Relationships: []
+      }
       trip_plans: {
         Row: {
           arrival_date: string

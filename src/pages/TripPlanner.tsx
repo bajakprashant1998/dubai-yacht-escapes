@@ -13,10 +13,14 @@ import {
   Globe2, 
   Wallet, 
   Heart,
-  CheckCircle2
+  CheckCircle2,
+  Mail,
+  Phone,
+  User
 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,
@@ -33,6 +37,8 @@ import CurrencySelector from '@/components/trip/CurrencySelector';
 import ComboSuggestion from '@/components/combo/ComboSuggestion';
 import { useTripPlanner, TripInput } from '@/hooks/useTripPlanner';
 import { useMatchCombo } from '@/hooks/useComboAIRules';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 type Step = 1 | 2 | 3 | 4 | 5;
 
@@ -48,6 +54,15 @@ const TripPlanner = () => {
   const navigate = useNavigate();
   const { generateTrip, isGenerating, error: tripError } = useTripPlanner();
   
+  // Lead capture state
+  const [leadCaptured, setLeadCaptured] = useState(false);
+  const [leadId, setLeadId] = useState<string | null>(null);
+  const [leadName, setLeadName] = useState('');
+  const [leadEmail, setLeadEmail] = useState('');
+  const [leadPhone, setLeadPhone] = useState('');
+  const [leadNotes, setLeadNotes] = useState('');
+  const [isSubmittingLead, setIsSubmittingLead] = useState(false);
+
   const [step, setStep] = useState<Step>(1);
   const [arrivalDate, setArrivalDate] = useState<Date>();
   const [departureDate, setDepartureDate] = useState<Date>();
@@ -61,6 +76,40 @@ const TripPlanner = () => {
   const [arrivalCalendarOpen, setArrivalCalendarOpen] = useState(false);
   const [departureCalendarOpen, setDepartureCalendarOpen] = useState(false);
   const [generatingStep, setGeneratingStep] = useState(0);
+
+  const handleLeadSubmit = async () => {
+    if (!leadName.trim() || !leadEmail.trim()) {
+      toast.error('Please fill in your name and email');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(leadEmail.trim())) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+    setIsSubmittingLead(true);
+    try {
+      const { data, error } = await supabase
+        .from('trip_leads')
+        .insert({
+          name: leadName.trim(),
+          email: leadEmail.trim(),
+          phone: leadPhone.trim() || null,
+          notes: leadNotes.trim() || null,
+        })
+        .select('id')
+        .single();
+      if (error) throw error;
+      setLeadId(data.id);
+      setLeadCaptured(true);
+      toast.success('Welcome! Let\'s plan your trip.');
+    } catch (err) {
+      console.error('Lead submission error:', err);
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmittingLead(false);
+    }
+  };
 
   // Calculate total days for matching
   const totalDays = arrivalDate && departureDate
@@ -141,6 +190,10 @@ const TripPlanner = () => {
     try {
       const result = await generateTrip(input);
       if (result?.tripId) {
+        // Link lead to the generated trip
+        if (leadId) {
+          await supabase.from('trip_leads').update({ trip_id: result.tripId, status: 'generated' }).eq('id', leadId);
+        }
         navigate(`/trip/${result.tripId}`);
       }
     } catch (error) {
@@ -194,6 +247,140 @@ const TripPlanner = () => {
             </div>
             <p className="text-xs text-muted-foreground">This usually takes 10-15 seconds</p>
           </motion.div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Lead capture form
+  if (!leadCaptured) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-secondary/5 relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+            <div className="absolute top-40 right-10 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-accent/5 rounded-full blur-3xl" />
+          </div>
+
+          <div className="relative py-12 md:py-20 text-center">
+            <div className="container max-w-4xl">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-secondary/20 to-primary/20 text-secondary px-5 py-2.5 rounded-full text-sm font-medium mb-6 border border-secondary/20"
+              >
+                <Sparkles className="w-4 h-4 animate-pulse" />
+                AI-Powered Trip Planning
+              </motion.div>
+              
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="font-display text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent mb-4"
+              >
+                Plan Your Perfect Dubai Trip
+              </motion.h1>
+              
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto"
+              >
+                Share your details to get started — our AI will craft a personalized itinerary just for you.
+              </motion.p>
+            </div>
+          </div>
+
+          <div className="container max-w-lg pb-20 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-card backdrop-blur-xl rounded-3xl shadow-2xl border border-border p-8 space-y-6"
+            >
+              <div className="text-center space-y-2">
+                <div className="w-14 h-14 bg-gradient-to-br from-secondary to-secondary/70 rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-secondary/30">
+                  <User className="w-7 h-7 text-secondary-foreground" />
+                </div>
+                <h2 className="text-2xl font-bold">Get Started</h2>
+                <p className="text-sm text-muted-foreground">Tell us how to reach you so we can share your trip plan</p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Full Name *</label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      value={leadName}
+                      onChange={(e) => setLeadName(e.target.value)}
+                      placeholder="Your full name"
+                      className="pl-10 h-12 rounded-xl"
+                      maxLength={100}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Email Address *</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      type="email"
+                      value={leadEmail}
+                      onChange={(e) => setLeadEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      className="pl-10 h-12 rounded-xl"
+                      maxLength={255}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Phone <span className="text-muted-foreground">(optional)</span></label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      type="tel"
+                      value={leadPhone}
+                      onChange={(e) => setLeadPhone(e.target.value)}
+                      placeholder="+971 50 123 4567"
+                      className="pl-10 h-12 rounded-xl"
+                      maxLength={20}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Special Requests <span className="text-muted-foreground">(optional)</span></label>
+                  <Input
+                    value={leadNotes}
+                    onChange={(e) => setLeadNotes(e.target.value)}
+                    placeholder="E.g., honeymoon, wheelchair access..."
+                    className="h-12 rounded-xl"
+                    maxLength={500}
+                  />
+                </div>
+              </div>
+
+              <Button
+                onClick={handleLeadSubmit}
+                disabled={isSubmittingLead || !leadName.trim() || !leadEmail.trim()}
+                className="w-full h-12 rounded-xl text-base font-semibold"
+                size="lg"
+              >
+                {isSubmittingLead ? (
+                  <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Submitting...</>
+                ) : (
+                  <>Continue to Plan My Trip <ArrowRight className="w-5 h-5 ml-2" /></>
+                )}
+              </Button>
+
+              <p className="text-xs text-center text-muted-foreground">
+                Your information is secure and will only be used to assist with your trip planning.
+              </p>
+            </motion.div>
+          </div>
         </div>
       </Layout>
     );
