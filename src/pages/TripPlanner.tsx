@@ -188,8 +188,8 @@ const TripPlanner = () => {
             className="bg-card backdrop-blur-xl rounded-3xl shadow-2xl border border-border overflow-hidden"
           >
             {/* Enhanced Step Indicators */}
-            <div className="px-4 md:px-8 py-6 border-b bg-gradient-to-r from-muted/30 to-muted/10">
-              <div className="flex items-center justify-between gap-2">
+            <div className="px-4 md:px-8 py-5 border-b border-border/50 bg-muted/20">
+              <div className="flex items-center justify-between">
                 {stepInfo.map((info, index) => {
                   const stepNum = index + 1;
                   const Icon = info.icon;
@@ -198,49 +198,51 @@ const TripPlanner = () => {
                   
                   return (
                     <div key={stepNum} className="flex items-center flex-1">
-                      <motion.div
-                        initial={false}
-                        animate={{
-                          scale: isCurrent ? 1.1 : 1,
-                        }}
-                        className="flex flex-col items-center gap-1.5"
+                      <button
+                        type="button"
+                        onClick={() => { if (isCompleted) setStep(stepNum as Step); }}
+                        className={cn(
+                          "flex flex-col items-center gap-1.5 group",
+                          isCompleted && "cursor-pointer"
+                        )}
+                        disabled={!isCompleted && !isCurrent}
+                        aria-label={`Step ${stepNum}: ${info.title}`}
                       >
-                        <div
+                        <motion.div
+                          initial={false}
+                          animate={{ scale: isCurrent ? 1.05 : 1 }}
                           className={cn(
-                            'w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all duration-300 relative',
+                            'w-10 h-10 md:w-11 md:h-11 rounded-xl flex items-center justify-center transition-all duration-300',
                             isCompleted
-                              ? 'bg-secondary text-secondary-foreground shadow-lg shadow-secondary/30'
+                              ? 'bg-secondary text-secondary-foreground shadow-md shadow-secondary/20 group-hover:shadow-lg'
                               : isCurrent
-                              ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30'
-                              : 'bg-muted text-muted-foreground'
+                              ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 ring-2 ring-primary/30 ring-offset-2 ring-offset-card'
+                              : 'bg-muted/60 text-muted-foreground/50'
                           )}
                         >
                           {isCompleted ? (
-                            <CheckCircle2 className="w-5 h-5" />
+                            <CheckCircle2 className="w-4.5 h-4.5" />
                           ) : (
-                            <Icon className="w-5 h-5" />
+                            <Icon className="w-4.5 h-4.5" />
                           )}
-                          {isCurrent && (
-                            <motion.div
-                              layoutId="activeIndicator"
-                              className="absolute inset-0 rounded-xl border-2 border-primary"
-                              transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                            />
-                          )}
+                        </motion.div>
+                        <div className="hidden sm:flex flex-col items-center">
+                          <span className={cn(
+                            "text-[11px] font-semibold tracking-wide",
+                            isCurrent ? "text-primary" : isCompleted ? "text-secondary" : "text-muted-foreground/50"
+                          )}>
+                            {info.title}
+                          </span>
                         </div>
-                        <span className={cn(
-                          "text-[10px] md:text-xs font-medium hidden sm:block",
-                          isCurrent ? "text-primary" : isCompleted ? "text-secondary" : "text-muted-foreground"
-                        )}>
-                          {info.title}
-                        </span>
-                      </motion.div>
+                      </button>
                       
                       {index < 4 && (
-                        <div className={cn(
-                          "flex-1 h-0.5 mx-2 rounded-full transition-colors duration-300",
-                          stepNum < step ? "bg-secondary" : "bg-muted"
-                        )} />
+                        <div className="flex-1 mx-1.5 md:mx-3">
+                          <div className={cn(
+                            "h-[2px] rounded-full transition-all duration-500",
+                            stepNum < step ? "bg-secondary" : "bg-border/50"
+                          )} />
+                        </div>
                       )}
                     </div>
                   );
@@ -369,12 +371,15 @@ const TripPlanner = () => {
 
                     {totalDays > 0 && (
                       <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="text-center p-4 bg-gradient-to-r from-secondary/10 to-primary/10 rounded-xl border border-secondary/20"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex items-center justify-center gap-3 py-3"
                       >
-                        <span className="text-2xl font-bold text-secondary">{totalDays}</span>
-                        <span className="text-muted-foreground ml-2">{totalDays === 1 ? 'day' : 'days'} in Dubai</span>
+                        <div className="inline-flex items-center gap-2 bg-secondary/10 text-secondary px-5 py-2.5 rounded-full border border-secondary/20">
+                          <CalendarIcon className="w-4 h-4" />
+                          <span className="font-bold text-lg">{totalDays}</span>
+                          <span className="text-sm font-medium">{totalDays === 1 ? 'day' : 'days'} in Dubai</span>
+                        </div>
                       </motion.div>
                     )}
                   </motion.div>
@@ -540,54 +545,45 @@ const TripPlanner = () => {
             </div>
 
             {/* Navigation */}
-            <div className="px-6 md:px-10 py-6 border-t bg-gradient-to-r from-muted/30 to-muted/10 flex items-center justify-between">
-              <motion.div whileHover={{ x: -3 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  variant="ghost"
-                  onClick={handleBack}
-                  disabled={step === 1}
-                  className="gap-2"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Back
-                </Button>
-              </motion.div>
+            <div className="px-6 md:px-10 py-5 border-t border-border/50 flex items-center justify-between">
+              <Button
+                variant="ghost"
+                onClick={handleBack}
+                disabled={step === 1}
+                className="gap-2 text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </Button>
 
               {step < 5 ? (
-                <motion.div whileHover={{ x: 3 }} whileTap={{ scale: 0.95 }}>
-                  <Button
-                    onClick={handleNext}
-                    disabled={!canProceed()}
-                    className="gap-2 px-6 h-11"
-                  >
-                    Continue
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </motion.div>
-              ) : (
-                <motion.div 
-                  whileHover={{ scale: 1.02 }} 
-                  whileTap={{ scale: 0.98 }}
+                <Button
+                  onClick={handleNext}
+                  disabled={!canProceed()}
+                  className="gap-2 px-8 h-11 rounded-xl shadow-sm"
                 >
-                  <Button
-                    onClick={handleGenerate}
-                    disabled={isGenerating || !canProceed()}
-                    className="gap-2 bg-gradient-to-r from-secondary to-secondary/80 hover:from-secondary/90 hover:to-secondary/70 text-secondary-foreground px-8 h-12 text-base shadow-lg shadow-secondary/30"
-                    size="lg"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        Creating Your Trip...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-5 h-5" />
-                        Generate My Trip
-                      </>
-                    )}
-                  </Button>
-                </motion.div>
+                  Continue
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleGenerate}
+                  disabled={isGenerating || !canProceed()}
+                  className="gap-2 bg-gradient-to-r from-secondary to-secondary/80 hover:from-secondary/90 hover:to-secondary/70 text-secondary-foreground px-8 h-12 text-base rounded-xl shadow-lg shadow-secondary/30"
+                  size="lg"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Creating Your Trip...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-5 h-5" />
+                      Generate My Trip
+                    </>
+                  )}
+                </Button>
               )}
             </div>
           </motion.div>
