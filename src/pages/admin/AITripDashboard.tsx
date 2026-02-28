@@ -11,11 +11,15 @@ import {
   Trash2,
   Download,
   UserPlus,
+  Search,
+  Mail,
+  Phone,
 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -44,7 +48,9 @@ import { toast } from 'sonner';
 
 // ─── Trip Plans Tab ───
 const TripPlansTab = () => {
+  const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const { data: trips = [], isLoading } = useQuery({
     queryKey: ['admin-trip-plans', statusFilter],
@@ -60,6 +66,39 @@ const TripPlansTab = () => {
       return data;
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      // Delete trip items first, then trip plans
+      const { error: itemsError } = await supabase.from('trip_items').delete().in('trip_id', ids);
+      if (itemsError) throw itemsError;
+      const { error } = await supabase.from('trip_plans').delete().in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-trip-plans'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-trip-stats'] });
+      setSelectedIds(new Set());
+      toast.success('Trip plan(s) deleted successfully');
+    },
+    onError: () => toast.error('Failed to delete trip plan(s)'),
+  });
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    if (selectedIds.size === trips.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(trips.map(t => t.id)));
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -77,26 +116,74 @@ const TripPlansTab = () => {
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat('en-AE', { style: 'currency', currency: 'AED', minimumFractionDigits: 0 }).format(amount);
 
+  const handleExportCsv = () => {
+    if (trips.length === 0) return;
+    exportToCsv(
+      trips.map(t => ({
+        created_at: t.created_at,
+        arrival_date: t.arrival_date,
+        departure_date: t.departure_date,
+        travelers: t.travelers_adults + t.travelers_children,
+        budget_tier: t.budget_tier,
+        travel_style: t.travel_style,
+        total_price_aed: t.total_price_aed || 0,
+        status: t.status,
+      })),
+      `trip-plans-${new Date().toISOString().split('T')[0]}`,
+      [
+        { key: 'created_at', label: 'Created' },
+        { key: 'arrival_date', label: 'Arrival' },
+        { key: 'departure_date', label: 'Departure' },
+        { key: 'travelers', label: 'Travelers' },
+        { key: 'budget_tier', label: 'Budget' },
+        { key: 'travel_style', label: 'Style' },
+        { key: 'total_price_aed', label: 'Value (AED)' },
+        { key: 'status', label: 'Status' },
+      ]
+    );
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex gap-2 flex-wrap">
-        {['all', 'draft', 'confirmed', 'booked', 'cancelled'].map((status) => (
-          <Button
-            key={status}
-            variant={statusFilter === status ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setStatusFilter(status)}
-          >
-            {status.charAt(0).toUpperCase() + status.slice(1)}
-          </Button>
-        ))}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex gap-2 flex-wrap items-center">
+          {['all', 'draft', 'confirmed', 'booked', 'cancelled'].map((status) => (
+            <Button
+              key={status}
+              variant={statusFilter === status ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setStatusFilter(status)}
+            >
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </Button>
+          ))}
+          {selectedIds.size > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm">
+                  <Trash2 className="w-4 h-4 mr-1" /> Delete {selectedIds.size}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete {selectedIds.size} trip plan(s)?</AlertDialogTitle>
+                  <AlertDialogDescription>This will permanently remove the selected trip plans and their itinerary items. This action cannot be undone.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => deleteMutation.mutate([...selectedIds])}>Delete</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
+        <Button variant="outline" size="sm" onClick={handleExportCsv} disabled={trips.length === 0}>
+          <Download className="w-4 h-4 mr-1" /> Export CSV
+        </Button>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Recent AI-Generated Trips</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {isLoading ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => <Skeleton key={i} className="h-12 w-full" />)}
@@ -110,6 +197,12 @@ const TripPlansTab = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-10">
+                    <Checkbox
+                      checked={selectedIds.size === trips.length && trips.length > 0}
+                      onCheckedChange={toggleAll}
+                    />
+                  </TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead>Dates</TableHead>
                   <TableHead>Travelers</TableHead>
@@ -122,12 +215,18 @@ const TripPlansTab = () => {
               </TableHeader>
               <TableBody>
                 {trips.map((trip) => (
-                  <TableRow key={trip.id}>
+                  <TableRow key={trip.id} data-state={selectedIds.has(trip.id) ? 'selected' : undefined}>
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedIds.has(trip.id)}
+                        onCheckedChange={() => toggleSelect(trip.id)}
+                      />
+                    </TableCell>
                     <TableCell className="text-sm">{format(new Date(trip.created_at), 'MMM d, HH:mm')}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1 text-sm">
                         <Calendar className="w-3 h-3" />
-                        {format(new Date(trip.arrival_date), 'MMM d')} - {format(new Date(trip.departure_date), 'MMM d')}
+                        {format(new Date(trip.arrival_date), 'MMM d')} – {format(new Date(trip.departure_date), 'MMM d')}
                       </div>
                     </TableCell>
                     <TableCell>{trip.travelers_adults + trip.travelers_children}</TableCell>
@@ -136,7 +235,26 @@ const TripPlansTab = () => {
                     <TableCell className="font-medium">{formatCurrency(trip.total_price_aed || 0)}</TableCell>
                     <TableCell>{getStatusBadge(trip.status)}</TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="sm"><Eye className="w-4 h-4" /></Button>
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="sm"><Eye className="w-4 h-4" /></Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete this trip plan?</AlertDialogTitle>
+                              <AlertDialogDescription>This will permanently remove the trip and its itinerary items.</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => deleteMutation.mutate([trip.id])}>Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -153,6 +271,7 @@ const TripPlansTab = () => {
 const LeadsTab = () => {
   const queryClient = useQueryClient();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: leads = [], isLoading } = useQuery({
     queryKey: ['admin-trip-leads'],
@@ -164,6 +283,16 @@ const LeadsTab = () => {
       if (error) throw error;
       return data;
     },
+  });
+
+  const filteredLeads = leads.filter(lead => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      lead.name.toLowerCase().includes(q) ||
+      lead.email.toLowerCase().includes(q) ||
+      (lead.phone && lead.phone.toLowerCase().includes(q))
+    );
   });
 
   const deleteMutation = useMutation({
@@ -189,10 +318,10 @@ const LeadsTab = () => {
   };
 
   const toggleAll = () => {
-    if (selectedIds.size === leads.length) {
+    if (selectedIds.size === filteredLeads.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(leads.map(l => l.id)));
+      setSelectedIds(new Set(filteredLeads.map(l => l.id)));
     }
   };
 
@@ -223,8 +352,17 @@ const LeadsTab = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by name, email, phone..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-9"
+            />
+          </div>
           {selectedIds.size > 0 && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -256,10 +394,10 @@ const LeadsTab = () => {
             <div className="space-y-3">
               {[1, 2, 3].map((i) => <Skeleton key={i} className="h-12 w-full" />)}
             </div>
-          ) : leads.length === 0 ? (
+          ) : filteredLeads.length === 0 ? (
             <div className="text-center py-10 text-muted-foreground">
               <UserPlus className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <p>No leads captured yet</p>
+              <p>{searchQuery ? 'No leads match your search' : 'No leads captured yet'}</p>
             </div>
           ) : (
             <Table>
@@ -267,22 +405,22 @@ const LeadsTab = () => {
                 <TableRow>
                   <TableHead className="w-10">
                     <Checkbox
-                      checked={selectedIds.size === leads.length && leads.length > 0}
+                      checked={selectedIds.size === filteredLeads.length && filteredLeads.length > 0}
                       onCheckedChange={toggleAll}
                     />
                   </TableHead>
                   <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Phone</TableHead>
+                  <TableHead>Contact</TableHead>
                   <TableHead>Travel Date</TableHead>
+                  <TableHead>Notes</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Submitted</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {leads.map((lead) => (
-                  <TableRow key={lead.id}>
+                {filteredLeads.map((lead) => (
+                  <TableRow key={lead.id} data-state={selectedIds.has(lead.id) ? 'selected' : undefined}>
                     <TableCell>
                       <Checkbox
                         checked={selectedIds.has(lead.id)}
@@ -290,15 +428,31 @@ const LeadsTab = () => {
                       />
                     </TableCell>
                     <TableCell className="font-medium">{lead.name}</TableCell>
-                    <TableCell>{lead.email}</TableCell>
-                    <TableCell>{lead.phone || '—'}</TableCell>
-                    <TableCell>{lead.travel_date ? format(new Date(lead.travel_date), 'MMM d, yyyy') : '—'}</TableCell>
                     <TableCell>
-                      <Badge variant={lead.status === 'new' ? 'default' : 'secondary'} className="capitalize">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5 text-sm">
+                          <Mail className="w-3 h-3 text-muted-foreground" />
+                          <a href={`mailto:${lead.email}`} className="hover:underline text-primary">{lead.email}</a>
+                        </div>
+                        {lead.phone && (
+                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                            <Phone className="w-3 h-3" />
+                            <a href={`tel:${lead.phone}`} className="hover:underline">{lead.phone}</a>
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{lead.travel_date ? format(new Date(lead.travel_date), 'MMM d, yyyy') : '—'}</TableCell>
+                    <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">{lead.notes || '—'}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={lead.status === 'new' ? 'default' : lead.status === 'generated' ? 'secondary' : 'outline'}
+                        className="capitalize"
+                      >
                         {lead.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm">{format(new Date(lead.created_at), 'MMM d, HH:mm')}</TableCell>
+                    <TableCell className="text-sm whitespace-nowrap">{format(new Date(lead.created_at), 'MMM d, HH:mm')}</TableCell>
                     <TableCell>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
