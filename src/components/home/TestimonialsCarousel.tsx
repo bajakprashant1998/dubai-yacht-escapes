@@ -15,24 +15,25 @@ const TestimonialsCarousel = () => {
   const slideVariants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 300 : -300,
-      opacity: 0
+      opacity: 0,
+      scale: 0.95,
     }),
     center: {
       zIndex: 1,
       x: 0,
-      opacity: 1
+      opacity: 1,
+      scale: 1,
     },
     exit: (direction: number) => ({
       zIndex: 0,
       x: direction < 0 ? 300 : -300,
-      opacity: 0
-    })
+      opacity: 0,
+      scale: 0.95,
+    }),
   };
 
   const swipeConfidenceThreshold = 10000;
-  const swipePower = (offset: number, velocity: number) => {
-    return Math.abs(offset) * velocity;
-  };
+  const swipePower = (offset: number, velocity: number) => Math.abs(offset) * velocity;
 
   const paginate = (newDirection: number) => {
     if (testimonials.length === 0) return;
@@ -45,23 +46,19 @@ const TestimonialsCarousel = () => {
     });
   };
 
-  // Auto-advance carousel
   useEffect(() => {
     if (testimonials.length === 0) return;
-    const timer = setInterval(() => {
-      paginate(1);
-    }, 6000);
+    const timer = setInterval(() => paginate(1), 6000);
     return () => clearInterval(timer);
   }, [testimonials.length]);
 
   if (isLoading) {
     return (
-      <section className="py-20 md:py-24 bg-muted/30 overflow-hidden">
+      <section className="py-24 md:py-28 bg-muted/30 overflow-hidden">
         <div className="container">
           <div className="text-center mb-12">
             <Skeleton className="h-6 w-32 mx-auto mb-3" />
             <Skeleton className="h-12 w-80 mx-auto mb-6" />
-            <Skeleton className="h-6 w-48 mx-auto" />
           </div>
           <div className="max-w-3xl mx-auto">
             <Skeleton className="h-72 w-full rounded-2xl" />
@@ -71,18 +68,22 @@ const TestimonialsCarousel = () => {
     );
   }
 
-  if (testimonials.length === 0) {
-    return null;
-  }
+  if (testimonials.length === 0) return null;
 
   const currentTestimonial = testimonials[currentIndex];
 
   return (
-    <section className="py-20 md:py-24 bg-muted/30 overflow-hidden">
-      <div className="container">
+    <section className="py-24 md:py-28 bg-muted/30 overflow-hidden relative">
+      {/* Decorative bg */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-primary/5 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" />
+      </div>
+
+      <div className="container relative">
         {/* Header */}
         <motion.div
-          className="text-center mb-12"
+          className="text-center mb-14"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -94,28 +95,35 @@ const TestimonialsCarousel = () => {
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
             What Our Guests Say
           </h2>
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-3">
             <div className="flex gap-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star key={i} className="w-5 h-5 fill-secondary text-secondary" />
               ))}
             </div>
-            <span className="font-bold text-lg text-foreground ml-1">{ratingData?.average || 4.9}</span>
+            <span className="font-bold text-lg text-foreground">{ratingData?.average || 4.9}</span>
             <span className="text-muted-foreground text-sm">• {ratingData?.count || 6}+ reviews</span>
           </div>
         </motion.div>
 
         {/* Carousel Container */}
         <div className="relative max-w-3xl mx-auto">
-          {/* Quote Icon - Floating above card */}
+          {/* Quote Icon */}
           <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-10">
-            <div className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center shadow-lg">
+            <motion.div 
+              className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center shadow-lg shadow-secondary/20"
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
               <Quote className="w-7 h-7 text-secondary-foreground fill-secondary-foreground" />
-            </div>
+            </motion.div>
           </div>
 
           {/* Testimonial Card */}
-          <div className="bg-card rounded-2xl shadow-lg p-8 pt-12 md:p-12 md:pt-14 relative overflow-hidden min-h-[280px]">
+          <div className="bg-card rounded-3xl shadow-xl p-8 pt-12 md:p-12 md:pt-14 relative overflow-hidden min-h-[280px] border border-border/50">
+            {/* Subtle gradient accent */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-secondary/50 to-transparent" />
+            
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
                 key={currentIndex}
@@ -126,18 +134,16 @@ const TestimonialsCarousel = () => {
                 exit="exit"
                 transition={{
                   x: { type: "spring", stiffness: 300, damping: 30 },
-                  opacity: { duration: 0.3 }
+                  opacity: { duration: 0.3 },
+                  scale: { duration: 0.3 },
                 }}
                 drag="x"
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={1}
                 onDragEnd={(e, { offset, velocity }) => {
                   const swipe = swipePower(offset.x, velocity.x);
-                  if (swipe < -swipeConfidenceThreshold) {
-                    paginate(1);
-                  } else if (swipe > swipeConfidenceThreshold) {
-                    paginate(-1);
-                  }
+                  if (swipe < -swipeConfidenceThreshold) paginate(1);
+                  else if (swipe > swipeConfidenceThreshold) paginate(-1);
                 }}
                 className="text-center"
               >
@@ -148,21 +154,19 @@ const TestimonialsCarousel = () => {
                   ))}
                 </div>
 
-                {/* Title / Quote */}
                 {currentTestimonial.title && (
                   <h3 className="font-display text-xl md:text-2xl font-bold text-foreground mb-4">
                     "{currentTestimonial.title}"
                   </h3>
                 )}
 
-                {/* Content */}
                 <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-8 max-w-2xl mx-auto">
                   {currentTestimonial.content}
                 </p>
 
                 {/* Author */}
                 <div className="flex items-center justify-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center text-lg font-bold text-secondary">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-secondary to-secondary/60 flex items-center justify-center text-lg font-bold text-secondary-foreground shadow-md">
                     {currentTestimonial.name.charAt(0)}
                   </div>
                   <div className="text-left">
@@ -181,13 +185,12 @@ const TestimonialsCarousel = () => {
             <Button
               variant="outline"
               size="icon"
-              className="rounded-full w-10 h-10 border-border hover:bg-secondary hover:text-secondary-foreground hover:border-secondary transition-all"
+              className="rounded-full w-11 h-11 border-border hover:bg-secondary hover:text-secondary-foreground hover:border-secondary transition-all shadow-sm"
               onClick={() => paginate(-1)}
             >
               <ChevronLeft className="w-5 h-5" />
             </Button>
 
-            {/* Dots */}
             <div className="flex items-center gap-2">
               {testimonials.map((_, index) => (
                 <button
@@ -198,7 +201,7 @@ const TestimonialsCarousel = () => {
                   }}
                   className={`transition-all duration-300 rounded-full ${
                     index === currentIndex
-                      ? "w-8 h-3 bg-secondary"
+                      ? "w-8 h-3 bg-secondary shadow-sm shadow-secondary/30"
                       : "w-3 h-3 bg-muted-foreground/20 hover:bg-muted-foreground/40"
                   }`}
                 />
@@ -208,7 +211,7 @@ const TestimonialsCarousel = () => {
             <Button
               variant="outline"
               size="icon"
-              className="rounded-full w-10 h-10 border-border hover:bg-secondary hover:text-secondary-foreground hover:border-secondary transition-all"
+              className="rounded-full w-11 h-11 border-border hover:bg-secondary hover:text-secondary-foreground hover:border-secondary transition-all shadow-sm"
               onClick={() => paginate(1)}
             >
               <ChevronRight className="w-5 h-5" />
