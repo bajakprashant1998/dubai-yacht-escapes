@@ -207,17 +207,21 @@ Return a JSON object with this exact structure:
     // Parse AI response
     let tripPlan;
     try {
-      // With responseMimeType: "application/json", response should be clean JSON
-      // But handle markdown code blocks as fallback
       let jsonStr = aiContent.trim();
       const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
       if (jsonMatch) jsonStr = jsonMatch[1].trim();
       tripPlan = JSON.parse(jsonStr);
     } catch (parseError) {
       console.error('Failed to parse AI response (first 500 chars):', aiContent.substring(0, 500));
-      console.error('Last 200 chars:', aiContent.substring(aiContent.length - 200));
       throw new Error('Failed to parse trip plan from AI');
     }
+
+    // Helper: validate UUID format, return null if invalid
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const safeUuid = (id: string | null | undefined): string | null => {
+      if (!id) return null;
+      return uuidRegex.test(id) ? id : null;
+    };
 
     // Store the trip plan in database
     const { data: savedTrip, error: tripError } = await supabase
@@ -261,7 +265,7 @@ Return a JSON object with this exact structure:
         trip_id: savedTrip.id,
         day_number: 1,
         item_type: 'hotel',
-        item_id: tripPlan.hotel.id || null,
+        item_id: safeUuid(tripPlan.hotel.id),
         title: tripPlan.hotel.name,
         description: `${tripPlan.hotel.nights} nights accommodation`,
         price_aed: tripPlan.hotel.pricePerNight * tripPlan.hotel.nights,
@@ -299,7 +303,7 @@ Return a JSON object with this exact structure:
             trip_id: savedTrip.id,
             day_number: day.dayNumber,
             item_type: item.type === 'tour' ? 'tour' : item.type === 'transfer' ? 'transfer' : 'activity',
-            item_id: item.itemId || null,
+            item_id: safeUuid(item.itemId),
             title: item.title,
             description: item.description,
             start_time: item.startTime,
@@ -339,7 +343,7 @@ Return a JSON object with this exact structure:
           trip_id: savedTrip.id,
           day_number: 0,
           item_type: 'upsell',
-          item_id: upsell.itemId || null,
+          item_id: safeUuid(upsell.itemId),
           title: upsell.title,
           description: upsell.reason || upsell.description,
           price_aed: upsell.price,
