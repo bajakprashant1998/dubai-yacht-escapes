@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format, addDays } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -46,7 +46,7 @@ const stepInfo = [
 
 const TripPlanner = () => {
   const navigate = useNavigate();
-  const { generateTrip, isGenerating } = useTripPlanner();
+  const { generateTrip, isGenerating, error: tripError } = useTripPlanner();
   
   const [step, setStep] = useState<Step>(1);
   const [arrivalDate, setArrivalDate] = useState<Date>();
@@ -60,6 +60,7 @@ const TripPlanner = () => {
   const [showComboSuggestion, setShowComboSuggestion] = useState(true);
   const [arrivalCalendarOpen, setArrivalCalendarOpen] = useState(false);
   const [departureCalendarOpen, setDepartureCalendarOpen] = useState(false);
+  const [generatingStep, setGeneratingStep] = useState(0);
 
   // Calculate total days for matching
   const totalDays = arrivalDate && departureDate
@@ -103,6 +104,26 @@ const TripPlanner = () => {
     }
   };
 
+  // Generating steps animation
+  const generatingSteps = [
+    'Analyzing your preferences...',
+    'Finding the best hotels...',
+    'Curating activities & tours...',
+    'Optimizing your schedule...',
+    'Finalizing your itinerary...',
+  ];
+
+  useEffect(() => {
+    if (!isGenerating) {
+      setGeneratingStep(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setGeneratingStep(prev => (prev + 1) % generatingSteps.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [isGenerating]);
+
   const handleGenerate = async () => {
     if (!arrivalDate || !departureDate || !nationality) return;
 
@@ -126,6 +147,57 @@ const TripPlanner = () => {
       console.error('Failed to generate trip:', error);
     }
   };
+
+  // Full-screen generating overlay
+  if (isGenerating) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-secondary/5 flex items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute top-40 right-10 w-96 h-96 bg-secondary/5 rounded-full blur-3xl animate-pulse" />
+            <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-accent/5 rounded-full blur-3xl animate-pulse" />
+          </div>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center space-y-8 relative z-10 max-w-md px-6"
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+              className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-secondary to-secondary/70 flex items-center justify-center shadow-xl shadow-secondary/30"
+            >
+              <Sparkles className="w-10 h-10 text-secondary-foreground" />
+            </motion.div>
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-3">Creating Your Trip</h2>
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={generatingStep}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="text-muted-foreground text-lg"
+                >
+                  {generatingSteps[generatingStep]}
+                </motion.p>
+              </AnimatePresence>
+            </div>
+            <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-secondary to-primary rounded-full"
+                initial={{ width: '5%' }}
+                animate={{ width: '90%' }}
+                transition={{ duration: 20, ease: 'easeOut' }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">This usually takes 10-15 seconds</p>
+          </motion.div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -545,46 +617,52 @@ const TripPlanner = () => {
             </div>
 
             {/* Navigation */}
-            <div className="px-6 md:px-10 py-5 border-t border-border/50 flex items-center justify-between">
-              <Button
-                variant="ghost"
-                onClick={handleBack}
-                disabled={step === 1}
-                className="gap-2 text-muted-foreground hover:text-foreground"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </Button>
-
-              {step < 5 ? (
-                <Button
-                  onClick={handleNext}
-                  disabled={!canProceed()}
-                  className="gap-2 px-8 h-11 rounded-xl shadow-sm"
+            <div className="px-6 md:px-10 py-5 border-t border-border/50 space-y-3">
+              {tripError && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3 text-sm text-destructive flex items-center gap-2"
                 >
-                  Continue
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleGenerate}
-                  disabled={isGenerating || !canProceed()}
-                  className="gap-2 bg-gradient-to-r from-secondary to-secondary/80 hover:from-secondary/90 hover:to-secondary/70 text-secondary-foreground px-8 h-12 text-base rounded-xl shadow-lg shadow-secondary/30"
-                  size="lg"
-                >
-                  {isGenerating ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Creating Your Trip...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-5 h-5" />
-                      Generate My Trip
-                    </>
-                  )}
-                </Button>
+                  <span className="shrink-0">⚠️</span>
+                  <span className="flex-1">{tripError}</span>
+                  <Button variant="ghost" size="sm" onClick={handleGenerate} className="text-destructive hover:text-destructive shrink-0">
+                    Retry
+                  </Button>
+                </motion.div>
               )}
+              <div className="flex items-center justify-between">
+                <Button
+                  variant="ghost"
+                  onClick={handleBack}
+                  disabled={step === 1}
+                  className="gap-2 text-muted-foreground hover:text-foreground"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back
+                </Button>
+
+                {step < 5 ? (
+                  <Button
+                    onClick={handleNext}
+                    disabled={!canProceed()}
+                    className="gap-2 px-8 h-11 rounded-xl shadow-sm"
+                  >
+                    Continue
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleGenerate}
+                    disabled={!canProceed()}
+                    className="gap-2 bg-gradient-to-r from-secondary to-secondary/80 hover:from-secondary/90 hover:to-secondary/70 text-secondary-foreground px-8 h-12 text-base rounded-xl shadow-lg shadow-secondary/30"
+                    size="lg"
+                  >
+                    <Sparkles className="w-5 h-5" />
+                    Generate My Trip
+                  </Button>
+                )}
+              </div>
             </div>
           </motion.div>
 

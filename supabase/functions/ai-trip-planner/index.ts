@@ -26,6 +26,13 @@ interface TripRequest {
   input: TripInput;
 }
 
+// Helper: validate UUID format
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const safeUuid = (id: string | null | undefined): string | null => {
+  if (!id) return null;
+  return uuidRegex.test(id) ? id : null;
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -35,157 +42,97 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
-    
+
     if (!geminiApiKey) {
       throw new Error('GEMINI_API_KEY is not configured');
     }
-    
+
     const supabase = createClient(supabaseUrl, supabaseKey);
     const { action, tripId, visitorId, input }: TripRequest = await req.json();
 
-    // Fetch all necessary data for AI context
-    const [hotelsRes, carsRes, toursRes, servicesRes, visaRulesRes, configRes] = await Promise.all([
-      supabase.from('hotels').select('*').eq('is_active', true),
-      supabase.from('car_rentals').select('*').eq('is_active', true),
-      supabase.from('tours').select('*').eq('status', 'active'),
-      supabase.from('services').select('*').eq('is_active', true),
-      supabase.from('visa_nationality_rules').select('*').eq('country_code', input.nationality.toUpperCase()),
-      supabase.from('ai_trip_config').select('*'),
+    // Fetch data in parallel - limit fields to reduce payload
+    const [hotelsRes, toursRes, servicesRes, visaRulesRes] = await Promise.all([
+      supabase.from('hotels').select('id,name,star_rating,location,price_from').eq('is_active', true).limit(20),
+      supabase.from('tours').select('id,title,duration,price,description').eq('status', 'active').limit(30),
+      supabase.from('services').select('id,title,duration,price,description').eq('is_active', true).limit(30),
+      supabase.from('visa_nationality_rules').select('*').eq('country_code', input.nationality.toUpperCase()).limit(1),
     ]);
 
     const hotels = hotelsRes.data || [];
-    const cars = carsRes.data || [];
     const tours = toursRes.data || [];
     const services = servicesRes.data || [];
     const visaRule = visaRulesRes.data?.[0];
-    const configs = configRes.data || [];
-
-    // Parse configs
-    const getConfig = (key: string) => {
-      const config = configs.find(c => c.config_key === key);
-      return config?.config_value || {};
-    };
-
-    const budgetHotelMapping = getConfig('budget_hotel_mapping');
-    const maxActivitiesConfig = getConfig('max_activities_per_day');
-    const transportRules = getConfig('transport_rules');
-    const upsellRules = getConfig('upsell_rules');
 
     // Calculate trip duration
     const arrival = new Date(input.arrivalDate);
     const departure = new Date(input.departureDate);
     const totalDays = Math.ceil((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-
-    // Determine transport type
     const totalTravelers = input.adults + input.children;
+
+    // Budget-based hotel filter
+    const targetStars = input.budgetTier === 'luxury' ? 5 : input.budgetTier === 'medium' ? 4 : 3;
+    const suitableHotels = hotels.filter(h => {
+      const stars = h.star_rating || 4;
+      return stars >= targetStars - 1 && stars <= targetStars + 1;
+    }).slice(0, 8);
+
+    // Transport type
     let transportType = 'sedan';
     if (totalTravelers >= 6) transportType = 'van';
     else if (totalTravelers >= 3) transportType = 'suv';
     if (input.budgetTier === 'luxury') transportType = 'private luxury';
 
-    // Filter hotels by budget tier
-    const targetStars = budgetHotelMapping[input.budgetTier] || 4;
-    const suitableHotels = hotels.filter(h => (h.star_rating || 4) >= targetStars - 1 && (h.star_rating || 4) <= targetStars + 1);
+    // Build compact inventory strings
+    const hotelList = suitableHotels.map(h => `${h.id}|${h.name}|${h.star_rating}★|${h.location}|${h.price_from}AED`).join('\n');
+    const tourList = tours.slice(0, 15).map(t => `${t.id}|${t.title}|${t.duration}|${t.price}AED`).join('\n');
+    const serviceList = services.slice(0, 15).map(s => `${s.id}|${s.title}|${s.duration}|${s.price}AED`).join('\n');
 
-    // Build AI prompt
-    const systemPrompt = `You are an expert Dubai travel planner AI. Generate a complete, detailed trip itinerary based on the user's preferences.
+    const visaStatus = visaRule
+      ? (visaRule.visa_required ? `Visa REQUIRED. Documents: ${(visaRule.documents_required || []).join(', ')}` : 'No visa required')
+      : 'Assume visa required';
 
-AVAILABLE INVENTORY:
-Hotels (${suitableHotels.length} options):
-${suitableHotels.map(h => `- ${h.name} (${h.star_rating}★, ${h.location}, from ${h.price_from} AED/night) ID: ${h.id}`).join('\n')}
+    const systemPrompt = `You are a Dubai travel planner. Generate a JSON trip itinerary.
 
-Cars (${cars.length} options):
-${cars.map(c => `- ${c.title} (${c.seats} seats, ${c.transmission}, ${c.daily_price} AED/day) ID: ${c.id}`).join('\n')}
+HOTELS (id|name|stars|location|price):
+${hotelList || 'No hotels available - create generic recommendations'}
 
-Tours/Cruises (${tours.length} options):
-${tours.map(t => `- ${t.title} (${t.duration}, ${t.price} AED) ID: ${t.id} - ${t.description?.substring(0, 100)}`).join('\n')}
+TOURS (id|name|duration|price):
+${tourList || 'No tours - create generic activities'}
 
-Activities (${services.length} options):
-${services.map(s => `- ${s.title} (${s.duration}, ${s.price} AED) ID: ${s.id} - ${s.description?.substring(0, 100)}`).join('\n')}
+ACTIVITIES (id|name|duration|price):
+${serviceList || 'No activities - create generic ones'}
 
-TRIP DETAILS:
-- Arrival: ${input.arrivalDate}
-- Departure: ${input.departureDate}
-- Total Days: ${totalDays}
-- Adults: ${input.adults}, Children: ${input.children}
-- Budget Tier: ${input.budgetTier} (Target hotel stars: ${targetStars})
-- Travel Style: ${input.travelStyle}
-- Special Occasion: ${input.specialOccasion || 'none'}
-- Transport Type: ${transportType}
-
-VISA STATUS:
-${visaRule ? (visaRule.visa_required ? `Visa REQUIRED. Documents needed: ${visaRule.documents_required?.join(', ')}` : 'No visa required') : 'Check visa requirements'}
+TRIP: ${input.arrivalDate} to ${input.departureDate} (${totalDays} days), ${input.adults} adults + ${input.children} children, ${input.budgetTier} budget, ${input.travelStyle} style${input.specialOccasion && input.specialOccasion !== 'none' ? `, occasion: ${input.specialOccasion}` : ''}.
+Transport: ${transportType}. Visa: ${visaStatus}.
 
 RULES:
-1. Day 1: Arrival + hotel check-in + max 1 light activity (evening preferred)
-2. Last Day: Free time for packing + airport transfer (no major activities)
-3. Middle Days: Max 2 major activities per day with proper time gaps
-4. Include airport transfers on arrival and departure days
-5. Select ONE hotel for the entire stay
-6. Select appropriate transport based on ${totalTravelers} travelers
-7. Add 2-3 upsell suggestions based on travel style (mark as optional)
-8. Price everything in AED
-9. Schedule activities with realistic times (9AM-9PM)
-10. For families with children, prioritize family-friendly activities
-11. For couples, include romantic experiences
-12. For adventure style, include thrilling activities
-13. For luxury, include premium experiences
+- Day 1: Arrival + check-in + 1 evening activity
+- Last day: Free morning + airport transfer
+- Middle days: 2-3 activities with realistic times (9AM-9PM)
+- Use EXACT UUIDs from inventory for itemId. If no match, set itemId to null.
+- Pick ONE hotel for all nights
+- Price in AED
 
-RESPONSE FORMAT:
-Return a JSON object with this exact structure:
-{
-  "hotel": { "id": "uuid", "name": "string", "nights": number, "pricePerNight": number },
-  "transport": { "type": "sedan|suv|van|private luxury", "dailyRate": number, "totalDays": number },
-  "days": [
-    {
-      "dayNumber": 1,
-      "date": "YYYY-MM-DD",
-      "items": [
-        {
-          "type": "transfer|activity|tour|meal|free_time",
-          "itemId": "uuid or null",
-          "title": "string",
-          "description": "string",
-          "startTime": "HH:MM",
-          "endTime": "HH:MM",
-          "price": number
-        }
-      ]
-    }
-  ],
-  "visa": { "required": boolean, "type": "string or null", "price": number, "documents": ["string"] },
-  "upsells": [
-    { "itemId": "uuid", "title": "string", "description": "string", "price": number, "reason": "string" }
-  ],
-  "summary": {
-    "hotelTotal": number,
-    "transportTotal": number,
-    "activitiesTotal": number,
-    "visaTotal": number,
-    "grandTotal": number
-  }
-}`;
+Return ONLY this JSON:
+{"hotel":{"id":"uuid","name":"str","nights":N,"pricePerNight":N},"transport":{"type":"str","dailyRate":N,"totalDays":N},"days":[{"dayNumber":N,"date":"YYYY-MM-DD","items":[{"type":"transfer|activity|tour|meal|free_time","itemId":"uuid or null","title":"str","description":"str","startTime":"HH:MM","endTime":"HH:MM","price":N}]}],"visa":{"required":bool,"type":"str or null","price":N,"documents":["str"]},"upsells":[{"itemId":"uuid or null","title":"str","description":"str","price":N,"reason":"str"}],"summary":{"hotelTotal":N,"transportTotal":N,"activitiesTotal":N,"visaTotal":N,"grandTotal":N}}`;
 
     const userMessage = action === 'modify' && input.modifications
-      ? `Current trip needs modification: ${input.modifications}. Update the itinerary accordingly.`
-      : `Generate a complete ${totalDays}-day Dubai trip itinerary for ${totalTravelers} travelers (${input.adults} adults, ${input.children} children) with ${input.budgetTier} budget and ${input.travelStyle} travel style.${input.specialOccasion && input.specialOccasion !== 'none' ? ` Special occasion: ${input.specialOccasion}.` : ''}`;
+      ? `Modify trip: ${input.modifications}`
+      : `Generate ${totalDays}-day Dubai itinerary for ${totalTravelers} travelers.`;
 
-    // Call Gemini API directly
+    console.log('Calling Lovable AI gateway...');
+
+    // Use Gemini API directly
     const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [
-          {
-            role: 'user',
-            parts: [{ text: `${systemPrompt}\n\n${userMessage}` }]
-          }
+          { role: 'user', parts: [{ text: `${systemPrompt}\n\n${userMessage}` }] }
         ],
         generationConfig: {
           temperature: 0.7,
-          maxOutputTokens: 16000,
+          maxOutputTokens: 8000,
           responseMimeType: "application/json",
         },
       }),
@@ -193,7 +140,7 @@ Return a JSON object with this exact structure:
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
-      console.error('Gemini API Error:', errorText);
+      console.error('Gemini API Error:', aiResponse.status, errorText);
       throw new Error(`Gemini API error: ${aiResponse.status}`);
     }
 
@@ -201,29 +148,28 @@ Return a JSON object with this exact structure:
     const aiContent = aiResult.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!aiContent) {
+      console.error('No content in AI response:', JSON.stringify(aiResult).substring(0, 500));
       throw new Error('No content returned from AI');
     }
+
+    console.log('AI response received, parsing...');
 
     // Parse AI response
     let tripPlan;
     try {
       let jsonStr = aiContent.trim();
+      // Strip markdown code blocks if present
       const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
       if (jsonMatch) jsonStr = jsonMatch[1].trim();
       tripPlan = JSON.parse(jsonStr);
     } catch (parseError) {
-      console.error('Failed to parse AI response (first 500 chars):', aiContent.substring(0, 500));
+      console.error('Parse error. First 500 chars:', aiContent.substring(0, 500));
       throw new Error('Failed to parse trip plan from AI');
     }
 
-    // Helper: validate UUID format, return null if invalid
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    const safeUuid = (id: string | null | undefined): string | null => {
-      if (!id) return null;
-      return uuidRegex.test(id) ? id : null;
-    };
+    console.log('Trip plan parsed, saving to database...');
 
-    // Store the trip plan in database
+    // Store the trip plan
     const { data: savedTrip, error: tripError } = await supabase
       .from('trip_plans')
       .insert({
@@ -243,9 +189,9 @@ Return a JSON object with this exact structure:
         display_currency: 'AED',
         display_price: tripPlan.summary?.grandTotal || 0,
         metadata: {
-          ai_model: 'gemini-2.0-flash',
+          ai_model: 'gemini-2.5-flash',
           generated_at: new Date().toISOString(),
-          version: 1,
+          version: 2,
         },
       })
       .select()
@@ -256,20 +202,20 @@ Return a JSON object with this exact structure:
       throw new Error('Failed to save trip plan');
     }
 
-    // Store trip items
-    const tripItems = [];
+    // Build trip items array
+    const tripItems: any[] = [];
 
-    // Add hotel
+    // Hotel
     if (tripPlan.hotel) {
       tripItems.push({
         trip_id: savedTrip.id,
         day_number: 1,
         item_type: 'hotel',
         item_id: safeUuid(tripPlan.hotel.id),
-        title: tripPlan.hotel.name,
-        description: `${tripPlan.hotel.nights} nights accommodation`,
-        price_aed: tripPlan.hotel.pricePerNight * tripPlan.hotel.nights,
-        quantity: tripPlan.hotel.nights,
+        title: tripPlan.hotel.name || 'Hotel',
+        description: `${tripPlan.hotel.nights || totalDays - 1} nights accommodation`,
+        price_aed: (tripPlan.hotel.pricePerNight || 0) * (tripPlan.hotel.nights || totalDays - 1),
+        quantity: tripPlan.hotel.nights || totalDays - 1,
         is_optional: false,
         is_included: true,
         sort_order: 0,
@@ -277,16 +223,16 @@ Return a JSON object with this exact structure:
       });
     }
 
-    // Add transport
+    // Transport
     if (tripPlan.transport) {
       tripItems.push({
         trip_id: savedTrip.id,
         day_number: 1,
         item_type: 'car',
-        title: `${tripPlan.transport.type} Transport`,
-        description: `${tripPlan.transport.totalDays} days private transport`,
-        price_aed: tripPlan.transport.dailyRate * tripPlan.transport.totalDays,
-        quantity: tripPlan.transport.totalDays,
+        title: `${tripPlan.transport.type || transportType} Transport`,
+        description: `${tripPlan.transport.totalDays || totalDays} days private transport`,
+        price_aed: (tripPlan.transport.dailyRate || 0) * (tripPlan.transport.totalDays || totalDays),
+        quantity: tripPlan.transport.totalDays || totalDays,
         is_optional: false,
         is_included: true,
         sort_order: 1,
@@ -294,20 +240,21 @@ Return a JSON object with this exact structure:
       });
     }
 
-    // Add daily items
-    if (tripPlan.days) {
+    // Daily items
+    if (tripPlan.days && Array.isArray(tripPlan.days)) {
       for (const day of tripPlan.days) {
+        if (!day.items || !Array.isArray(day.items)) continue;
         for (let i = 0; i < day.items.length; i++) {
           const item = day.items[i];
           tripItems.push({
             trip_id: savedTrip.id,
-            day_number: day.dayNumber,
+            day_number: day.dayNumber || 1,
             item_type: item.type === 'tour' ? 'tour' : item.type === 'transfer' ? 'transfer' : 'activity',
             item_id: safeUuid(item.itemId),
-            title: item.title,
-            description: item.description,
-            start_time: item.startTime,
-            end_time: item.endTime,
+            title: item.title || 'Activity',
+            description: item.description || '',
+            start_time: item.startTime || null,
+            end_time: item.endTime || null,
             price_aed: item.price || 0,
             quantity: 1,
             is_optional: false,
@@ -319,14 +266,14 @@ Return a JSON object with this exact structure:
       }
     }
 
-    // Add visa if required
+    // Visa
     if (tripPlan.visa?.required) {
       tripItems.push({
         trip_id: savedTrip.id,
         day_number: 0,
         item_type: 'visa',
         title: `UAE ${tripPlan.visa.type || 'Tourist'} Visa`,
-        description: tripPlan.visa.documents?.join(', '),
+        description: (tripPlan.visa.documents || []).join(', '),
         price_aed: tripPlan.visa.price || 0,
         quantity: input.adults + input.children,
         is_optional: false,
@@ -336,17 +283,17 @@ Return a JSON object with this exact structure:
       });
     }
 
-    // Add upsells
-    if (tripPlan.upsells) {
+    // Upsells
+    if (tripPlan.upsells && Array.isArray(tripPlan.upsells)) {
       for (const upsell of tripPlan.upsells) {
         tripItems.push({
           trip_id: savedTrip.id,
           day_number: 0,
           item_type: 'upsell',
           item_id: safeUuid(upsell.itemId),
-          title: upsell.title,
-          description: upsell.reason || upsell.description,
-          price_aed: upsell.price,
+          title: upsell.title || 'Extra',
+          description: upsell.reason || upsell.description || '',
+          price_aed: upsell.price || 0,
           quantity: 1,
           is_optional: true,
           is_included: false,
@@ -364,8 +311,11 @@ Return a JSON object with this exact structure:
 
       if (itemsError) {
         console.error('Error saving trip items:', itemsError);
+        // Don't throw - trip is saved, items are secondary
       }
     }
+
+    console.log('Trip saved successfully:', savedTrip.id);
 
     return new Response(
       JSON.stringify({
