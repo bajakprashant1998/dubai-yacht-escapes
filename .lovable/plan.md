@@ -1,47 +1,59 @@
 
 
-## Plan: Enhance Trip Planner Wizard & Create Tests
+## Plan: Lead Capture Form for AI Trip Planner + Admin Leads Management
 
-The user is on `/plan-trip` and wants the wizard section enhanced to match the reference screenshot style (cleaner, more polished step indicators with icons and labels, refined date selection UI) and wants tests created.
+### 1. Create `trip_leads` database table
+New table to store lead submissions before trip generation:
+- `id`, `name`, `email`, `phone` (optional), `travel_date` (optional), `notes` (optional)
+- `trip_id` (nullable, linked after generation)
+- `status` (default: 'new')
+- `created_at`
+- RLS: public INSERT, admin-only SELECT/UPDATE/DELETE
 
-### Current State
-- 5-step wizard: Dates → Travelers → Nationality → Budget → Style
-- Step indicators use rounded squares with icons and connecting lines
-- Date pickers use Popover + Calendar components
-- Navigation has Back/Continue buttons and trust badges at bottom
-- All sub-components (TravelerCounter, BudgetSelector, etc.) are functional
+### 2. Add lead capture gate to TripPlanner page
+- New state `leadCaptured` (default false) + `leadData` in `TripPlanner.tsx`
+- Before the wizard renders, show a lead form (name*, email*, phone, travel date)
+- On submit, insert into `trip_leads`, store the lead ID in state
+- Only then show the 5-step wizard
+- After trip generation, update the `trip_leads` row with the `trip_id`
 
-### Changes
-
-#### 1. Enhance `TripPlanner.tsx` - Wizard UI Polish
-- **Step indicators**: Match reference — use rounded square icon containers with text labels below, cleaner spacing, softer active/completed states
-- **Step 1 (Dates)**: Make the date picker buttons match the reference screenshot exactly — arrival date with blue filled state when selected, departure with outline style, cleaner layout
-- **Days summary pill**: Improve the "X days in Dubai" indicator styling
-- **Navigation footer**: Cleaner layout matching reference — left-aligned "← Back" text button, right-aligned filled "Continue →" button
-- **Trust badges at bottom**: Match the reference pill style with icons
-
-#### 2. Enhance Sub-components
-- **TravelerCounter**: Add subtle hover states, improve spacing
-- **BudgetSelector**: Add gradient backgrounds on selected state
-- **TravelStyleSelector**: Refine selected indicator animations
-- **SpecialOccasionSelector**: Minor polish for consistency
-
-#### 3. Create Tests - `src/pages/__tests__/TripPlanner.test.tsx`
-- Test wizard renders with step 1 (Dates) visible
-- Test step navigation (Continue button advances, Back goes back)
-- Test Continue button disabled when no dates selected
-- Test step indicator shows correct active step
-- Test traveler counter increment/decrement
-
-#### 4. Create Tests - `src/components/trip/__tests__/TravelerCounter.test.tsx`
-- Test renders with default values
-- Test increment/decrement adults
-- Test children min is 0, adults min is 1
-- Test total travelers display
+### 3. Add Leads tab to Admin AI Trips dashboard
+Update `AITripDashboard.tsx`:
+- Add a **Tabs** component with "Trip Plans" and "Leads" tabs
+- **Leads tab**: table showing name, email, phone, travel date, status, submitted date
+- **Delete button** per row with confirmation dialog
+- **Bulk select + delete** support
+- **Download CSV** button to export all leads
+- Lead count stat card added to the overview
 
 ### Technical Details
-- All changes are UI-only in existing components, no database or backend changes needed
-- Tests will use Vitest + React Testing Library (already configured)
-- Will mock `useTripPlanner`, `useMatchCombo`, and router hooks in tests
-- Sub-component tests can render in isolation without mocking
+
+**Migration SQL:**
+```sql
+CREATE TABLE public.trip_leads (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  email text NOT NULL,
+  phone text,
+  travel_date date,
+  notes text,
+  trip_id uuid,
+  status text NOT NULL DEFAULT 'new',
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.trip_leads ENABLE ROW LEVEL SECURITY;
+
+-- Public can submit leads
+CREATE POLICY "Anyone can create trip leads" ON public.trip_leads
+  FOR INSERT WITH CHECK (true);
+
+-- Admins can manage all leads
+CREATE POLICY "Admins can manage trip leads" ON public.trip_leads
+  FOR ALL USING (has_role(auth.uid(), 'admin'));
+```
+
+**Files to modify:**
+- `src/pages/TripPlanner.tsx` — add lead form gate before wizard
+- `src/pages/admin/AITripDashboard.tsx` — add Leads tab with table, delete, CSV export
 
