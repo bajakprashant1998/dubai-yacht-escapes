@@ -26,7 +26,9 @@ export const useVisaRules = (countryCode?: string) => {
       if (error) throw error;
       return data as VisaNationalityRule[];
     },
-    staleTime: 1000 * 60 * 60, // 1 hour - visa rules don't change often
+    staleTime: 1000 * 60 * 60,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 10000),
   });
 
   const { data: countryRule, isLoading: isLoadingCountry } = useQuery({
