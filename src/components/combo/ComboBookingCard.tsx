@@ -45,7 +45,8 @@ const ComboBookingCard = ({ combo }: ComboBookingCardProps) => {
           {/* CTA Buttons */}
           <div className="space-y-3">
             <Button
-              className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground gap-2"
+              data-combo-book
+              className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground gap-2 rounded-xl"
               size="lg"
               onClick={() => setIsCheckoutOpen(true)}
             >
