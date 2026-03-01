@@ -9,7 +9,6 @@ interface ComboFiltersProps {
   onTypeChange: (type: string) => void;
 }
 
-// Icon mapping for dynamic icons from database
 const iconMap: Record<string, LucideIcon> = {
   sparkles: Sparkles,
   users: Users,
@@ -24,34 +23,32 @@ const ComboFilters = ({ activeType, onTypeChange }: ComboFiltersProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-wrap gap-2 justify-center">
+      <div className="flex flex-wrap gap-2">
         {[1, 2, 3, 4, 5].map((i) => (
-          <Skeleton key={i} className="h-10 w-28 rounded-md" />
+          <Skeleton key={i} className="h-9 w-24 rounded-full" />
         ))}
       </div>
     );
   }
 
   return (
-    <div className="flex flex-wrap gap-2 justify-center">
-      {/* All Combos option */}
+    <div className="flex flex-wrap gap-2">
       <Button
         key="all"
         variant={activeType === "all" ? "default" : "outline"}
-        size="lg"
+        size="sm"
         onClick={() => onTypeChange("all")}
         className={cn(
-          "gap-2 transition-all",
+          "gap-1.5 rounded-full transition-all text-xs h-9 px-4",
           activeType === "all"
             ? "bg-secondary text-secondary-foreground shadow-md"
-            : "hover:bg-secondary/10 hover:text-secondary hover:border-secondary"
+            : "hover:bg-secondary/10 hover:text-secondary hover:border-secondary/50"
         )}
       >
-        <Grid3X3 className="w-4 h-4" />
-        All Combos
+        <Grid3X3 className="w-3.5 h-3.5" />
+        All
       </Button>
 
-      {/* Dynamic package types from database */}
       {packageTypes.map((type) => {
         const Icon = iconMap[type.icon] || Sparkles;
         const isActive = activeType === type.slug;
@@ -60,16 +57,16 @@ const ComboFilters = ({ activeType, onTypeChange }: ComboFiltersProps) => {
           <Button
             key={type.id}
             variant={isActive ? "default" : "outline"}
-            size="lg"
+            size="sm"
             onClick={() => onTypeChange(type.slug)}
             className={cn(
-              "gap-2 transition-all",
+              "gap-1.5 rounded-full transition-all text-xs h-9 px-4",
               isActive
                 ? "bg-secondary text-secondary-foreground shadow-md"
-                : "hover:bg-secondary/10 hover:text-secondary hover:border-secondary"
+                : "hover:bg-secondary/10 hover:text-secondary hover:border-secondary/50"
             )}
           >
-            <Icon className="w-4 h-4" />
+            <Icon className="w-3.5 h-3.5" />
             {type.name}
           </Button>
         );
