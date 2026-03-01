@@ -1,0 +1,1 @@
+ALTER TABLE public.services ADD COLUMN booking_features jsonb DEFAULT NULL;

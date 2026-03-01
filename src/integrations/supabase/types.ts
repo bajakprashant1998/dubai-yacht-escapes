@@ -1624,6 +1624,7 @@ export type Database = {
       }
       services: {
         Row: {
+          booking_features: Json | null
           booking_type: string | null
           cancellation_policy: string | null
           category_id: string | null
@@ -1662,6 +1663,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          booking_features?: Json | null
           booking_type?: string | null
           cancellation_policy?: string | null
           category_id?: string | null
@@ -1700,6 +1702,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          booking_features?: Json | null
           booking_type?: string | null
           cancellation_policy?: string | null
           category_id?: string | null

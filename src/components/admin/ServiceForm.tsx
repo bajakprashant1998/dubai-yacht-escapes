@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Upload, X, Plus, Loader2, ImageIcon, Sparkles, MapPin } from "lucide-react";
+import { Upload, X, Plus, Loader2, ImageIcon, Sparkles, MapPin, Calendar, Clock, Users, Shield, Flame, RotateCcw, Ship, Info, CheckCircle2, Backpack, AlertCircle } from "lucide-react";
 import { useServiceCategories } from "@/hooks/useServiceCategories";
 import { useActiveLocations } from "@/hooks/useLocations";
 import { useCreateService, useUpdateService } from "@/hooks/useServices";
@@ -26,6 +26,64 @@ import SEOPreview from "./SEOPreview";
 import KeywordsInput from "./KeywordsInput";
 import RichTextEditor from "./RichTextEditor";
 import type { Service } from "@/lib/serviceMapper";
+import { BookingFeatures, defaultBookingFeatures, GuestCategory, AddOn } from "@/lib/tourMapper";
+import { Textarea } from "@/components/ui/textarea";
+
+// Helper component for important info list editing
+const InfoListEditor = ({
+  title,
+  icon,
+  items,
+  onChange,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  items: string[];
+  onChange: (items: string[]) => void;
+}) => {
+  return (
+    <div className="space-y-3">
+      <Label className="flex items-center gap-2 text-sm font-semibold">
+        {icon}
+        {title}
+      </Label>
+      <div className="space-y-2">
+        {items.map((item, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-secondary shrink-0" />
+            <Input
+              value={item}
+              onChange={(e) => {
+                const updated = [...items];
+                updated[index] = e.target.value;
+                onChange(updated);
+              }}
+              className="flex-1"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 shrink-0"
+              onClick={() => onChange(items.filter((_, i) => i !== index))}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+        ))}
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => onChange([...items, ""])}
+      >
+        <Plus className="w-4 h-4 mr-2" />
+        Add Item
+      </Button>
+    </div>
+  );
+};
 
 interface ServiceFormProps {
   service?: Service;
@@ -78,6 +136,7 @@ const ServiceForm = ({ service, mode }: ServiceFormProps) => {
     meta_title: service?.metaTitle || "",
     meta_description: service?.metaDescription || "",
     meta_keywords: service?.metaKeywords || [],
+    booking_features: ((service as any)?.bookingFeatures as BookingFeatures) || defaultBookingFeatures,
   });
 
   // Array field inputs
@@ -240,6 +299,7 @@ const ServiceForm = ({ service, mode }: ServiceFormProps) => {
       meta_title: formData.meta_title || null,
       meta_description: formData.meta_description || null,
       meta_keywords: formData.meta_keywords?.length ? formData.meta_keywords : null,
+      booking_features: JSON.parse(JSON.stringify(formData.booking_features)),
     };
 
     if (mode === "create") {
@@ -653,7 +713,623 @@ const ServiceForm = ({ service, mode }: ServiceFormProps) => {
             </CardContent>
           </Card>
 
-          {/* SEO */}
+          {/* Booking Options */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-secondary" />
+                Booking Options
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Price Label Override */}
+              <div className="space-y-2">
+                <Label>Price Label Override</Label>
+                <Input
+                  value={formData.booking_features.price_label_override}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      booking_features: { ...prev.booking_features, price_label_override: e.target.value },
+                    }))
+                  }
+                  placeholder='Optional: Override "per person" or "per hour" text e.g. per 2 hours, per couple'
+                />
+              </div>
+
+              {/* Booking Mode */}
+              <div className="space-y-2">
+                <Label>Booking Mode</Label>
+                <Select
+                  value={formData.booking_features.booking_mode}
+                  onValueChange={(value: "guest_categories" | "quantity_only") =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      booking_features: { ...prev.booking_features, booking_mode: value },
+                    }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="guest_categories">Guest Categories</SelectItem>
+                    <SelectItem value="quantity_only">Quantity Only</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Guest Categories */}
+              {formData.booking_features.booking_mode === "guest_categories" && (
+                <div className="space-y-3">
+                  <Label className="text-sm font-semibold">Guest Categories</Label>
+                  <div className="border rounded-lg overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-muted/50">
+                          <th className="px-3 py-2 text-left font-medium">Name</th>
+                          <th className="px-3 py-2 text-left font-medium">Label</th>
+                          <th className="px-3 py-2 text-left font-medium">Price</th>
+                          <th className="px-3 py-2 text-left font-medium">Min</th>
+                          <th className="px-3 py-2 text-left font-medium">Max</th>
+                          <th className="px-3 py-2 w-10"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {formData.booking_features.guest_categories.map((cat, index) => (
+                          <tr key={index} className="border-t">
+                            <td className="px-3 py-2">
+                              <Input
+                                value={cat.name}
+                                onChange={(e) => {
+                                  const updated = [...formData.booking_features.guest_categories];
+                                  updated[index] = { ...updated[index], name: e.target.value };
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    booking_features: { ...prev.booking_features, guest_categories: updated },
+                                  }));
+                                }}
+                                className="h-8"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <Input
+                                value={cat.label}
+                                onChange={(e) => {
+                                  const updated = [...formData.booking_features.guest_categories];
+                                  updated[index] = { ...updated[index], label: e.target.value };
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    booking_features: { ...prev.booking_features, guest_categories: updated },
+                                  }));
+                                }}
+                                className="h-8"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <Input
+                                type="number"
+                                value={cat.price}
+                                onChange={(e) => {
+                                  const updated = [...formData.booking_features.guest_categories];
+                                  updated[index] = { ...updated[index], price: Number(e.target.value) };
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    booking_features: { ...prev.booking_features, guest_categories: updated },
+                                  }));
+                                }}
+                                className="h-8 w-20"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <Input
+                                type="number"
+                                value={cat.min}
+                                onChange={(e) => {
+                                  const updated = [...formData.booking_features.guest_categories];
+                                  updated[index] = { ...updated[index], min: Number(e.target.value) };
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    booking_features: { ...prev.booking_features, guest_categories: updated },
+                                  }));
+                                }}
+                                className="h-8 w-16"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <Input
+                                type="number"
+                                value={cat.max}
+                                onChange={(e) => {
+                                  const updated = [...formData.booking_features.guest_categories];
+                                  updated[index] = { ...updated[index], max: Number(e.target.value) };
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    booking_features: { ...prev.booking_features, guest_categories: updated },
+                                  }));
+                                }}
+                                className="h-8 w-16"
+                              />
+                            </td>
+                            <td className="px-3 py-2">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => {
+                                  const updated = formData.booking_features.guest_categories.filter((_, i) => i !== index);
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    booking_features: { ...prev.booking_features, guest_categories: updated },
+                                  }));
+                                }}
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        booking_features: {
+                          ...prev.booking_features,
+                          guest_categories: [
+                            ...prev.booking_features.guest_categories,
+                            { name: "", label: "", price: 0, min: 0, max: 10 },
+                          ],
+                        },
+                      }));
+                    }}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Category
+                  </Button>
+                </div>
+              )}
+
+              {/* Add-Ons */}
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold">Add-Ons</Label>
+                {formData.booking_features.addons.map((addon, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <Input
+                      value={addon.name}
+                      onChange={(e) => {
+                        const updated = [...formData.booking_features.addons];
+                        updated[index] = { ...updated[index], name: e.target.value };
+                        setFormData((prev) => ({
+                          ...prev,
+                          booking_features: { ...prev.booking_features, addons: updated },
+                        }));
+                      }}
+                      placeholder="Add-on name"
+                      className="flex-1"
+                    />
+                    <Input
+                      type="number"
+                      value={addon.price}
+                      onChange={(e) => {
+                        const updated = [...formData.booking_features.addons];
+                        updated[index] = { ...updated[index], price: Number(e.target.value) };
+                        setFormData((prev) => ({
+                          ...prev,
+                          booking_features: { ...prev.booking_features, addons: updated },
+                        }));
+                      }}
+                      placeholder="Price"
+                      className="w-24"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        const updated = formData.booking_features.addons.filter((_, i) => i !== index);
+                        setFormData((prev) => ({
+                          ...prev,
+                          booking_features: { ...prev.booking_features, addons: updated },
+                        }));
+                      }}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      booking_features: {
+                        ...prev.booking_features,
+                        addons: [...prev.booking_features.addons, { name: "", price: 0 }],
+                      },
+                    }));
+                  }}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add New Add-On
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Booking Sidebar Features */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="flex items-center gap-2">
+                <Flame className="w-5 h-5 text-secondary" />
+                Booking Sidebar Features
+              </CardTitle>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    booking_features: defaultBookingFeatures,
+                  }));
+                  toast.success("Booking features reset to defaults");
+                }}
+                className="h-8 gap-2 text-muted-foreground hover:text-foreground"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Reset to Defaults
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Urgency Banner */}
+              <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <Label className="flex items-center gap-2">
+                    <Flame className="w-4 h-4 text-destructive" />
+                    Urgency Banner
+                  </Label>
+                  <Switch
+                    checked={formData.booking_features.urgency_enabled}
+                    onCheckedChange={(checked) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        booking_features: { ...prev.booking_features, urgency_enabled: checked },
+                      }))
+                    }
+                  />
+                </div>
+                {formData.booking_features.urgency_enabled && (
+                  <Input
+                    value={formData.booking_features.urgency_text}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        booking_features: { ...prev.booking_features, urgency_text: e.target.value },
+                      }))
+                    }
+                    placeholder="Only few spots left today!"
+                  />
+                )}
+              </div>
+
+              {/* Quick Info Items */}
+              <div className="space-y-4">
+                <Label className="text-sm font-semibold">Quick Info Items</Label>
+                <div className="grid gap-3">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="w-4 h-4 text-secondary shrink-0" />
+                    <Input
+                      value={formData.booking_features.availability_text}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          booking_features: { ...prev.booking_features, availability_text: e.target.value },
+                        }))
+                      }
+                      placeholder="Available daily"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Clock className="w-4 h-4 text-secondary shrink-0" />
+                    <Input
+                      value={formData.booking_features.minimum_duration}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          booking_features: { ...prev.booking_features, minimum_duration: e.target.value },
+                        }))
+                      }
+                      placeholder="Minimum 2 Hours Required"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Users className="w-4 h-4 text-secondary shrink-0" />
+                        <Label>Hotel Pickup</Label>
+                      </div>
+                      <Switch
+                        checked={formData.booking_features.hotel_pickup}
+                        onCheckedChange={(checked) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            booking_features: { ...prev.booking_features, hotel_pickup: checked },
+                          }))
+                        }
+                      />
+                    </div>
+                    {formData.booking_features.hotel_pickup && (
+                      <Input
+                        value={formData.booking_features.hotel_pickup_text}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            booking_features: { ...prev.booking_features, hotel_pickup_text: e.target.value },
+                          }))
+                        }
+                        placeholder="Hotel pickup included"
+                        className="ml-7"
+                      />
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Shield className="w-4 h-4 text-secondary shrink-0" />
+                    <Input
+                      value={formData.booking_features.cancellation_text}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          booking_features: { ...prev.booking_features, cancellation_text: e.target.value },
+                        }))
+                      }
+                      placeholder="Free cancellation (24h)"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Travel Type & Transfer Options */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Ship className="w-5 h-5 text-secondary" />
+                Travel & Deck Options
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <Label>Enable Travel Type Selection</Label>
+                  <Switch
+                    checked={formData.booking_features.travel_type_enabled}
+                    onCheckedChange={(checked) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        booking_features: { ...prev.booking_features, travel_type_enabled: checked },
+                      }))
+                    }
+                  />
+                </div>
+                {formData.booking_features.travel_type_enabled && (
+                  <div className="space-y-2">
+                    <Label>Direct To Boat Discount (AED)</Label>
+                    <Input
+                      type="number"
+                      value={formData.booking_features.direct_to_boat_discount}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          booking_features: { ...prev.booking_features, direct_to_boat_discount: Number(e.target.value) },
+                        }))
+                      }
+                      placeholder="Amount deducted for Self Travelling"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <Label>Transfer Service Available</Label>
+                  <Switch
+                    checked={formData.booking_features.transfer_available}
+                    onCheckedChange={(checked) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        booking_features: { ...prev.booking_features, transfer_available: checked },
+                      }))
+                    }
+                  />
+                </div>
+                {formData.booking_features.transfer_available && (
+                  <div className="space-y-2">
+                    <Label>Transfer Label</Label>
+                    <Input
+                      value={formData.booking_features.transfer_label}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          booking_features: { ...prev.booking_features, transfer_label: e.target.value },
+                        }))
+                      }
+                      placeholder="Hotel/Residence Transfer"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <Label>Has Upper Deck Option</Label>
+                  <Switch
+                    checked={formData.booking_features.upper_deck_enabled}
+                    onCheckedChange={(checked) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        booking_features: { ...prev.booking_features, upper_deck_enabled: checked },
+                      }))
+                    }
+                  />
+                </div>
+                {formData.booking_features.upper_deck_enabled && (
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <Label>Upper Deck Surcharge (AED)</Label>
+                      <Input
+                        type="number"
+                        value={formData.booking_features.upper_deck_surcharge}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            booking_features: { ...prev.booking_features, upper_deck_surcharge: Number(e.target.value) },
+                          }))
+                        }
+                        placeholder="Extra charge for Upper Deck"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Deck Options</Label>
+                      {formData.booking_features.deck_options.map((option, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <Input
+                            value={option}
+                            onChange={(e) => {
+                              const updated = [...formData.booking_features.deck_options];
+                              updated[index] = e.target.value;
+                              setFormData((prev) => ({
+                                ...prev,
+                                booking_features: { ...prev.booking_features, deck_options: updated },
+                              }));
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              const updated = formData.booking_features.deck_options.filter((_, i) => i !== index);
+                              setFormData((prev) => ({
+                                ...prev,
+                                booking_features: { ...prev.booking_features, deck_options: updated },
+                              }));
+                            }}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            booking_features: {
+                              ...prev.booking_features,
+                              deck_options: [...prev.booking_features.deck_options, ""],
+                            },
+                          }));
+                        }}
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Deck Option
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Important Information */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="flex items-center gap-2">
+                <Info className="w-5 h-5 text-secondary" />
+                Important Information
+              </CardTitle>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    booking_features: {
+                      ...prev.booking_features,
+                      important_info: defaultBookingFeatures.important_info,
+                    },
+                  }));
+                  toast.success("Important info reset to defaults");
+                }}
+                className="h-8 gap-2 text-muted-foreground hover:text-foreground"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Reset to Defaults
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <p className="text-sm text-muted-foreground">Customize the information tabs shown on service detail pages</p>
+
+              <InfoListEditor
+                title="Cancellation Policy"
+                icon={<Shield className="w-4 h-4 text-secondary" />}
+                items={formData.booking_features.important_info.cancellation_policy}
+                onChange={(items) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    booking_features: {
+                      ...prev.booking_features,
+                      important_info: { ...prev.booking_features.important_info, cancellation_policy: items },
+                    },
+                  }))
+                }
+              />
+
+              <InfoListEditor
+                title="What to Bring"
+                icon={<Backpack className="w-4 h-4 text-secondary" />}
+                items={formData.booking_features.important_info.what_to_bring}
+                onChange={(items) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    booking_features: {
+                      ...prev.booking_features,
+                      important_info: { ...prev.booking_features.important_info, what_to_bring: items },
+                    },
+                  }))
+                }
+              />
+
+              <InfoListEditor
+                title="Good to Know"
+                icon={<AlertCircle className="w-4 h-4 text-secondary" />}
+                items={formData.booking_features.important_info.good_to_know}
+                onChange={(items) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    booking_features: {
+                      ...prev.booking_features,
+                      important_info: { ...prev.booking_features.important_info, good_to_know: items },
+                    },
+                  }))
+                }
+              />
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>SEO Settings</CardTitle>
