@@ -1,6 +1,25 @@
 import { Tables } from "@/integrations/supabase/types";
 
 // Booking features interface
+export interface GuestCategory {
+  name: string;
+  label: string;
+  price: number;
+  min: number;
+  max: number;
+}
+
+export interface AddOn {
+  name: string;
+  price: number;
+}
+
+export interface ImportantInfo {
+  cancellation_policy: string[];
+  what_to_bring: string[];
+  good_to_know: string[];
+}
+
 export interface BookingFeatures {
   urgency_enabled: boolean;
   urgency_text: string;
@@ -10,6 +29,22 @@ export interface BookingFeatures {
   hotel_pickup_text: string;
   cancellation_text: string;
   charter_features: string[];
+  // Booking Options
+  price_label_override: string;
+  booking_mode: "guest_categories" | "quantity_only";
+  guest_categories: GuestCategory[];
+  addons: AddOn[];
+  additional_tour_ids: string[];
+  // Travel Type / Transfer / Deck
+  travel_type_enabled: boolean;
+  direct_to_boat_discount: number;
+  transfer_available: boolean;
+  transfer_label: string;
+  upper_deck_enabled: boolean;
+  upper_deck_surcharge: number;
+  deck_options: string[];
+  // Important Information
+  important_info: ImportantInfo;
 }
 
 // Default booking features
@@ -22,6 +57,41 @@ export const defaultBookingFeatures: BookingFeatures = {
   hotel_pickup_text: "Hotel pickup included",
   cancellation_text: "Free cancellation (24h)",
   charter_features: ["Private experience", "Exclusive use"],
+  price_label_override: "",
+  booking_mode: "guest_categories",
+  guest_categories: [
+    { name: "Adult", label: "12+ years", price: 0, min: 1, max: 10 },
+    { name: "Child", label: "4-11 years", price: 0, min: 0, max: 10 },
+    { name: "Infant", label: "0-3 years", price: 0, min: 0, max: 5 },
+  ],
+  addons: [],
+  additional_tour_ids: [],
+  travel_type_enabled: false,
+  direct_to_boat_discount: 0,
+  transfer_available: false,
+  transfer_label: "Hotel/Residence Transfer",
+  upper_deck_enabled: false,
+  upper_deck_surcharge: 0,
+  deck_options: ["Lower Deck", "Upper Deck"],
+  important_info: {
+    cancellation_policy: [
+      "Free cancellation up to 24 hours before the start time",
+      "Full refund for cancellations made within the free period",
+      "No refund for no-shows or late cancellations",
+    ],
+    what_to_bring: [
+      "Comfortable shoes and smart casual attire",
+      "Camera or smartphone for photos",
+      "Light jacket (air conditioning on lower deck)",
+      "Valid ID for verification",
+    ],
+    good_to_know: [
+      "Arrive 20-30 minutes before departure",
+      "Not wheelchair accessible",
+      "Vegetarian options available upon request",
+      "Dress code: Smart casual (no shorts/flip-flops)",
+    ],
+  },
 };
 
 // Frontend Tour interface (matching TourCard expectations)
