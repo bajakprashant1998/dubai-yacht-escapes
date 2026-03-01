@@ -1174,6 +1174,149 @@ const TourForm = ({ tour, mode }: TourFormProps) => {
                   Add New Add-On
                 </Button>
               </div>
+
+              {/* Time Slots */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="flex items-center gap-2 text-sm font-semibold">
+                    <Clock className="w-4 h-4 text-secondary" />
+                    Time Slots
+                  </Label>
+                  <Switch
+                    checked={formData.booking_features.time_slots_enabled}
+                    onCheckedChange={(checked) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        booking_features: { ...prev.booking_features, time_slots_enabled: checked },
+                      }))
+                    }
+                  />
+                </div>
+                {formData.booking_features.time_slots_enabled && (
+                  <div className="space-y-3">
+                    <div className="border rounded-lg overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="bg-muted/50">
+                            <th className="px-3 py-2 text-left font-medium">Label</th>
+                            <th className="px-3 py-2 text-left font-medium">Start Time</th>
+                            <th className="px-3 py-2 text-left font-medium">End Time</th>
+                            <th className="px-3 py-2 text-left font-medium">Price Override</th>
+                            <th className="px-3 py-2 w-10"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(formData.booking_features.time_slots || []).map((slot, index) => (
+                            <tr key={index} className="border-t">
+                              <td className="px-3 py-2">
+                                <Input
+                                  value={slot.label}
+                                  onChange={(e) => {
+                                    const updated = [...(formData.booking_features.time_slots || [])];
+                                    updated[index] = { ...updated[index], label: e.target.value };
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      booking_features: { ...prev.booking_features, time_slots: updated },
+                                    }));
+                                  }}
+                                  placeholder="e.g., Morning"
+                                  className="h-8"
+                                />
+                              </td>
+                              <td className="px-3 py-2">
+                                <Input
+                                  type="time"
+                                  value={slot.start_time}
+                                  onChange={(e) => {
+                                    const updated = [...(formData.booking_features.time_slots || [])];
+                                    updated[index] = { ...updated[index], start_time: e.target.value };
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      booking_features: { ...prev.booking_features, time_slots: updated },
+                                    }));
+                                  }}
+                                  className="h-8 w-28"
+                                />
+                              </td>
+                              <td className="px-3 py-2">
+                                <Input
+                                  type="time"
+                                  value={slot.end_time}
+                                  onChange={(e) => {
+                                    const updated = [...(formData.booking_features.time_slots || [])];
+                                    updated[index] = { ...updated[index], end_time: e.target.value };
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      booking_features: { ...prev.booking_features, time_slots: updated },
+                                    }));
+                                  }}
+                                  className="h-8 w-28"
+                                />
+                              </td>
+                              <td className="px-3 py-2">
+                                <Input
+                                  type="number"
+                                  value={slot.price_override ?? ""}
+                                  onChange={(e) => {
+                                    const updated = [...(formData.booking_features.time_slots || [])];
+                                    updated[index] = {
+                                      ...updated[index],
+                                      price_override: e.target.value ? Number(e.target.value) : null,
+                                    };
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      booking_features: { ...prev.booking_features, time_slots: updated },
+                                    }));
+                                  }}
+                                  placeholder="Optional"
+                                  className="h-8 w-24"
+                                />
+                              </td>
+                              <td className="px-3 py-2">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => {
+                                    const updated = (formData.booking_features.time_slots || []).filter((_, i) => i !== index);
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      booking_features: { ...prev.booking_features, time_slots: updated },
+                                    }));
+                                  }}
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          booking_features: {
+                            ...prev.booking_features,
+                            time_slots: [
+                              ...(prev.booking_features.time_slots || []),
+                              { label: "", start_time: "09:00", end_time: "12:00", price_override: null },
+                            ],
+                          },
+                        }));
+                      }}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Time Slot
+                    </Button>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 
