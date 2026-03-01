@@ -19,6 +19,12 @@ import {
   Camera,
   ArrowRight,
   Sparkles,
+  ThumbsUp,
+  MessageCircle,
+  Headphones,
+  Lock,
+  Award,
+  Info,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import Layout from "@/components/layout/Layout";
@@ -32,22 +38,30 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useService } from "@/hooks/useServices";
+import { useService, useServicesByCategory } from "@/hooks/useServices";
 import { useContactConfig } from "@/hooks/useContactConfig";
 import ServiceBookingModal from "@/components/service-detail/ServiceBookingModal";
+import ServiceCardRedesigned from "@/components/ServiceCardRedesigned";
 import { addToRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/hooks/useCurrency";
+import SEOHead from "@/components/SEOHead";
 
 const ServiceDetail = () => {
   const { slug, categoryPath } = useParams();
   const navigate = useNavigate();
   const { data: service, isLoading, error } = useService(slug || "");
-  const { whatsappLink } = useContactConfig();
+  const { whatsappLink, phone, phoneFormatted } = useContactConfig();
+  const { formatPrice } = useCurrency();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const { toast } = useToast();
+
+  // Fetch related services from same category
+  const { data: relatedServices } = useServicesByCategory(service?.categorySlug || "");
+  const filteredRelated = relatedServices?.filter(s => s.id !== service?.id)?.slice(0, 3) || [];
 
   useEffect(() => {
     if (service) {
@@ -115,7 +129,14 @@ const ServiceDetail = () => {
 
   return (
     <Layout>
-      <div className="pt-24 pb-16">
+      <SEOHead
+        title={service.metaTitle || `${service.title} | Dubai Experiences`}
+        description={service.metaDescription || service.description || `Book ${service.title} in Dubai. Best price guaranteed with instant confirmation.`}
+        canonical={`/dubai/services/${service.categorySlug || 'general'}/${service.slug}`}
+        keywords={service.metaKeywords?.length ? service.metaKeywords : [service.title, "Dubai", service.categoryName || "experience"]}
+      />
+
+      <div className="pt-24 pb-0">
         {/* Breadcrumb */}
         <div className="container mb-6">
           <nav className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -151,7 +172,7 @@ const ServiceDetail = () => {
               <div className="relative aspect-[16/9] lg:aspect-[21/9]">
                 <img
                   src={allImages[currentImageIndex]}
-                  alt={service.title}
+                  alt={service.imageAlt || service.title}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 {/* Gradient overlays */}
@@ -189,6 +210,11 @@ const ServiceDetail = () => {
                       {discount}% OFF
                     </Badge>
                   )}
+                  {service.isFeatured && (
+                    <Badge className="bg-secondary text-secondary-foreground border-0 shadow-lg shadow-secondary/30 px-3 py-1">
+                      <Zap className="w-3 h-3 mr-1" /> Best Seller
+                    </Badge>
+                  )}
                 </div>
 
                 {/* Navigation arrows */}
@@ -216,7 +242,6 @@ const ServiceDetail = () => {
                 {/* Bottom overlay info */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
                   <div className="flex items-end justify-between">
-                    {/* Image counter */}
                     {allImages.length > 1 && (
                       <div className="flex items-center gap-1.5 bg-card/50 backdrop-blur-md px-3 py-1.5 rounded-full text-card-foreground text-sm">
                         <Camera className="w-3.5 h-3.5" />
@@ -230,7 +255,7 @@ const ServiceDetail = () => {
               {/* Thumbnail strip */}
               {allImages.length > 1 && (
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                  {allImages.map((img, idx) => (
+                  {allImages.slice(0, 8).map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => setCurrentImageIndex(idx)}
@@ -271,7 +296,7 @@ const ServiceDetail = () => {
                     <Star className="w-4 h-4 text-secondary fill-secondary" />
                     <span className="font-bold text-secondary">{service.rating.toFixed(1)}</span>
                     <span className="text-sm text-muted-foreground">
-                      ({service.reviewCount.toLocaleString()})
+                      ({service.reviewCount.toLocaleString()} reviews)
                     </span>
                   </div>
                   {service.duration && (
@@ -292,6 +317,12 @@ const ServiceDetail = () => {
                       <span className="font-medium">Instant Confirmation</span>
                     </div>
                   )}
+                  {service.maxParticipants && (
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/60 text-sm">
+                      <Users className="w-4 h-4 text-secondary" />
+                      <span>Max {service.maxParticipants}</span>
+                    </div>
+                  )}
                 </div>
               </motion.div>
 
@@ -302,10 +333,13 @@ const ServiceDetail = () => {
                 transition={{ delay: 0.25, duration: 0.4 }}
               >
                 <Tabs defaultValue="overview" className="w-full">
-                  <TabsList className="w-full justify-start bg-muted/50 rounded-xl p-1 h-auto">
+                  <TabsList className="w-full justify-start bg-muted/50 rounded-xl p-1 h-auto flex-wrap">
                     <TabsTrigger value="overview" className="rounded-lg px-5 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-sm font-medium">Overview</TabsTrigger>
                     <TabsTrigger value="included" className="rounded-lg px-5 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-sm font-medium">What's Included</TabsTrigger>
                     <TabsTrigger value="details" className="rounded-lg px-5 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-sm font-medium">Details</TabsTrigger>
+                    {service.itinerary && service.itinerary.length > 0 && (
+                      <TabsTrigger value="itinerary" className="rounded-lg px-5 py-2.5 data-[state=active]:bg-card data-[state=active]:shadow-sm font-medium">Itinerary</TabsTrigger>
+                    )}
                   </TabsList>
 
                   <TabsContent value="overview" className="pt-8 space-y-8">
@@ -322,7 +356,7 @@ const ServiceDetail = () => {
                     )}
                     {service.longDescription && (
                       <div
-                        className="prose prose-sm max-w-none text-muted-foreground [&_h2]:text-foreground [&_h3]:text-foreground [&_strong]:text-foreground"
+                        className="prose prose-sm max-w-none text-muted-foreground [&_h2]:text-foreground [&_h3]:text-foreground [&_strong]:text-foreground [&_ul]:list-disc [&_ol]:list-decimal [&_li]:ml-4"
                         dangerouslySetInnerHTML={{ __html: service.longDescription }}
                       />
                     )}
@@ -416,6 +450,17 @@ const ServiceDetail = () => {
                           </div>
                         </div>
                       )}
+                      {service.location && (
+                        <div className="flex items-center gap-4 p-5 rounded-2xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-shadow">
+                          <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                            <MapPin className="w-6 h-6 text-secondary" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Location</p>
+                            <p className="font-bold text-foreground">{service.location}</p>
+                          </div>
+                        </div>
+                      )}
                       <div className="flex items-center gap-4 p-5 rounded-2xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-shadow">
                         <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
                           <Users className="w-6 h-6 text-secondary" />
@@ -439,9 +484,113 @@ const ServiceDetail = () => {
                           </div>
                         </div>
                       )}
+                      <div className="flex items-center gap-4 p-5 rounded-2xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                          <Info className="w-6 h-6 text-secondary" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Booking Type</p>
+                          <p className="font-bold text-foreground capitalize">
+                            {service.bookingType.replace("_", " ")}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </TabsContent>
+
+                  {/* Itinerary Tab */}
+                  {service.itinerary && service.itinerary.length > 0 && (
+                    <TabsContent value="itinerary" className="pt-8">
+                      <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-secondary" />
+                        Your Experience Timeline
+                      </h3>
+                      <div className="relative">
+                        {/* Timeline line */}
+                        <div className="absolute left-[19px] top-3 bottom-3 w-0.5 bg-gradient-to-b from-secondary via-secondary/50 to-secondary/20" />
+                        <div className="space-y-6">
+                          {service.itinerary.map((item, idx) => (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, x: -20 }}
+                              whileInView={{ opacity: 1, x: 0 }}
+                              viewport={{ once: true }}
+                              transition={{ delay: idx * 0.08 }}
+                              className="flex gap-4 relative"
+                            >
+                              <div className="w-10 h-10 rounded-full bg-secondary/10 border-2 border-secondary flex items-center justify-center flex-shrink-0 z-10">
+                                <span className="text-xs font-bold text-secondary">{idx + 1}</span>
+                              </div>
+                              <div className="flex-1 pb-2">
+                                <p className="text-xs font-semibold text-secondary uppercase tracking-wider mb-1">{item.time}</p>
+                                <p className="text-sm text-foreground font-medium">{item.activity}</p>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    </TabsContent>
+                  )}
                 </Tabs>
+              </motion.div>
+
+              {/* FAQs */}
+              {service.faqs && service.faqs.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <MessageCircle className="w-5 h-5 text-secondary" />
+                    Frequently Asked Questions
+                  </h3>
+                  <Accordion type="single" collapsible className="space-y-2">
+                    {service.faqs.map((faq, idx) => (
+                      <AccordionItem
+                        key={idx}
+                        value={`faq-${idx}`}
+                        className="border border-border/50 rounded-xl px-5 data-[state=open]:bg-secondary/5 data-[state=open]:border-secondary/20 transition-colors"
+                      >
+                        <AccordionTrigger className="text-sm font-semibold hover:text-secondary transition-colors py-4 [&>svg]:text-secondary">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-sm text-muted-foreground pb-4 leading-relaxed">
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </motion.div>
+              )}
+
+              {/* Need Help CTA */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="rounded-2xl bg-gradient-to-r from-secondary/10 via-secondary/5 to-transparent border border-secondary/20 p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4"
+              >
+                <div className="w-12 h-12 rounded-xl bg-secondary/15 flex items-center justify-center flex-shrink-0">
+                  <Headphones className="w-6 h-6 text-secondary" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-bold text-foreground mb-1">Need Help Choosing?</h4>
+                  <p className="text-sm text-muted-foreground">Our travel experts are available 24/7 to help you plan the perfect experience.</p>
+                </div>
+                <div className="flex gap-2">
+                  <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+                    <Button size="sm" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-xl font-semibold gap-1.5">
+                      <Phone className="w-3.5 h-3.5" /> WhatsApp
+                    </Button>
+                  </a>
+                  <a href={`tel:${phone}`}>
+                    <Button size="sm" variant="outline" className="rounded-xl font-semibold gap-1.5">
+                      <Phone className="w-3.5 h-3.5" /> Call
+                    </Button>
+                  </a>
+                </div>
               </motion.div>
             </div>
 
@@ -465,11 +614,11 @@ const ServiceDetail = () => {
                     </div>
                     <div className="flex items-baseline gap-2.5">
                       <span className="text-4xl font-extrabold text-secondary">
-                        AED {service.price.toLocaleString()}
+                        {formatPrice(service.price)}
                       </span>
                       {service.originalPrice && (
                         <span className="text-lg text-muted-foreground line-through">
-                          AED {service.originalPrice.toLocaleString()}
+                          {formatPrice(service.originalPrice)}
                         </span>
                       )}
                     </div>
@@ -535,16 +684,81 @@ const ServiceDetail = () => {
                       )}
                       <div className="flex items-center gap-3 text-sm">
                         <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                          <Shield className="w-4 h-4 text-secondary" />
+                          <Lock className="w-4 h-4 text-secondary" />
                         </div>
                         <span>Secure online booking</span>
                       </div>
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                          <Headphones className="w-4 h-4 text-secondary" />
+                        </div>
+                        <span>24/7 customer support</span>
+                      </div>
+                    </div>
+
+                    {/* Urgency */}
+                    <div className="rounded-xl bg-destructive/5 border border-destructive/15 p-3 text-center">
+                      <p className="text-xs font-semibold text-destructive flex items-center justify-center gap-1.5">
+                        <Zap className="w-3.5 h-3.5" />
+                        High demand — Book early to secure your spot!
+                      </p>
                     </div>
                   </div>
                 </div>
               </motion.div>
             </div>
           </div>
+        </div>
+
+        {/* Related Experiences */}
+        {filteredRelated.length > 0 && (
+          <section className="py-16 mt-8 bg-muted/20">
+            <div className="container">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-2xl lg:text-3xl font-display font-bold text-foreground">
+                    Similar Experiences
+                  </h2>
+                  <p className="text-muted-foreground text-sm mt-1">You might also enjoy these {service.categoryName?.toLowerCase()} experiences</p>
+                </div>
+                <Button variant="outline" asChild className="rounded-xl hidden sm:flex">
+                  <Link to={`/dubai/services/${service.categorySlug}`}>
+                    View All <ArrowRight className="w-4 h-4 ml-1" />
+                  </Link>
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredRelated.map((s) => (
+                  <ServiceCardRedesigned key={s.id} service={s} />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* spacer for mobile bottom bar */}
+        <div className="h-20 lg:hidden" />
+      </div>
+
+      {/* Mobile Sticky Booking Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-card/95 backdrop-blur-lg border-t border-border/50 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] px-4 py-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs text-muted-foreground">From</p>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-xl font-extrabold text-secondary">{formatPrice(service.price)}</span>
+              {service.originalPrice && service.originalPrice > service.price && (
+                <span className="text-xs text-muted-foreground line-through">{formatPrice(service.originalPrice)}</span>
+              )}
+            </div>
+          </div>
+          <Button
+            onClick={() => setIsBookingOpen(true)}
+            className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold rounded-xl shadow-lg shadow-secondary/20 gap-1.5 px-6 h-11"
+          >
+            Book Now
+            <ArrowRight className="w-4 h-4" />
+          </Button>
         </div>
       </div>
 
