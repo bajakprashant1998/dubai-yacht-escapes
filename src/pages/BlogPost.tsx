@@ -2,11 +2,10 @@ import { useParams, Link } from "react-router-dom";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import Layout from "@/components/layout/Layout";
-import SEOHead, { createBreadcrumbSchema, createFAQSchema } from "@/components/SEOHead";
+import SEOHead, { createBreadcrumbSchema } from "@/components/SEOHead";
 import { useBlogPost, useBlogPosts } from "@/hooks/useBlogPosts";
 import FloatingShareBar from "@/components/blog/FloatingShareBar";
 import TableOfContents from "@/components/blog/TableOfContents";
-import AuthorBadge from "@/components/blog/AuthorBadge";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,11 +23,13 @@ import {
   MessageCircle,
   Mail,
   Sparkles,
+  TrendingUp,
+  FileText,
+  Tag,
 } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 
-// Transform plain HTML content into card-style sections
+// Transform plain HTML content into numbered card-style sections
 const transformContentToCards = (html: string): string => {
   if (!html) return "";
   const parser = new DOMParser();
@@ -43,16 +44,11 @@ const transformContentToCards = (html: string): string => {
 
   const flushCard = () => {
     if (currentCard.length > 0) {
-      const cardColors = [
-        "border-l-secondary",
-        "border-l-primary",
-        "border-l-amber-500",
-        "border-l-emerald-500",
-        "border-l-blue-500",
-        "border-l-purple-500",
-      ];
-      const colorClass = cardColors[cardIndex % cardColors.length];
-      result += `<div class="content-card ${colorClass}">${currentCard.join("")}</div>`;
+      const num = cardIndex + 1;
+      result += `<div class="content-card" data-section="${num}">
+        <div class="section-number">${num}</div>
+        ${currentCard.join("")}
+      </div>`;
       currentCard = [];
       cardIndex++;
     }
@@ -69,6 +65,13 @@ const transformContentToCards = (html: string): string => {
   return result;
 };
 
+// Word count helper
+const countWords = (html: string): number => {
+  if (!html) return 0;
+  const text = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  return text.split(" ").filter(Boolean).length;
+};
+
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: post, isLoading, error } = useBlogPost(slug || "");
@@ -76,7 +79,6 @@ const BlogPost = () => {
   const [readProgress, setReadProgress] = useState(0);
   const [email, setEmail] = useState("");
 
-  // Reading progress
   const handleScroll = useCallback(() => {
     const scrollTop = window.scrollY;
     const docHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -94,7 +96,10 @@ const BlogPost = () => {
     return post?.content ? transformContentToCards(post.content) : "";
   }, [post?.content]);
 
-  // Add IDs to headings for TOC
+  const wordCount = useMemo(() => {
+    return post?.content ? countWords(post.content) : 0;
+  }, [post?.content]);
+
   useEffect(() => {
     if (post?.content) {
       const contentDiv = document.querySelector(".blog-content");
@@ -107,7 +112,6 @@ const BlogPost = () => {
     }
   }, [post?.content]);
 
-  // Related posts
   const relatedPosts = useMemo(() => {
     if (!post || !allPosts.length) return [];
     return allPosts
@@ -118,19 +122,24 @@ const BlogPost = () => {
   if (isLoading) {
     return (
       <Layout>
-        <div className="min-h-screen">
-          <Skeleton className="h-[50vh] w-full" />
-          <div className="container max-w-6xl py-8 space-y-6">
-            <Skeleton className="h-10 w-3/4" />
-            <Skeleton className="h-6 w-1/2" />
-            <div className="grid grid-cols-12 gap-8">
-              <div className="col-span-12 lg:col-span-8 space-y-4">
-                <Skeleton className="h-40 w-full rounded-xl" />
-                <Skeleton className="h-40 w-full rounded-xl" />
+        <div className="min-h-screen bg-muted/30">
+          <div className="bg-background pt-28 pb-12">
+            <div className="container max-w-4xl space-y-6">
+              <Skeleton className="h-6 w-32 rounded-full" />
+              <Skeleton className="h-14 w-3/4" />
+              <Skeleton className="h-6 w-2/3" />
+              <div className="flex gap-3">
+                <Skeleton className="h-10 w-40 rounded-full" />
+                <Skeleton className="h-10 w-28 rounded-full" />
+                <Skeleton className="h-10 w-28 rounded-full" />
               </div>
-              <div className="col-span-4 hidden xl:block">
-                <Skeleton className="h-64 w-full rounded-xl" />
-              </div>
+            </div>
+          </div>
+          <div className="container max-w-6xl py-8">
+            <Skeleton className="h-80 w-full max-w-3xl rounded-2xl" />
+            <div className="mt-8 space-y-6">
+              <Skeleton className="h-40 w-full max-w-3xl rounded-xl" />
+              <Skeleton className="h-40 w-full max-w-3xl rounded-xl" />
             </div>
           </div>
         </div>
@@ -203,89 +212,166 @@ const BlogPost = () => {
         />
       </div>
 
-      {/* Cinematic Hero */}
-      <section className="relative h-[50vh] md:h-[55vh] overflow-hidden bg-primary">
-        <motion.img
-          src={post.featured_image || "/placeholder.svg"}
-          alt={post.title}
-          className="absolute inset-0 w-full h-full object-cover"
-          initial={{ scale: 1.05 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.5 }}
-          loading="eager"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
-
-        {/* Breadcrumb */}
-        <div className="absolute top-0 left-0 right-0 z-20 pt-24 md:pt-28">
-          <div className="container max-w-6xl">
-            <nav className="flex items-center gap-2 text-sm text-white/60">
-              <Link to="/" className="hover:text-white transition-colors flex items-center gap-1">
-                <Home className="w-3.5 h-3.5" /> Home
-              </Link>
-              <ChevronRight className="w-3 h-3" />
-              <Link to="/blog" className="hover:text-white transition-colors">Blog</Link>
-              {post.category && (
-                <>
-                  <ChevronRight className="w-3 h-3" />
-                  <Link to={`/blog/category/${post.category.slug}`} className="hover:text-white transition-colors">
-                    {post.category.name}
-                  </Link>
-                </>
-              )}
-            </nav>
-          </div>
-        </div>
-
-        {/* Hero Content */}
-        <div className="absolute bottom-0 left-0 right-0 z-10">
-          <div className="container max-w-6xl pb-10">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              {post.category && (
-                <Link to={`/blog/category/${post.category.slug}`}>
-                  <Badge className="bg-secondary/90 text-secondary-foreground rounded-lg text-xs mb-4 hover:bg-secondary transition-colors">
-                    {post.category.name}
-                  </Badge>
+      {/* Clean Editorial Hero - Light Background */}
+      <section className="bg-gradient-to-b from-primary/5 via-primary/3 to-background pt-24 md:pt-28 pb-8 md:pb-12">
+        <div className="container max-w-4xl">
+          {/* Breadcrumb */}
+          <motion.nav
+            className="flex items-center gap-2 text-sm text-muted-foreground mb-6"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Link to="/" className="hover:text-foreground transition-colors flex items-center gap-1">
+              <Home className="w-3.5 h-3.5" /> Home
+            </Link>
+            <ChevronRight className="w-3 h-3" />
+            <Link to="/blog" className="hover:text-foreground transition-colors">Blog</Link>
+            {post.category && (
+              <>
+                <ChevronRight className="w-3 h-3" />
+                <Link to={`/blog/category/${post.category.slug}`} className="text-secondary font-medium hover:text-secondary/80 transition-colors">
+                  {post.category.name}
                 </Link>
-              )}
-              <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-4 leading-tight max-w-4xl">
-                {post.title}
-              </h1>
-              {post.excerpt && (
-                <p className="text-base md:text-lg text-white/70 mb-5 max-w-3xl line-clamp-2">
-                  {post.excerpt}
-                </p>
-              )}
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm text-white/90">
-                  {post.author?.full_name ? (
-                    <div className="w-6 h-6 rounded-full bg-secondary/30 flex items-center justify-center text-[10px] font-bold text-secondary">
-                      {authorName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-                    </div>
-                  ) : null}
-                  <span>{authorName}</span>
+              </>
+            )}
+          </motion.nav>
+
+          {/* Category Badge */}
+          {post.category && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="mb-5"
+            >
+              <Link to={`/blog/category/${post.category.slug}`}>
+                <Badge className="bg-secondary/10 text-secondary border border-secondary/20 rounded-full px-4 py-1.5 text-sm font-medium hover:bg-secondary/20 transition-colors gap-2">
+                  <Tag className="w-3.5 h-3.5" />
+                  {post.category.name}
+                </Badge>
+              </Link>
+            </motion.div>
+          )}
+
+          {/* Title */}
+          <motion.h1
+            className="text-3xl md:text-5xl lg:text-[3.25rem] font-display font-bold text-foreground leading-tight mb-5 max-w-3xl"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.15 }}
+          >
+            {post.title}
+          </motion.h1>
+
+          {/* Excerpt */}
+          {post.excerpt && (
+            <motion.p
+              className="text-lg text-muted-foreground leading-relaxed mb-7 max-w-2xl"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+            >
+              {post.excerpt}
+            </motion.p>
+          )}
+
+          {/* Author & Meta Pills */}
+          <motion.div
+            className="flex flex-wrap items-center gap-3"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.25 }}
+          >
+            {/* Author Card */}
+            <div className="flex items-center gap-3 bg-card border border-border/60 rounded-full px-4 py-2 shadow-sm">
+              <div className="w-9 h-9 rounded-full bg-secondary/15 flex items-center justify-center text-xs font-bold text-secondary">
+                {authorName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-foreground leading-tight">{authorName}</div>
+                <div className="text-xs text-muted-foreground">Expert Team</div>
+              </div>
+            </div>
+
+            {publishDate && (
+              <div className="flex items-center gap-2 bg-card border border-border/60 rounded-full px-4 py-2.5 text-sm text-muted-foreground shadow-sm">
+                <Calendar className="w-4 h-4 text-secondary/70" />
+                {publishDate}
+              </div>
+            )}
+            {post.reading_time > 0 && (
+              <div className="flex items-center gap-2 bg-card border border-border/60 rounded-full px-4 py-2.5 text-sm text-muted-foreground shadow-sm">
+                <Clock className="w-4 h-4 text-secondary/70" />
+                {post.reading_time} min read
+              </div>
+            )}
+            {wordCount > 0 && (
+              <div className="flex items-center gap-2 bg-card border border-border/60 rounded-full px-4 py-2.5 text-sm text-muted-foreground shadow-sm">
+                <Eye className="w-4 h-4 text-secondary/70" />
+                {wordCount.toLocaleString()} words
+              </div>
+            )}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Featured Image Card */}
+      <section className="bg-muted/30 pt-6 pb-2">
+        <div className="container max-w-6xl">
+          <div className="grid grid-cols-12 gap-8">
+            {/* Spacer for share bar alignment */}
+            <div className="col-span-1 hidden lg:block" />
+
+            {/* Image Card */}
+            <motion.div
+              className="col-span-12 lg:col-span-8 xl:col-span-7"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <div className="relative rounded-2xl overflow-hidden shadow-lg group">
+                <img
+                  src={post.featured_image || "/placeholder.svg"}
+                  alt={post.title}
+                  className="w-full aspect-[16/9] object-cover"
+                  loading="eager"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                
+                {/* Overlay badges */}
+                <div className="absolute top-4 right-4">
+                  <Badge className="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs font-semibold shadow-lg gap-1.5">
+                    <Sparkles className="w-3 h-3" />
+                    Premium
+                  </Badge>
                 </div>
-                {publishDate && (
-                  <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm text-white/80">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {publishDate}
-                  </div>
-                )}
-                {post.reading_time > 0 && (
-                  <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm text-white/80">
-                    <Clock className="w-3.5 h-3.5" />
-                    {post.reading_time} min read
-                  </div>
-                )}
-                {post.view_count > 0 && (
-                  <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm text-white/80">
-                    <Eye className="w-3.5 h-3.5" />
-                    {post.view_count.toLocaleString()} reads
-                  </div>
-                )}
+                
+                <div className="absolute bottom-4 left-4 flex flex-wrap gap-2">
+                  <Badge className="bg-white/15 backdrop-blur-md text-white border border-white/20 rounded-full px-3 py-1.5 text-xs gap-1.5">
+                    <TrendingUp className="w-3 h-3" />
+                    Expert Analysis
+                  </Badge>
+                  {post.reading_time > 0 && (
+                    <Badge className="bg-white/15 backdrop-blur-md text-white border border-white/20 rounded-full px-3 py-1.5 text-xs gap-1.5">
+                      <Clock className="w-3 h-3" />
+                      {post.reading_time} min read
+                    </Badge>
+                  )}
+                  {post.category && (
+                    <Badge className="bg-white/15 backdrop-blur-md text-white border border-white/20 rounded-full px-3 py-1.5 text-xs gap-1.5">
+                      <FileText className="w-3 h-3" />
+                      {post.category.name}
+                    </Badge>
+                  )}
+                </div>
               </div>
             </motion.div>
+
+            {/* Table of Contents Preview (desktop) */}
+            <div className="hidden xl:block col-span-3">
+              <TableOfContents content={post.content || ""} />
+            </div>
           </div>
         </div>
       </section>
@@ -304,7 +390,7 @@ const BlogPost = () => {
               className="col-span-12 lg:col-span-8 xl:col-span-7"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              transition={{ duration: 0.5, delay: 0.35 }}
             >
               <div
                 className="blog-content prose prose-lg max-w-none 
@@ -315,24 +401,31 @@ const BlogPost = () => {
                   prose-pre:bg-primary prose-pre:text-primary-foreground prose-pre:rounded-xl prose-pre:p-6
                   prose-img:rounded-xl prose-img:shadow-lg prose-img:my-4
                   
-                  [&_.content-card]:relative [&_.content-card]:bg-card [&_.content-card]:rounded-xl 
-                  [&_.content-card]:border [&_.content-card]:border-border/50 [&_.content-card]:border-l-4
-                  [&_.content-card]:p-6 [&_.content-card]:mb-6 [&_.content-card]:shadow-sm
-                  [&_.content-card]:hover:shadow-md [&_.content-card]:transition-all [&_.content-card]:duration-300
-                  [&_.content-card]:hover:translate-y-[-2px]
+                  [&_.content-card]:relative [&_.content-card]:bg-card [&_.content-card]:rounded-2xl 
+                  [&_.content-card]:border [&_.content-card]:border-border/40
+                  [&_.content-card]:p-7 [&_.content-card]:pl-16 [&_.content-card]:mb-6 
+                  [&_.content-card]:shadow-sm [&_.content-card]:hover:shadow-md 
+                  [&_.content-card]:transition-all [&_.content-card]:duration-300
+                  [&_.content-card]:hover:border-secondary/30
+
+                  [&_.section-number]:absolute [&_.section-number]:left-5 [&_.section-number]:top-7
+                  [&_.section-number]:w-8 [&_.section-number]:h-8 [&_.section-number]:rounded-full
+                  [&_.section-number]:bg-secondary/10 [&_.section-number]:text-secondary
+                  [&_.section-number]:flex [&_.section-number]:items-center [&_.section-number]:justify-center
+                  [&_.section-number]:text-sm [&_.section-number]:font-bold
+                  [&_.section-number]:border [&_.section-number]:border-secondary/20
                   
                   [&_.content-card_h2]:text-xl [&_.content-card_h2]:md:text-2xl [&_.content-card_h2]:font-bold 
                   [&_.content-card_h2]:text-foreground [&_.content-card_h2]:mb-4 [&_.content-card_h2]:mt-0
-                  [&_.content-card_h2]:flex [&_.content-card_h2]:items-center [&_.content-card_h2]:gap-3
-                  [&_.content-card_h2]:pb-3 [&_.content-card_h2]:border-b [&_.content-card_h2]:border-border/50
+                  [&_.content-card_h2]:pb-3 [&_.content-card_h2]:border-b [&_.content-card_h2]:border-border/40
                   
                   [&_.content-card_h3]:text-lg [&_.content-card_h3]:font-semibold [&_.content-card_h3]:text-foreground 
-                  [&_.content-card_h3]:mb-3 [&_.content-card_h3]:mt-0 [&_.content-card_h3]:flex [&_.content-card_h3]:items-center [&_.content-card_h3]:gap-2
+                  [&_.content-card_h3]:mb-3 [&_.content-card_h3]:mt-0
                   
                   [&_.content-card_p]:text-muted-foreground [&_.content-card_p]:leading-relaxed 
                   [&_.content-card_p]:mb-4 [&_.content-card_p]:last:mb-0 [&_.content-card_p]:text-[15px]
                   
-                  [&_.content-card_ul]:my-4 [&_.content-card_ul]:space-y-2 [&_.content-card_ul]:pl-0 [&_.content-card_ul]:list-none
+                  [&_.content-card_ul]:my-4 [&_.content-card_ul]:space-y-2.5 [&_.content-card_ul]:pl-0 [&_.content-card_ul]:list-none
                   [&_.content-card_li]:flex [&_.content-card_li]:items-start [&_.content-card_li]:gap-3 
                   [&_.content-card_li]:text-muted-foreground [&_.content-card_li]:text-[15px]
                   [&_.content-card_li]:before:content-['→'] [&_.content-card_li]:before:text-secondary 
@@ -341,17 +434,11 @@ const BlogPost = () => {
                   [&_.content-card_ol]:my-4 [&_.content-card_ol]:space-y-2 [&_.content-card_ol]:list-decimal [&_.content-card_ol]:pl-5
                   [&_.content-card_ol_li]:text-muted-foreground [&_.content-card_ol_li]:text-[15px] [&_.content-card_ol_li]:pl-2
                   
-                  [&_.content-card_blockquote]:bg-muted/50 [&_.content-card_blockquote]:border-l-4 
-                  [&_.content-card_blockquote]:border-secondary [&_.content-card_blockquote]:rounded-r-lg 
-                  [&_.content-card_blockquote]:py-3 [&_.content-card_blockquote]:px-4 [&_.content-card_blockquote]:my-4
+                  [&_.content-card_blockquote]:bg-secondary/5 [&_.content-card_blockquote]:border-l-4 
+                  [&_.content-card_blockquote]:border-secondary [&_.content-card_blockquote]:rounded-r-xl 
+                  [&_.content-card_blockquote]:py-4 [&_.content-card_blockquote]:px-5 [&_.content-card_blockquote]:my-5
                   [&_.content-card_blockquote]:not-italic [&_.content-card_blockquote]:text-foreground/90
-                  
-                  [&_.border-l-secondary]:border-l-secondary
-                  [&_.border-l-primary]:border-l-primary
-                  [&_.border-l-amber-500]:border-l-amber-500
-                  [&_.border-l-emerald-500]:border-l-emerald-500
-                  [&_.border-l-blue-500]:border-l-blue-500
-                  [&_.border-l-purple-500]:border-l-purple-500
+                  [&_.content-card_blockquote]:font-medium
                 "
                 dangerouslySetInnerHTML={{ __html: cardContent }}
               />
@@ -362,7 +449,7 @@ const BlogPost = () => {
                   <span className="text-sm font-medium text-muted-foreground mr-2">Tags:</span>
                   {post.tags.map((tag) => (
                     <Link key={tag} to={`/blog/tag/${tag}`}>
-                      <Badge variant="outline" className="hover:bg-muted transition-colors rounded-lg">
+                      <Badge variant="outline" className="hover:bg-secondary/10 hover:text-secondary hover:border-secondary/30 transition-colors rounded-full px-3">
                         #{tag}
                       </Badge>
                     </Link>
@@ -370,9 +457,34 @@ const BlogPost = () => {
                 </div>
               )}
 
+              {/* CTA Card - "Have questions about this article?" */}
+              <motion.div
+                className="mt-10 bg-card rounded-2xl border border-border/50 p-8"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+              >
+                <h3 className="text-xl font-bold mb-2">Have questions about this article?</h3>
+                <p className="text-muted-foreground text-sm mb-5">
+                  Our team of travel experts is here to help you plan your perfect Dubai experience.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Link to="/contact">
+                    <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-xl gap-2">
+                      Get Expert Help <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                  <Link to="/services">
+                    <Button variant="outline" className="rounded-xl">
+                      Explore Services
+                    </Button>
+                  </Link>
+                </div>
+              </motion.div>
+
               {/* Newsletter CTA */}
               <motion.div
-                className="mt-12 bg-card rounded-xl border border-border/50 p-8 text-center"
+                className="mt-8 bg-gradient-to-br from-secondary/5 via-card to-primary/5 rounded-2xl border border-border/50 p-8 text-center"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -390,7 +502,7 @@ const BlogPost = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="rounded-xl bg-muted/50"
+                    className="rounded-xl bg-background"
                   />
                   <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-xl shrink-0">
                     Subscribe
@@ -406,14 +518,15 @@ const BlogPost = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                 >
-                  <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                  <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-secondary" />
-                    You Might Also Like
+                    Recommended Reading
                   </h2>
+                  <p className="text-sm text-muted-foreground mb-6">Continue learning with related articles</p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {relatedPosts.map((rp) => (
                       <Link key={rp.id} to={`/blog/${rp.slug}`} className="group">
-                        <Card className="overflow-hidden rounded-xl border-border/50 hover:shadow-lg transition-all duration-300 h-full">
+                        <Card className="overflow-hidden rounded-2xl border-border/40 hover:shadow-lg hover:border-secondary/30 transition-all duration-300 h-full">
                           <div className="relative aspect-[16/10] overflow-hidden">
                             <img
                               src={rp.featured_image || "/placeholder.svg"}
@@ -423,7 +536,7 @@ const BlogPost = () => {
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                             {rp.category && (
-                              <Badge className="absolute bottom-2 left-2 bg-secondary/90 text-secondary-foreground text-xs rounded-lg">
+                              <Badge className="absolute bottom-2 left-2 bg-white/15 backdrop-blur-md text-white border border-white/20 text-xs rounded-full">
                                 {rp.category.name}
                               </Badge>
                             )}
@@ -438,11 +551,10 @@ const BlogPost = () => {
                                   <Clock className="w-3 h-3" /> {rp.reading_time} min
                                 </span>
                               )}
-                              {rp.view_count > 0 && (
-                                <span className="flex items-center gap-1">
-                                  <Eye className="w-3 h-3" /> {rp.view_count.toLocaleString()}
-                                </span>
+                              {rp.published_at && (
+                                <span>{format(new Date(rp.published_at), "MMM d")}</span>
                               )}
+                              <span className="ml-auto text-secondary text-xs font-medium">Read More</span>
                             </div>
                           </CardContent>
                         </Card>
@@ -463,8 +575,8 @@ const BlogPost = () => {
               </div>
             </motion.div>
 
-            {/* Table of Contents */}
-            <div className="hidden xl:block col-span-3">
+            {/* TOC sidebar (hidden on xl since it's shown above) */}
+            <div className="hidden xl:hidden lg:block col-span-3">
               <TableOfContents content={post.content || ""} />
             </div>
           </div>
