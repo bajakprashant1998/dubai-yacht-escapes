@@ -14,6 +14,13 @@ export interface AddOn {
   price: number;
 }
 
+export interface TimeSlot {
+  label: string;
+  start_time: string;
+  end_time: string;
+  price_override: number | null;
+}
+
 export interface ImportantInfo {
   cancellation_policy: string[];
   what_to_bring: string[];
@@ -45,6 +52,9 @@ export interface BookingFeatures {
   deck_options: string[];
   // Important Information
   important_info: ImportantInfo;
+  // Time Slots
+  time_slots_enabled: boolean;
+  time_slots: TimeSlot[];
 }
 
 // Default booking features
@@ -92,6 +102,8 @@ export const defaultBookingFeatures: BookingFeatures = {
       "Dress code: Smart casual (no shorts/flip-flops)",
     ],
   },
+  time_slots_enabled: false,
+  time_slots: [],
 };
 
 // Frontend Tour interface (matching TourCard expectations)
