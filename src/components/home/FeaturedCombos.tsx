@@ -1,8 +1,9 @@
 import { memo, useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Package } from "lucide-react";
+import { ArrowRight, Package, Percent, Sparkles, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import ComboCard from "@/components/combo/ComboCard";
 import { useFeaturedComboPackages } from "@/hooks/useComboPackages";
@@ -13,7 +14,6 @@ const FeaturedCombos = memo(() => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Intersection Observer to track active card
   useEffect(() => {
     if (isLoading || featuredCombos.length === 0) return;
 
@@ -51,8 +51,12 @@ const FeaturedCombos = memo(() => {
   );
 
   return (
-    <section className="py-20 bg-gradient-to-b from-muted/50 to-background">
-      <div className="container">
+    <section className="py-20 bg-gradient-to-b from-muted/50 to-background relative overflow-hidden">
+      {/* Decorative background */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-72 h-72 bg-secondary/3 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="container relative">
         <motion.div
           className="flex flex-col md:flex-row md:items-end justify-between mb-12"
           initial={{ opacity: 0, y: 20 }}
@@ -62,20 +66,32 @@ const FeaturedCombos = memo(() => {
         >
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Package className="w-5 h-5 text-secondary" />
-              <p className="text-secondary font-semibold tracking-wider uppercase">
-                Bundle & Save
-              </p>
+              <Badge className="bg-secondary/10 text-secondary border-secondary/20 text-xs px-3 py-1">
+                <Package className="w-3.5 h-3.5 mr-1.5" />
+                Bundle & Save up to 25%
+              </Badge>
             </div>
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
               Featured Combo Packages
             </h2>
             <p className="text-muted-foreground mt-3 max-w-lg">
-              Experience more and save big with our curated multi-day packages
+              Experience more and save big with our curated multi-day packages — hotel, transport & activities all included.
             </p>
+            {/* Trust micro-strip */}
+            <div className="flex flex-wrap items-center gap-4 mt-4 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <Percent className="w-3.5 h-3.5 text-secondary" /> Best Price Guarantee
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-secondary" /> AI Customizable
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Shield className="w-3.5 h-3.5 text-secondary" /> Free Cancellation
+              </span>
+            </div>
           </div>
           <Link to="/combo-packages" className="mt-6 md:mt-0">
-            <Button variant="outline" size="lg" className="font-semibold group">
+            <Button variant="outline" size="lg" className="font-semibold group rounded-xl">
               View All Packages
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -121,7 +137,7 @@ const FeaturedCombos = memo(() => {
                   </div>
                 ))}
               </div>
-              {/* Scroll indicator - synced with visible card */}
+              {/* Scroll indicator */}
               <div className="flex justify-center gap-1.5 mt-2">
                 {featuredCombos.slice(0, 4).map((_, index) => (
                   <button
@@ -144,20 +160,20 @@ const FeaturedCombos = memo(() => {
               </div>
             </div>
 
-            {/* Desktop: Grid layout */}
-            <motion.div
-              className="hidden lg:grid lg:grid-cols-3 gap-6"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.4 }}
-            >
-              {featuredCombos.slice(0, 3).map((combo) => (
-                <div key={combo.id}>
+            {/* Desktop: Grid layout with stagger */}
+            <div className="hidden lg:grid lg:grid-cols-3 gap-6">
+              {featuredCombos.slice(0, 3).map((combo, i) => (
+                <motion.div
+                  key={combo.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                >
                   <ComboCard combo={combo} />
-                </div>
+                </motion.div>
               ))}
-            </motion.div>
+            </div>
           </>
         )}
 
@@ -167,7 +183,7 @@ const FeaturedCombos = memo(() => {
             <Package className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
             <p className="text-muted-foreground mb-4">No featured packages available at the moment.</p>
             <Link to="/combo-packages">
-              <Button>Browse All Packages</Button>
+              <Button className="rounded-xl">Browse All Packages</Button>
             </Link>
           </div>
         )}
