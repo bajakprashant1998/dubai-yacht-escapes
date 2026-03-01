@@ -1,9 +1,8 @@
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Filter, X, Star, ChevronDown, ChevronUp } from "lucide-react";
+import { Filter, X, Star, ChevronDown, ChevronUp, Wifi, Car, Dumbbell, Waves, UtensilsCrossed } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -19,12 +18,15 @@ interface HotelFiltersProps {
 }
 
 const hotelCategories = [
-  { value: "budget", label: "Budget Friendly" },
-  { value: "3-star", label: "3-Star Hotels" },
-  { value: "4-star", label: "4-Star Hotels" },
-  { value: "5-star", label: "5-Star Hotels" },
-  { value: "luxury", label: "Luxury Resorts" },
+  { value: "budget", label: "Budget Friendly", emoji: "💰" },
+  { value: "3-star", label: "3-Star Hotels", emoji: "🏨" },
+  { value: "4-star", label: "4-Star Hotels", emoji: "🌟" },
+  { value: "5-star", label: "5-Star Hotels", emoji: "👑" },
+  { value: "luxury", label: "Luxury Resorts", emoji: "🏖️" },
 ];
+
+const SectionToggle = ({ open }: { open: boolean }) =>
+  open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />;
 
 const HotelFilters = ({
   selectedCategory,
@@ -50,44 +52,40 @@ const HotelFilters = ({
   };
 
   const toggleSection = (section: keyof typeof openSections) => {
-    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+    setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
-  
+
   const hasActiveFilters = selectedCategory || starRatingFilter.length > 0 || priceRange[0] > 0 || priceRange[1] < 10000;
   const activeFilterCount = (selectedCategory ? 1 : 0) + starRatingFilter.length + (priceRange[0] > 0 || priceRange[1] < 10000 ? 1 : 0);
-  
+
   return (
-    <Card className="sticky top-24 shadow-sm">
+    <Card className="sticky top-24 shadow-sm rounded-xl border-border/50">
       <CardHeader className="pb-3 border-b border-border">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base flex items-center gap-2">
-            <Filter className="w-4 h-4" />
+            <Filter className="w-4 h-4 text-secondary" />
             Filters
             {activeFilterCount > 0 && (
-              <span className="ml-1 px-2 py-0.5 text-xs font-semibold bg-secondary text-secondary-foreground rounded-full">
+              <span className="ml-1 px-2.5 py-0.5 text-xs font-bold bg-secondary text-secondary-foreground rounded-full">
                 {activeFilterCount}
               </span>
             )}
           </CardTitle>
           {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={onClearFilters} className="h-8 text-xs">
+            <Button variant="ghost" size="sm" onClick={onClearFilters} className="h-7 text-xs text-muted-foreground hover:text-foreground">
               <X className="w-3 h-3 mr-1" />
               Reset
             </Button>
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent className="p-0">
-        {/* Categories Section */}
+        {/* Categories */}
         <Collapsible open={openSections.category} onOpenChange={() => toggleSection("category")}>
           <CollapsibleTrigger className="flex items-center justify-between w-full p-4 hover:bg-muted/50 transition-colors">
             <Label className="text-sm font-semibold cursor-pointer">Hotel Type</Label>
-            {openSections.category ? (
-              <ChevronUp className="w-4 h-4 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-muted-foreground" />
-            )}
+            <SectionToggle open={openSections.category} />
           </CollapsibleTrigger>
           <CollapsibleContent>
             <div className="px-4 pb-4 space-y-1">
@@ -95,44 +93,40 @@ const HotelFilters = ({
                 type="button"
                 onClick={() => onCategoryChange(null)}
                 className={cn(
-                  "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
+                  "w-full text-left px-3 py-2.5 rounded-xl text-sm transition-all",
                   selectedCategory === null
-                    ? "bg-secondary/10 text-secondary font-medium"
+                    ? "bg-secondary/10 text-secondary font-medium border border-secondary/20"
                     : "text-muted-foreground hover:bg-muted/50"
                 )}
               >
-                All Hotels
+                🏢 All Hotels
               </button>
-              {hotelCategories.map((category) => (
+              {hotelCategories.map((cat) => (
                 <button
-                  key={category.value}
+                  key={cat.value}
                   type="button"
-                  onClick={() => onCategoryChange(category.value)}
+                  onClick={() => onCategoryChange(cat.value)}
                   className={cn(
-                    "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
-                    selectedCategory === category.value
-                      ? "bg-secondary/10 text-secondary font-medium"
+                    "w-full text-left px-3 py-2.5 rounded-xl text-sm transition-all",
+                    selectedCategory === cat.value
+                      ? "bg-secondary/10 text-secondary font-medium border border-secondary/20"
                       : "text-muted-foreground hover:bg-muted/50"
                   )}
                 >
-                  {category.label}
+                  {cat.emoji} {cat.label}
                 </button>
               ))}
             </div>
           </CollapsibleContent>
         </Collapsible>
-        
+
         <div className="border-t border-border" />
-        
-        {/* Star Rating Section */}
+
+        {/* Star Rating */}
         <Collapsible open={openSections.rating} onOpenChange={() => toggleSection("rating")}>
           <CollapsibleTrigger className="flex items-center justify-between w-full p-4 hover:bg-muted/50 transition-colors">
             <Label className="text-sm font-semibold cursor-pointer">Star Rating</Label>
-            {openSections.rating ? (
-              <ChevronUp className="w-4 h-4 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-muted-foreground" />
-            )}
+            <SectionToggle open={openSections.rating} />
           </CollapsibleTrigger>
           <CollapsibleContent>
             <div className="px-4 pb-4">
@@ -143,35 +137,33 @@ const HotelFilters = ({
                     type="button"
                     onClick={() => handleStarRatingToggle(rating)}
                     className={cn(
-                      "flex items-center gap-1 px-3 py-2 rounded-lg border text-sm transition-all",
+                      "flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm transition-all",
                       starRatingFilter.includes(rating)
-                        ? "border-secondary bg-secondary/10 text-secondary"
-                        : "border-border hover:border-secondary/50"
+                        ? "border-secondary bg-secondary/10 text-secondary font-medium shadow-sm"
+                        : "border-border hover:border-secondary/50 text-muted-foreground"
                     )}
                   >
                     {rating}
-                    <Star className={cn(
-                      "w-3.5 h-3.5",
-                      starRatingFilter.includes(rating) ? "fill-secondary text-secondary" : "text-muted-foreground"
-                    )} />
+                    <Star
+                      className={cn(
+                        "w-3.5 h-3.5",
+                        starRatingFilter.includes(rating) ? "fill-secondary text-secondary" : "text-muted-foreground"
+                      )}
+                    />
                   </button>
                 ))}
               </div>
             </div>
           </CollapsibleContent>
         </Collapsible>
-        
+
         <div className="border-t border-border" />
-        
-        {/* Price Range Section */}
+
+        {/* Price Range */}
         <Collapsible open={openSections.price} onOpenChange={() => toggleSection("price")}>
           <CollapsibleTrigger className="flex items-center justify-between w-full p-4 hover:bg-muted/50 transition-colors">
             <Label className="text-sm font-semibold cursor-pointer">Price per Night</Label>
-            {openSections.price ? (
-              <ChevronUp className="w-4 h-4 text-muted-foreground" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-muted-foreground" />
-            )}
+            <SectionToggle open={openSections.price} />
           </CollapsibleTrigger>
           <CollapsibleContent>
             <div className="px-4 pb-4 space-y-4">
@@ -184,11 +176,11 @@ const HotelFilters = ({
                 className="mt-2"
               />
               <div className="flex justify-between items-center">
-                <div className="px-3 py-1.5 bg-muted rounded-lg text-sm">
+                <div className="px-3 py-1.5 bg-muted rounded-xl text-sm font-medium">
                   AED {priceRange[0].toLocaleString()}
                 </div>
-                <span className="text-muted-foreground">—</span>
-                <div className="px-3 py-1.5 bg-muted rounded-lg text-sm">
+                <span className="text-muted-foreground text-xs">to</span>
+                <div className="px-3 py-1.5 bg-muted rounded-xl text-sm font-medium">
                   AED {priceRange[1].toLocaleString()}
                 </div>
               </div>
