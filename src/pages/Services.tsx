@@ -19,6 +19,7 @@ import {
   defaultFilters,
   type FilterState,
 } from "@/components/services/ServiceFilters";
+import CategoryHighlights from "@/components/services/CategoryHighlights";
 import SEOHead from "@/components/SEOHead";
 
 const sortOptions: SortOption[] = [
@@ -134,10 +135,13 @@ const Services = () => {
       {/* Hero */}
       <section className="relative pt-28 pb-20 lg:pt-36 lg:pb-28 bg-primary overflow-hidden">
         <div
-          className="absolute inset-0 opacity-20 bg-cover bg-center transition-all duration-700 scale-105"
+          className={cn(
+            "absolute inset-0 bg-cover bg-center transition-all duration-700 scale-105",
+            activeCategory ? "opacity-30" : "opacity-20"
+          )}
           style={{ backgroundImage: `url(${bannerImage})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-primary/75 to-primary" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/20 via-primary/70 to-primary" />
         <div className="absolute inset-0 bg-gradient-to-r from-primary via-transparent to-primary/50" />
 
         {/* Decorative */}
@@ -244,6 +248,9 @@ const Services = () => {
           </div>
         </div>
       </section>
+
+      {/* Category Highlights */}
+      {categoryPath && <CategoryHighlights categorySlug={categoryPath} />}
 
       {/* Main Content */}
       <section className="py-8 lg:py-12 bg-muted/20">
