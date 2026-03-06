@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getVisitorId, getCurrentPage, ChatConversation, ChatMessage } from "@/lib/chatUtils";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useToast } from "@/hooks/use-toast";
 import { withTimeout } from "@/lib/withTimeout";
 
@@ -11,6 +12,7 @@ export function useChat() {
   const [isBotTyping, setIsBotTyping] = useState(false);
   const [isAgentOnline, setIsAgentOnline] = useState(false);
   const { toast } = useToast();
+  const { items: recentlyViewedItems } = useRecentlyViewed();
 
   const visitorId = getVisitorId();
 
@@ -178,7 +180,9 @@ export function useChat() {
           message: content,
           conversationId: conversation.id,
           visitorId,
-          messages: [...messages, savedMsg].slice(-10), // Last 10 messages for context
+          messages: [...messages, savedMsg].slice(-10),
+          currentPage: getCurrentPage(),
+          recentlyViewed: recentlyViewedItems.slice(0, 5).map(item => item.title),
         },
       });
 
@@ -197,7 +201,7 @@ export function useChat() {
     } finally {
       setIsBotTyping(false);
     }
-  }, [conversation, messages, visitorId, toast]);
+  }, [conversation, messages, visitorId, recentlyViewedItems, toast]);
 
   // Update visitor details
   const updateVisitorDetails = useCallback(async (details: {
