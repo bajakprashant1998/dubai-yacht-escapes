@@ -2,6 +2,7 @@ import { ChatMessage as ChatMessageType, formatChatTime } from "@/lib/chatUtils"
 import { cn } from "@/lib/utils";
 import { User, Bot, Headset, Check, CheckCheck } from "lucide-react";
 import { motion } from "framer-motion";
+import RecommendationCard from "./RecommendationCard";
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -11,6 +12,8 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
   const isVisitor = message.sender_type === "visitor";
   const isBot = message.sender_type === "bot";
   const isAgent = message.sender_type === "agent";
+
+  const recommendations = (message.metadata as any)?.recommendations;
 
   return (
     <motion.div
@@ -68,6 +71,11 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
             {message.content}
           </p>
         </div>
+
+        {/* Recommendation Cards */}
+        {!isVisitor && recommendations && recommendations.length > 0 && (
+          <RecommendationCard recommendations={recommendations} />
+        )}
         
         {/* Timestamp with read indicator */}
         <div
