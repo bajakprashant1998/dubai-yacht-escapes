@@ -29,6 +29,7 @@ const Home = () => {
       <HeroSection />
       <PopularDestinations />
       <PopularActivities />
+      <WeatherRecommendations />
       <FeaturedToursCarousel />
       <FeaturedCombos />
       <QuickServices />
