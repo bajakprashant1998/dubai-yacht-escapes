@@ -34,7 +34,7 @@ import QuickInfoCards from "@/components/tour-detail/QuickInfoCards";
 import BookingSidebar from "@/components/tour-detail/BookingSidebar";
 import ReviewsSection from "@/components/tour-detail/ReviewsSection";
 import MobileBookingBar from "@/components/tour-detail/MobileBookingBar";
-import AvailabilityCalendar from "@/components/tour-detail/AvailabilityCalendar";
+import AvailabilityHeatmap from "@/components/tour-detail/AvailabilityHeatmap";
 import PhotoReviewsGallery from "@/components/tour-detail/PhotoReviewsGallery";
 
 import BookingModal from "@/components/tour-detail/BookingModal";
