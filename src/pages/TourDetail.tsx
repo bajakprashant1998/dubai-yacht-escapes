@@ -441,8 +441,8 @@ const TourDetail = () => {
               {/* Reviews Section */}
               <ReviewsSection rating={tour.rating} reviewCount={tour.reviewCount} />
 
-              {/* Availability Calendar */}
-              <AvailabilityCalendar tourId={tour.id} />
+              {/* Availability Heatmap */}
+              <AvailabilityHeatmap tourId={tour.id} basePrice={tour.price} />
 
               {/* FAQs */}
               {tour.faqs.length > 0 && (
