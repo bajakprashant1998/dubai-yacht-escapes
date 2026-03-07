@@ -181,6 +181,9 @@ const App = () => (
             {/* Combo Packages */}
             <Route path="/combo-packages" element={<ComboPackages />} />
             <Route path="/combo-packages/:slug" element={<ComboPackageDetail />} />
+            {/* Group Trips */}
+            <Route path="/group-trip" element={<GroupTripPage />} />
+            <Route path="/group-trip/:shareCode" element={<GroupTripPage />} />
             {/* Admin Routes */}
             <Route
               path="/admin"
