@@ -49,6 +49,7 @@ const TripItinerary = lazy(() => import("./pages/TripItinerary"));
 // Combo Packages
 const ComboPackages = lazy(() => import("./pages/ComboPackages"));
 const ComboPackageDetail = lazy(() => import("./pages/ComboPackageDetail"));
+const GroupTripPage = lazy(() => import("./pages/GroupTrip"));
 // Admin pages - lazy load entire admin section
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminBookings = lazy(() => import("./pages/admin/Bookings"));
@@ -180,6 +181,9 @@ const App = () => (
             {/* Combo Packages */}
             <Route path="/combo-packages" element={<ComboPackages />} />
             <Route path="/combo-packages/:slug" element={<ComboPackageDetail />} />
+            {/* Group Trips */}
+            <Route path="/group-trip" element={<GroupTripPage />} />
+            <Route path="/group-trip/:shareCode" element={<GroupTripPage />} />
             {/* Admin Routes */}
             <Route
               path="/admin"

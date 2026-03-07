@@ -13,6 +13,7 @@ import CTASection from "@/components/home/CTASection";
 import QuickServices from "@/components/home/QuickServices";
 import PopularActivities from "@/components/home/PopularActivities";
 import ValuePillars from "@/components/home/ValuePillars";
+import WeatherRecommendations from "@/components/home/WeatherRecommendations";
 import SEOHead, { createLocalBusinessSchema } from "@/components/SEOHead";
 
 const Home = () => {
@@ -28,6 +29,7 @@ const Home = () => {
       <HeroSection />
       <PopularDestinations />
       <PopularActivities />
+      <WeatherRecommendations />
       <FeaturedToursCarousel />
       <FeaturedCombos />
       <QuickServices />
