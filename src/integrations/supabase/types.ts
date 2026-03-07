@@ -1096,6 +1096,148 @@ export type Database = {
           },
         ]
       }
+      group_trip_items: {
+        Row: {
+          added_by: string | null
+          created_at: string
+          group_trip_id: string
+          id: string
+          image_url: string | null
+          item_id: string | null
+          item_type: string
+          price_per_person: number
+          quantity: number
+          slug: string | null
+          title: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string
+          group_trip_id: string
+          id?: string
+          image_url?: string | null
+          item_id?: string | null
+          item_type: string
+          price_per_person?: number
+          quantity?: number
+          slug?: string | null
+          title: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string
+          group_trip_id?: string
+          id?: string
+          image_url?: string | null
+          item_id?: string | null
+          item_type?: string
+          price_per_person?: number
+          quantity?: number
+          slug?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_trip_items_group_trip_id_fkey"
+            columns: ["group_trip_id"]
+            isOneToOne: false
+            referencedRelation: "group_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_trip_members: {
+        Row: {
+          amount_owed: number
+          amount_paid: number
+          email: string
+          group_trip_id: string
+          id: string
+          is_organizer: boolean
+          joined_at: string
+          name: string
+          notes: string | null
+          payment_status: string
+          phone: string | null
+        }
+        Insert: {
+          amount_owed?: number
+          amount_paid?: number
+          email: string
+          group_trip_id: string
+          id?: string
+          is_organizer?: boolean
+          joined_at?: string
+          name: string
+          notes?: string | null
+          payment_status?: string
+          phone?: string | null
+        }
+        Update: {
+          amount_owed?: number
+          amount_paid?: number
+          email?: string
+          group_trip_id?: string
+          id?: string
+          is_organizer?: boolean
+          joined_at?: string
+          name?: string
+          notes?: string | null
+          payment_status?: string
+          phone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_trip_members_group_trip_id_fkey"
+            columns: ["group_trip_id"]
+            isOneToOne: false
+            referencedRelation: "group_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_trips: {
+        Row: {
+          created_at: string
+          creator_email: string
+          creator_name: string
+          creator_phone: string | null
+          id: string
+          name: string
+          notes: string | null
+          share_code: string
+          status: string
+          trip_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_email: string
+          creator_name: string
+          creator_phone?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          share_code?: string
+          status?: string
+          trip_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_email?: string
+          creator_name?: string
+          creator_phone?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          share_code?: string
+          status?: string
+          trip_date?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hotel_rooms: {
         Row: {
           amenities: string[] | null
