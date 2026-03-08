@@ -192,7 +192,16 @@ const AdminRefundManagement = () => {
           </CardContent>
         </Card>
 
-        <TablePagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} onPageChange={pagination.goToPage} totalItems={filtered.length} />
+        <TablePagination
+          currentPage={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          onPageChange={pagination.goToPage}
+          totalItems={filtered.length}
+          pageSize={pagination.pageSize}
+          startIndex={pagination.startIndex}
+          endIndex={pagination.endIndex}
+          onPageSizeChange={pagination.setPageSize}
+        />
 
         {/* Review Dialog */}
         <Dialog open={!!selectedRefund} onOpenChange={() => setSelectedRefund(null)}>
