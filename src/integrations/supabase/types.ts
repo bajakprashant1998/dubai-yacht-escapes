@@ -899,6 +899,75 @@ export type Database = {
         }
         Relationships: []
       }
+      corporate_events: {
+        Row: {
+          assigned_to: string | null
+          budget_range: string | null
+          company_name: string
+          contact_email: string
+          contact_name: string
+          contact_phone: string | null
+          created_at: string
+          event_date: string | null
+          event_type: string
+          guests_count: number | null
+          id: string
+          invoice_amount: number | null
+          invoice_number: string | null
+          invoice_status: string | null
+          notes: string | null
+          proposal_url: string | null
+          requirements: string | null
+          selected_activities: string[] | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          budget_range?: string | null
+          company_name: string
+          contact_email: string
+          contact_name: string
+          contact_phone?: string | null
+          created_at?: string
+          event_date?: string | null
+          event_type?: string
+          guests_count?: number | null
+          id?: string
+          invoice_amount?: number | null
+          invoice_number?: string | null
+          invoice_status?: string | null
+          notes?: string | null
+          proposal_url?: string | null
+          requirements?: string | null
+          selected_activities?: string[] | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          budget_range?: string | null
+          company_name?: string
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string | null
+          created_at?: string
+          event_date?: string | null
+          event_type?: string
+          guests_count?: number | null
+          id?: string
+          invoice_amount?: number | null
+          invoice_number?: string | null
+          invoice_status?: string | null
+          notes?: string | null
+          proposal_url?: string | null
+          requirements?: string | null
+          selected_activities?: string[] | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       currency_rates: {
         Row: {
           created_at: string
@@ -1390,6 +1459,128 @@ export type Database = {
         }
         Relationships: []
       }
+      influencer_applications: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          bio: string | null
+          created_at: string
+          email: string
+          engagement_rate: number | null
+          followers_count: number | null
+          full_name: string
+          id: string
+          niche: string | null
+          phone: string | null
+          portfolio_url: string | null
+          social_handle: string
+          social_platform: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          bio?: string | null
+          created_at?: string
+          email: string
+          engagement_rate?: number | null
+          followers_count?: number | null
+          full_name: string
+          id?: string
+          niche?: string | null
+          phone?: string | null
+          portfolio_url?: string | null
+          social_handle: string
+          social_platform?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          bio?: string | null
+          created_at?: string
+          email?: string
+          engagement_rate?: number | null
+          followers_count?: number | null
+          full_name?: string
+          id?: string
+          niche?: string | null
+          phone?: string | null
+          portfolio_url?: string | null
+          social_handle?: string
+          social_platform?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      influencer_campaigns: {
+        Row: {
+          booking_date: string | null
+          campaign_name: string
+          content_links: string[] | null
+          created_at: string
+          deliverables: Json | null
+          engagement_count: number | null
+          estimated_reach: number | null
+          id: string
+          influencer_id: string
+          notes: string | null
+          roi_value: number | null
+          service_id: string | null
+          status: string
+          tour_id: string | null
+          updated_at: string
+          views_count: number | null
+        }
+        Insert: {
+          booking_date?: string | null
+          campaign_name: string
+          content_links?: string[] | null
+          created_at?: string
+          deliverables?: Json | null
+          engagement_count?: number | null
+          estimated_reach?: number | null
+          id?: string
+          influencer_id: string
+          notes?: string | null
+          roi_value?: number | null
+          service_id?: string | null
+          status?: string
+          tour_id?: string | null
+          updated_at?: string
+          views_count?: number | null
+        }
+        Update: {
+          booking_date?: string | null
+          campaign_name?: string
+          content_links?: string[] | null
+          created_at?: string
+          deliverables?: Json | null
+          engagement_count?: number | null
+          estimated_reach?: number | null
+          id?: string
+          influencer_id?: string
+          notes?: string | null
+          roi_value?: number | null
+          service_id?: string | null
+          status?: string
+          tour_id?: string | null
+          updated_at?: string
+          views_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_campaigns_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inquiries: {
         Row: {
           created_at: string
@@ -1667,6 +1858,69 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "review_photos_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_rewards: {
+        Row: {
+          badge_name: string | null
+          booking_id: string | null
+          created_at: string
+          discount_code: string | null
+          discount_value: number | null
+          id: string
+          is_redeemed: boolean | null
+          points_earned: number
+          redeemed_at: string | null
+          review_id: string | null
+          reward_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          badge_name?: string | null
+          booking_id?: string | null
+          created_at?: string
+          discount_code?: string | null
+          discount_value?: number | null
+          id?: string
+          is_redeemed?: boolean | null
+          points_earned?: number
+          redeemed_at?: string | null
+          review_id?: string | null
+          reward_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          badge_name?: string | null
+          booking_id?: string | null
+          created_at?: string
+          discount_code?: string | null
+          discount_value?: number | null
+          id?: string
+          is_redeemed?: boolean | null
+          points_earned?: number
+          redeemed_at?: string | null
+          review_id?: string | null
+          reward_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_rewards_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_rewards_review_id_fkey"
             columns: ["review_id"]
             isOneToOne: false
             referencedRelation: "reviews"
