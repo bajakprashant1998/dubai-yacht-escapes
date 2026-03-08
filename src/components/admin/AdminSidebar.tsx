@@ -126,6 +126,7 @@ const navItems: NavItem[] = [
   { title: "Banners", href: "/admin/banners", icon: Megaphone },
   { title: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { title: "Reports", href: "/admin/reports", icon: FileText },
+  { title: "Refunds", href: "/admin/refunds", icon: DollarSign },
   { title: "User Management", href: "/admin/users", icon: Users },
   { title: "User Roles", href: "/admin/roles", icon: Shield },
   { title: "Legal Pages", href: "/admin/legal-pages", icon: Scale },
