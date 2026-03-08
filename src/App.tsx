@@ -414,6 +414,12 @@ const App = () => (
             {/* Banners & Analytics Admin */}
             <Route path="/admin/banners" element={<RequireSession><AdminBanners /></RequireSession>} />
             <Route path="/admin/analytics" element={<RequireSession><AdminAnalytics /></RequireSession>} />
+            {/* New Modules */}
+            <Route path="/admin/group-trips" element={<RequireSession><AdminGroupTrips /></RequireSession>} />
+            <Route path="/admin/review-rewards" element={<RequireSession><AdminReviewRewards /></RequireSession>} />
+            <Route path="/admin/corporate-events" element={<RequireSession><AdminCorporateEvents /></RequireSession>} />
+            <Route path="/admin/influencer-portal" element={<RequireSession><AdminInfluencerPortal /></RequireSession>} />
+            <Route path="/admin/reports" element={<RequireSession><AdminReports /></RequireSession>} />
             {/* Customer Dashboard */}
             <Route path="/dashboard" element={<CustomerDashboard />} />
             {/* Auth routes */}
