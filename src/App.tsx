@@ -104,6 +104,8 @@ const AdminReviewRewards = lazy(() => import("./pages/admin/ReviewRewards"));
 const AdminCorporateEvents = lazy(() => import("./pages/admin/CorporateEvents"));
 const AdminInfluencerPortal = lazy(() => import("./pages/admin/InfluencerPortal"));
 const AdminReports = lazy(() => import("./pages/admin/Reports"));
+const AdminBookingCalendar = lazy(() => import("./pages/admin/BookingCalendar"));
+const AdminRefundManagement = lazy(() => import("./pages/admin/RefundManagement"));
 const CustomerDashboard = lazy(() => import("./pages/CustomerDashboard"));
 // RequireSession must be loaded synchronously as it's a wrapper component
 import RequireSession from "./components/admin/RequireSession";
@@ -420,6 +422,8 @@ const App = () => (
             <Route path="/admin/corporate-events" element={<RequireSession><AdminCorporateEvents /></RequireSession>} />
             <Route path="/admin/influencer-portal" element={<RequireSession><AdminInfluencerPortal /></RequireSession>} />
             <Route path="/admin/reports" element={<RequireSession><AdminReports /></RequireSession>} />
+            <Route path="/admin/booking-calendar" element={<RequireSession><AdminBookingCalendar /></RequireSession>} />
+            <Route path="/admin/refunds" element={<RequireSession><AdminRefundManagement /></RequireSession>} />
             {/* Customer Dashboard */}
             <Route path="/dashboard" element={<CustomerDashboard />} />
             {/* Auth routes */}
