@@ -56,6 +56,7 @@ const navItems: NavItem[] = [
     ],
   },
   { title: "Bookings", href: "/admin/bookings", icon: Calendar },
+  { title: "Booking Calendar", href: "/admin/booking-calendar", icon: Calendar },
   { title: "Live Chat", href: "/admin/live-chat", icon: Headset },
   { title: "Locations", href: "/admin/locations", icon: MapPin },
   {
