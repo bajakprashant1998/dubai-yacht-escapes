@@ -1830,6 +1830,65 @@ export type Database = {
         }
         Relationships: []
       }
+      refund_requests: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          booking_id: string
+          created_at: string
+          customer_email: string
+          customer_name: string
+          id: string
+          processed_at: string | null
+          reason: string
+          refund_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          booking_id: string
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          id?: string
+          processed_at?: string | null
+          reason: string
+          refund_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          booking_id?: string
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          id?: string
+          processed_at?: string | null
+          reason?: string
+          refund_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refund_requests_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       review_photos: {
         Row: {
           caption: string | null
