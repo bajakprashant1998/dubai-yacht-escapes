@@ -106,6 +106,9 @@ const AdminInfluencerPortal = lazy(() => import("./pages/admin/InfluencerPortal"
 const AdminReports = lazy(() => import("./pages/admin/Reports"));
 const AdminBookingCalendar = lazy(() => import("./pages/admin/BookingCalendar"));
 const AdminRefundManagement = lazy(() => import("./pages/admin/RefundManagement"));
+const AdminInventoryManagement = lazy(() => import("./pages/admin/InventoryManagement"));
+const AdminStaffTasks = lazy(() => import("./pages/admin/StaffTasks"));
+const AdminEmailSequences = lazy(() => import("./pages/admin/EmailSequences"));
 const CustomerDashboard = lazy(() => import("./pages/CustomerDashboard"));
 // RequireSession must be loaded synchronously as it's a wrapper component
 import RequireSession from "./components/admin/RequireSession";
@@ -424,6 +427,9 @@ const App = () => (
             <Route path="/admin/reports" element={<RequireSession><AdminReports /></RequireSession>} />
             <Route path="/admin/booking-calendar" element={<RequireSession><AdminBookingCalendar /></RequireSession>} />
             <Route path="/admin/refunds" element={<RequireSession><AdminRefundManagement /></RequireSession>} />
+            <Route path="/admin/inventory" element={<RequireSession><AdminInventoryManagement /></RequireSession>} />
+            <Route path="/admin/staff-tasks" element={<RequireSession><AdminStaffTasks /></RequireSession>} />
+            <Route path="/admin/email-sequences" element={<RequireSession><AdminEmailSequences /></RequireSession>} />
             {/* Customer Dashboard */}
             <Route path="/dashboard" element={<CustomerDashboard />} />
             {/* Auth routes */}
