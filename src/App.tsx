@@ -106,6 +106,9 @@ const AdminInfluencerPortal = lazy(() => import("./pages/admin/InfluencerPortal"
 const AdminReports = lazy(() => import("./pages/admin/Reports"));
 const AdminBookingCalendar = lazy(() => import("./pages/admin/BookingCalendar"));
 const AdminRefundManagement = lazy(() => import("./pages/admin/RefundManagement"));
+const AdminInventoryManagement = lazy(() => import("./pages/admin/InventoryManagement"));
+const AdminStaffTasks = lazy(() => import("./pages/admin/StaffTasks"));
+const AdminEmailSequences = lazy(() => import("./pages/admin/EmailSequences"));
 const CustomerDashboard = lazy(() => import("./pages/CustomerDashboard"));
 // RequireSession must be loaded synchronously as it's a wrapper component
 import RequireSession from "./components/admin/RequireSession";
