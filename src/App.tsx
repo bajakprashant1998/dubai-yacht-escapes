@@ -427,6 +427,9 @@ const App = () => (
             <Route path="/admin/reports" element={<RequireSession><AdminReports /></RequireSession>} />
             <Route path="/admin/booking-calendar" element={<RequireSession><AdminBookingCalendar /></RequireSession>} />
             <Route path="/admin/refunds" element={<RequireSession><AdminRefundManagement /></RequireSession>} />
+            <Route path="/admin/inventory" element={<RequireSession><AdminInventoryManagement /></RequireSession>} />
+            <Route path="/admin/staff-tasks" element={<RequireSession><AdminStaffTasks /></RequireSession>} />
+            <Route path="/admin/email-sequences" element={<RequireSession><AdminEmailSequences /></RequireSession>} />
             {/* Customer Dashboard */}
             <Route path="/dashboard" element={<CustomerDashboard />} />
             {/* Auth routes */}
