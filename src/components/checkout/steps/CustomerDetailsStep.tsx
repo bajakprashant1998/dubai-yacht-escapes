@@ -6,11 +6,9 @@ import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from "@/components/ui/form";
 
-interface CustomerFormValues {
-  name: string;
-  email: string;
-  phone: string;
-  specialRequests?: string;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface CustomerDetailsStepProps {
+  form: UseFormReturn<any>;
 }
 
 interface CustomerDetailsStepProps {
