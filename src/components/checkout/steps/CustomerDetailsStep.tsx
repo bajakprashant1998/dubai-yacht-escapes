@@ -6,8 +6,8 @@ import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from "@/components/ui/form";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface CustomerDetailsStepProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   form: UseFormReturn<any>;
 }
 
