@@ -11,10 +11,6 @@ interface CustomerDetailsStepProps {
   form: UseFormReturn<any>;
 }
 
-interface CustomerDetailsStepProps {
-  form: UseFormReturn<CustomerFormValues>;
-}
-
 const CustomerDetailsStep = ({ form }: CustomerDetailsStepProps) => (
   <div className="space-y-6">
     <div className="text-center">
