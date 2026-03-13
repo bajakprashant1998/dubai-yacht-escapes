@@ -433,6 +433,7 @@ const App = () => (
             <Route path="/admin/email-sequences" element={<RequireSession><AdminEmailSequences /></RequireSession>} />
             {/* Customer Dashboard */}
             <Route path="/dashboard" element={<CustomerDashboard />} />
+            <Route path="/my-tasks" element={<MyTasks />} />
             {/* Auth routes */}
             <Route path="/auth/verify-email" element={<VerifyEmail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
