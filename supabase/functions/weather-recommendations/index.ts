@@ -19,44 +19,86 @@ interface WeatherData {
 const DUBAI_LAT = 25.2048;
 const DUBAI_LON = 55.2708;
 
+// Simple in-memory cache (persists across warm invocations)
+let cachedResult: { data: any; timestamp: number } | null = null;
+const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+
+async function fetchWeatherWithRetry(url: string, retries = 2): Promise<Response> {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+      if (res.ok) return res;
+      await res.text(); // consume body
+    } catch (err) {
+      if (i === retries) throw err;
+      // Wait briefly before retry
+      await new Promise(r => setTimeout(r, 500 * (i + 1)));
+    }
+  }
+  throw new Error("Weather API failed after retries");
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Fetch weather from Open-Meteo (free, no API key needed)
+    // Return cached data if fresh
+    if (cachedResult && Date.now() - cachedResult.timestamp < CACHE_TTL_MS) {
+      return new Response(JSON.stringify(cachedResult.data), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Fetch weather from Open-Meteo with retry logic
     const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${DUBAI_LAT}&longitude=${DUBAI_LON}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code&timezone=Asia/Dubai`;
 
-    const weatherRes = await fetch(weatherUrl);
-    if (!weatherRes.ok) throw new Error("Weather API failed");
-    const weatherJson = await weatherRes.json();
+    let weather: WeatherData;
+    let weatherCode: number;
 
-    const current = weatherJson.current;
-    const temp = current.temperature_2m;
-    const humidity = current.relative_humidity_2m;
-    const windSpeed = current.wind_speed_10m;
-    const weatherCode = current.weather_code;
+    try {
+      const weatherRes = await fetchWeatherWithRetry(weatherUrl);
+      const weatherJson = await weatherRes.json();
+      const current = weatherJson.current;
+      const temp = current.temperature_2m;
+      const humidity = current.relative_humidity_2m;
+      const windSpeed = current.wind_speed_10m;
+      weatherCode = current.weather_code;
+      const { condition, icon, description } = mapWeatherCode(weatherCode);
 
-    // Map WMO weather codes to conditions
-    const { condition, icon, description } = mapWeatherCode(weatherCode);
+      weather = {
+        temperature: Math.round(temp),
+        condition,
+        humidity,
+        wind_speed: Math.round(windSpeed),
+        icon,
+        description,
+      };
+    } catch (weatherErr) {
+      console.warn("Weather API unreachable, using fallback:", weatherErr);
+      // Fallback: typical Dubai weather
+      weather = {
+        temperature: 35,
+        condition: "clear",
+        humidity: 45,
+        wind_speed: 15,
+        icon: "☀️",
+        description: "Clear sky (estimated)",
+      };
+      weatherCode = 0;
+    }
 
-    const weather: WeatherData = {
-      temperature: Math.round(temp),
-      condition,
-      humidity,
-      wind_speed: Math.round(windSpeed),
-      icon,
-      description,
-    };
-
-    // Determine recommendation type based on weather
+    const temp = weather.temperature;
     const isHot = temp > 38;
     const isRainy = [51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(weatherCode);
-    const isWindy = windSpeed > 30;
+    const isWindy = weather.wind_speed > 30;
     const isPleasant = temp >= 20 && temp <= 35 && !isRainy && !isWindy;
 
-    // Fetch relevant tours and services from DB
+    // Fetch recommendations from DB
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -81,11 +123,9 @@ Deno.serve(async (req) => {
       weatherTip = `${weather.temperature}°C today — great for both indoor and outdoor activities!`;
     }
 
-    // Indoor categories/keywords
     const indoorKeywords = ["theme park", "museum", "aquarium", "mall", "observation", "indoor", "spa", "dining"];
     const outdoorKeywords = ["desert", "safari", "yacht", "cruise", "water sport", "beach", "garden", "outdoor", "jet ski", "kayak"];
 
-    // Fetch tours
     const { data: tours } = await supabase
       .from("tours")
       .select("id, title, slug, image_url, price, original_price, rating, review_count, duration, category_id")
@@ -93,7 +133,6 @@ Deno.serve(async (req) => {
       .order("is_featured", { ascending: false })
       .limit(50);
 
-    // Fetch services
     const { data: services } = await supabase
       .from("services")
       .select("id, title, slug, image_url, price, original_price, rating, review_count, duration")
@@ -101,7 +140,6 @@ Deno.serve(async (req) => {
       .order("is_featured", { ascending: false })
       .limit(50);
 
-    // Score and filter recommendations
     const allItems = [
       ...(tours || []).map((t) => ({ ...t, type: "tour" as const })),
       ...(services || []).map((s) => ({ ...s, type: "service" as const })),
@@ -110,24 +148,18 @@ Deno.serve(async (req) => {
     const scored = allItems.map((item) => {
       const titleLower = item.title.toLowerCase();
       let score = 0;
-
       if (recommendationType === "indoor") {
         if (indoorKeywords.some((k) => titleLower.includes(k))) score += 10;
         if (outdoorKeywords.some((k) => titleLower.includes(k))) score -= 5;
-        // Water activities are good when it's hot
         if (isHot && titleLower.match(/water|pool|aqua|swim/)) score += 8;
       } else if (recommendationType === "outdoor") {
         if (outdoorKeywords.some((k) => titleLower.includes(k))) score += 10;
         if (indoorKeywords.some((k) => titleLower.includes(k))) score -= 3;
       } else {
-        score += 5; // mixed - everything gets a baseline
+        score += 5;
       }
-
-      // Boost by rating
       score += (item.rating || 4) * 1.5;
-      // Boost featured/popular
       if (item.review_count && item.review_count > 50) score += 3;
-
       return { ...item, score };
     });
 
@@ -136,15 +168,14 @@ Deno.serve(async (req) => {
       .slice(0, 6)
       .map(({ score, ...item }) => item);
 
-    return new Response(
-      JSON.stringify({
-        weather,
-        recommendationType,
-        weatherTip,
-        recommendations,
-      }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    const responseData = { weather, recommendationType, weatherTip, recommendations };
+
+    // Cache the result
+    cachedResult = { data: responseData, timestamp: Date.now() };
+
+    return new Response(JSON.stringify(responseData), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.error("Weather recommendation error:", error);
     return new Response(
