@@ -431,9 +431,9 @@ const App = () => (
             <Route path="/admin/inventory" element={<RequireSession><AdminInventoryManagement /></RequireSession>} />
             <Route path="/admin/staff-tasks" element={<RequireSession><AdminStaffTasks /></RequireSession>} />
             <Route path="/admin/email-sequences" element={<RequireSession><AdminEmailSequences /></RequireSession>} />
-            {/* Customer Dashboard */}
-            <Route path="/dashboard" element={<CustomerDashboard />} />
-            <Route path="/my-tasks" element={<MyTasks />} />
+            {/* Customer Dashboard - Protected */}
+            <Route path="/dashboard" element={<RequireSession><CustomerDashboard /></RequireSession>} />
+            <Route path="/my-tasks" element={<RequireSession><MyTasks /></RequireSession>} />
             {/* Auth routes */}
             <Route path="/auth/verify-email" element={<VerifyEmail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

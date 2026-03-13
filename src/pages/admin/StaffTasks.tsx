@@ -3,8 +3,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Plus, ClipboardList } from "lucide-react";
+import { Plus, ClipboardList, TrendingUp, AlertTriangle as AlertIcon } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { isPast, isToday } from "date-fns";
 import TaskStatsBar from "@/components/admin/staff-tasks/TaskStatsBar";
 import TaskFilters from "@/components/admin/staff-tasks/TaskFilters";
 import TaskCard from "@/components/admin/staff-tasks/TaskCard";
@@ -17,7 +20,7 @@ const AdminStaffTasks = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
-  const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
+  const [viewMode, setViewMode] = useState<"list" | "kanban">("kanban");
   const [createDialog, setCreateDialog] = useState(false);
   const [editTask, setEditTask] = useState<any>(null);
   const [form, setForm] = useState({ title: "", description: "", assigned_to: "", priority: "medium", due_date: "", related_entity_type: "" });
@@ -60,7 +63,7 @@ const AdminStaffTasks = () => {
       queryClient.invalidateQueries({ queryKey: ["staff-tasks"] });
       setCreateDialog(false);
       setForm({ title: "", description: "", assigned_to: "", priority: "medium", due_date: "", related_entity_type: "" });
-      toast.success("Task created");
+      toast.success("Task created successfully");
     },
     onError: (e: any) => toast.error(e.message),
   });
@@ -98,6 +101,11 @@ const AdminStaffTasks = () => {
 
   const filtered = tasks.filter(t => !search || t.title.toLowerCase().includes(search.toLowerCase()));
 
+  const overdueTasks = tasks.filter(t =>
+    t.due_date && t.status !== "completed" && t.status !== "cancelled" &&
+    isPast(new Date(t.due_date)) && !isToday(new Date(t.due_date))
+  );
+
   const stats = {
     total: tasks.length,
     pending: tasks.filter(t => t.status === "pending").length,
@@ -113,15 +121,42 @@ const AdminStaffTasks = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
+        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">Staff Tasks</h1>
-            <p className="text-sm text-muted-foreground">Assign and track tasks for your team</p>
+            <p className="text-sm text-muted-foreground">Assign, track, and manage tasks for your team</p>
           </div>
-          <Button onClick={() => setCreateDialog(true)}>
-            <Plus className="w-4 h-4 mr-2" /> New Task
+          <Button onClick={() => setCreateDialog(true)} className="gap-2">
+            <Plus className="w-4 h-4" /> New Task
           </Button>
         </div>
+
+        {/* Overdue Alert Banner */}
+        {overdueTasks.length > 0 && (
+          <Card className="border-destructive/30 bg-destructive/5">
+            <CardContent className="p-3 flex items-center gap-3">
+              <AlertIcon className="w-5 h-5 text-destructive flex-shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-destructive">
+                  {overdueTasks.length} overdue task{overdueTasks.length > 1 ? "s" : ""} need attention
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {overdueTasks.map(t => t.title).slice(0, 3).join(", ")}
+                  {overdueTasks.length > 3 ? ` +${overdueTasks.length - 3} more` : ""}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                onClick={() => { setStatusFilter("all"); setPriorityFilter("all"); }}
+              >
+                View All
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         <TaskStatsBar stats={stats} />
 
@@ -132,29 +167,35 @@ const AdminStaffTasks = () => {
           viewMode={viewMode} onViewModeChange={setViewMode}
         />
 
-        {viewMode === "kanban" ? (
+        {/* Content */}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
+          </div>
+        ) : viewMode === "kanban" ? (
           <TaskKanbanBoard
             tasks={filtered}
             getAssigneeName={getAssigneeName}
-            onEdit={setEditTask}
+            onEdit={(task) => setEditTask({ ...task })}
             onDelete={(id) => deleteMutation.mutate(id)}
             onStatusChange={handleKanbanStatusChange}
           />
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {filtered.map(task => (
               <TaskCard
                 key={task.id}
                 task={task}
                 getAssigneeName={getAssigneeName}
-                onEdit={setEditTask}
+                onEdit={(task) => setEditTask({ ...task })}
                 onDelete={(id) => deleteMutation.mutate(id)}
               />
             ))}
-            {filtered.length === 0 && !isLoading && (
-              <div className="text-center py-12 text-muted-foreground">
-                <ClipboardList className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                <p>No tasks found</p>
+            {filtered.length === 0 && (
+              <div className="text-center py-16 text-muted-foreground">
+                <ClipboardList className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                <p className="font-medium">No tasks found</p>
+                <p className="text-sm">Create a new task or adjust your filters.</p>
               </div>
             )}
           </div>
