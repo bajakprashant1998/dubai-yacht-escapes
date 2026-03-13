@@ -110,6 +110,7 @@ const AdminInventoryManagement = lazy(() => import("./pages/admin/InventoryManag
 const AdminStaffTasks = lazy(() => import("./pages/admin/StaffTasks"));
 const AdminEmailSequences = lazy(() => import("./pages/admin/EmailSequences"));
 const CustomerDashboard = lazy(() => import("./pages/CustomerDashboard"));
+const MyTasks = lazy(() => import("./pages/MyTasks"));
 // RequireSession must be loaded synchronously as it's a wrapper component
 import RequireSession from "./components/admin/RequireSession";
 
