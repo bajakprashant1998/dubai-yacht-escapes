@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Heart, User, MapPin, Clock, DollarSign, LogOut } from "lucide-react";
+import { Calendar, Heart, User, MapPin, Clock, DollarSign, LogOut, ClipboardList } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useWishlist } from "@/hooks/useWishlist";
 import { toast } from "sonner";
