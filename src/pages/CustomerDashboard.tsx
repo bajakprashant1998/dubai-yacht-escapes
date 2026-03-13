@@ -97,9 +97,14 @@ const CustomerDashboard = () => {
               Welcome back, {profile?.full_name || user?.email}
             </p>
           </div>
-          <Button variant="outline" onClick={handleLogout} className="gap-2">
-            <LogOut className="w-4 h-4" /> Sign Out
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild className="gap-2">
+              <Link to="/my-tasks"><ClipboardList className="w-4 h-4" /> My Tasks</Link>
+            </Button>
+            <Button variant="outline" onClick={handleLogout} className="gap-2">
+              <LogOut className="w-4 h-4" /> Sign Out
+            </Button>
+          </div>
         </div>
 
         {/* Stats */}
