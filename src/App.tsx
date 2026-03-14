@@ -198,6 +198,9 @@ const App = () => (
             {/* Group Trips */}
             <Route path="/group-trip" element={<GroupTripPage />} />
             <Route path="/group-trip/:shareCode" element={<GroupTripPage />} />
+            {/* Dubai Guide & Events */}
+            <Route path="/dubai-guide" element={<DubaiGuide />} />
+            <Route path="/events" element={<DubaiEvents />} />
             {/* Admin Routes */}
             <Route
               path="/admin"
