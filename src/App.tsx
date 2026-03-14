@@ -50,6 +50,8 @@ const TripItinerary = lazy(() => import("./pages/TripItinerary"));
 const ComboPackages = lazy(() => import("./pages/ComboPackages"));
 const ComboPackageDetail = lazy(() => import("./pages/ComboPackageDetail"));
 const GroupTripPage = lazy(() => import("./pages/GroupTrip"));
+const DubaiGuide = lazy(() => import("./pages/DubaiGuide"));
+const DubaiEvents = lazy(() => import("./pages/DubaiEvents"));
 // Admin pages - lazy load entire admin section
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminBookings = lazy(() => import("./pages/admin/Bookings"));
