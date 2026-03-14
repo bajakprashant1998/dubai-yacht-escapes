@@ -437,6 +437,7 @@ const App = () => (
             <Route path="/admin/inventory" element={<RequireSession><AdminInventoryManagement /></RequireSession>} />
             <Route path="/admin/staff-tasks" element={<RequireSession><AdminStaffTasks /></RequireSession>} />
             <Route path="/admin/email-sequences" element={<RequireSession><AdminEmailSequences /></RequireSession>} />
+            <Route path="/admin/dubai-events" element={<RequireSession><AdminDubaiEvents /></RequireSession>} />
             {/* Customer Dashboard - Protected */}
             <Route path="/dashboard" element={<RequireSession><CustomerDashboard /></RequireSession>} />
             <Route path="/my-tasks" element={<RequireSession><MyTasks /></RequireSession>} />

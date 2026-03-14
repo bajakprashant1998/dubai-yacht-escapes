@@ -151,6 +151,7 @@ const navSections: NavSection[] = [
     items: [
       { title: "AI Trip Planner", href: "/admin/ai-trips", icon: Plane },
       { title: "Group Trips", href: "/admin/group-trips", icon: Users },
+      { title: "Dubai Events", href: "/admin/dubai-events", icon: Calendar },
     ],
   },
   {

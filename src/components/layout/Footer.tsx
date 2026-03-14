@@ -90,6 +90,8 @@ const Footer = () => {
     { name: "Plan Trip", path: "/plan-trip" },
     { name: "Combo Packages", path: "/combo-packages" },
     { name: "Activities", path: "/experiences" },
+    { name: "Dubai Guide", path: "/dubai-guide" },
+    { name: "Events", path: "/events" },
     { name: "Blog", path: "/blog" },
     { name: "Contact", path: "/contact" },
   ];
