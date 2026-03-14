@@ -1096,6 +1096,99 @@ export type Database = {
         }
         Relationships: []
       }
+      dubai_events: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          end_date: string | null
+          end_time: string | null
+          event_date: string
+          gallery: string[] | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          is_free: boolean | null
+          linked_combo_ids: string[] | null
+          linked_service_ids: string[] | null
+          linked_tour_ids: string[] | null
+          location: string | null
+          long_description: string | null
+          meta_description: string | null
+          meta_title: string | null
+          price_from: number | null
+          slug: string
+          sort_order: number | null
+          start_time: string | null
+          tags: string[] | null
+          ticket_url: string | null
+          title: string
+          updated_at: string
+          venue: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          end_time?: string | null
+          event_date: string
+          gallery?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          is_free?: boolean | null
+          linked_combo_ids?: string[] | null
+          linked_service_ids?: string[] | null
+          linked_tour_ids?: string[] | null
+          location?: string | null
+          long_description?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          price_from?: number | null
+          slug: string
+          sort_order?: number | null
+          start_time?: string | null
+          tags?: string[] | null
+          ticket_url?: string | null
+          title: string
+          updated_at?: string
+          venue?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          end_time?: string | null
+          event_date?: string
+          gallery?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          is_free?: boolean | null
+          linked_combo_ids?: string[] | null
+          linked_service_ids?: string[] | null
+          linked_tour_ids?: string[] | null
+          location?: string | null
+          long_description?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          price_from?: number | null
+          slug?: string
+          sort_order?: number | null
+          start_time?: string | null
+          tags?: string[] | null
+          ticket_url?: string | null
+          title?: string
+          updated_at?: string
+          venue?: string | null
+        }
+        Relationships: []
+      }
       email_templates: {
         Row: {
           body_html: string

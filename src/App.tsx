@@ -50,6 +50,8 @@ const TripItinerary = lazy(() => import("./pages/TripItinerary"));
 const ComboPackages = lazy(() => import("./pages/ComboPackages"));
 const ComboPackageDetail = lazy(() => import("./pages/ComboPackageDetail"));
 const GroupTripPage = lazy(() => import("./pages/GroupTrip"));
+const DubaiGuide = lazy(() => import("./pages/DubaiGuide"));
+const DubaiEvents = lazy(() => import("./pages/DubaiEvents"));
 // Admin pages - lazy load entire admin section
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminBookings = lazy(() => import("./pages/admin/Bookings"));
@@ -109,6 +111,7 @@ const AdminRefundManagement = lazy(() => import("./pages/admin/RefundManagement"
 const AdminInventoryManagement = lazy(() => import("./pages/admin/InventoryManagement"));
 const AdminStaffTasks = lazy(() => import("./pages/admin/StaffTasks"));
 const AdminEmailSequences = lazy(() => import("./pages/admin/EmailSequences"));
+const AdminDubaiEvents = lazy(() => import("./pages/admin/DubaiEvents"));
 const CustomerDashboard = lazy(() => import("./pages/CustomerDashboard"));
 const MyTasks = lazy(() => import("./pages/MyTasks"));
 // RequireSession must be loaded synchronously as it's a wrapper component
@@ -195,6 +198,9 @@ const App = () => (
             {/* Group Trips */}
             <Route path="/group-trip" element={<GroupTripPage />} />
             <Route path="/group-trip/:shareCode" element={<GroupTripPage />} />
+            {/* Dubai Guide & Events */}
+            <Route path="/dubai-guide" element={<DubaiGuide />} />
+            <Route path="/events" element={<DubaiEvents />} />
             {/* Admin Routes */}
             <Route
               path="/admin"
@@ -431,6 +437,7 @@ const App = () => (
             <Route path="/admin/inventory" element={<RequireSession><AdminInventoryManagement /></RequireSession>} />
             <Route path="/admin/staff-tasks" element={<RequireSession><AdminStaffTasks /></RequireSession>} />
             <Route path="/admin/email-sequences" element={<RequireSession><AdminEmailSequences /></RequireSession>} />
+            <Route path="/admin/dubai-events" element={<RequireSession><AdminDubaiEvents /></RequireSession>} />
             {/* Customer Dashboard - Protected */}
             <Route path="/dashboard" element={<RequireSession><CustomerDashboard /></RequireSession>} />
             <Route path="/my-tasks" element={<RequireSession><MyTasks /></RequireSession>} />
