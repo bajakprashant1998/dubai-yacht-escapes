@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Layout from "@/components/layout/Layout";
 import SEOHead, { createBreadcrumbSchema } from "@/components/SEOHead";
 import { useBlogPost, useBlogPosts } from "@/hooks/useBlogPosts";
@@ -17,6 +17,7 @@ import {
   Home,
   Eye,
   ArrowRight,
+  ArrowUp,
   BookOpen,
   Clock,
   Calendar,
@@ -26,8 +27,15 @@ import {
   TrendingUp,
   FileText,
   Tag,
+  Bookmark,
+  BookmarkCheck,
+  Printer,
+  Heart,
+  ThumbsUp,
+  Share2,
 } from "lucide-react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 // Transform plain HTML content into numbered card-style sections
 const transformContentToCards = (html: string): string => {
@@ -78,6 +86,20 @@ const BlogPost = () => {
   const { data: allPosts = [] } = useBlogPosts();
   const [readProgress, setReadProgress] = useState(0);
   const [email, setEmail] = useState("");
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [hasLiked, setHasLiked] = useState(false);
+
+  // Check bookmark state
+  useEffect(() => {
+    if (slug) {
+      const bookmarks = JSON.parse(localStorage.getItem("blog-bookmarks") || "[]");
+      setIsBookmarked(bookmarks.includes(slug));
+      const likes = JSON.parse(localStorage.getItem("blog-likes") || "{}");
+      setHasLiked(!!likes[slug]);
+    }
+  }, [slug]);
 
   const handleScroll = useCallback(() => {
     const scrollTop = window.scrollY;
@@ -85,6 +107,7 @@ const BlogPost = () => {
     if (docHeight > 0) {
       setReadProgress(Math.min((scrollTop / docHeight) * 100, 100));
     }
+    setShowBackToTop(scrollTop > 600);
   }, []);
 
   useEffect(() => {
@@ -99,6 +122,11 @@ const BlogPost = () => {
   const wordCount = useMemo(() => {
     return post?.content ? countWords(post.content) : 0;
   }, [post?.content]);
+
+  const readingTimeRemaining = useMemo(() => {
+    if (!post?.reading_time) return 0;
+    return Math.max(0, Math.ceil(post.reading_time * (1 - readProgress / 100)));
+  }, [post?.reading_time, readProgress]);
 
   useEffect(() => {
     if (post?.content) {
@@ -118,6 +146,50 @@ const BlogPost = () => {
       .filter((p) => p.id !== post.id && (p.category_id === post.category_id || p.tags?.some((t) => post.tags?.includes(t))))
       .slice(0, 3);
   }, [post, allPosts]);
+
+  // Previous / Next post navigation
+  const { prevPost, nextPost } = useMemo(() => {
+    if (!post || !allPosts.length) return { prevPost: null, nextPost: null };
+    const idx = allPosts.findIndex((p) => p.id === post.id);
+    return {
+      prevPost: idx > 0 ? allPosts[idx - 1] : null,
+      nextPost: idx < allPosts.length - 1 ? allPosts[idx + 1] : null,
+    };
+  }, [post, allPosts]);
+
+  const toggleBookmark = () => {
+    if (!slug) return;
+    const bookmarks = JSON.parse(localStorage.getItem("blog-bookmarks") || "[]");
+    if (isBookmarked) {
+      localStorage.setItem("blog-bookmarks", JSON.stringify(bookmarks.filter((b: string) => b !== slug)));
+      setIsBookmarked(false);
+      toast.success("Bookmark removed");
+    } else {
+      bookmarks.push(slug);
+      localStorage.setItem("blog-bookmarks", JSON.stringify(bookmarks));
+      setIsBookmarked(true);
+      toast.success("Article bookmarked!");
+    }
+  };
+
+  const handleLike = () => {
+    if (!slug) return;
+    const likes = JSON.parse(localStorage.getItem("blog-likes") || "{}");
+    if (hasLiked) {
+      delete likes[slug];
+      setHasLiked(false);
+      setLikeCount((c) => Math.max(0, c - 1));
+    } else {
+      likes[slug] = true;
+      setHasLiked(true);
+      setLikeCount((c) => c + 1);
+    }
+    localStorage.setItem("blog-likes", JSON.stringify(likes));
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   if (isLoading) {
     return (
@@ -212,7 +284,7 @@ const BlogPost = () => {
         />
       </div>
 
-      {/* Clean Editorial Hero - Light Background */}
+      {/* Clean Editorial Hero */}
       <section className="bg-gradient-to-b from-primary/5 via-primary/3 to-background pt-24 md:pt-28 pb-8 md:pb-12">
         <div className="container max-w-4xl">
           {/* Breadcrumb */}
@@ -283,7 +355,6 @@ const BlogPost = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.25 }}
           >
-            {/* Author Card */}
             <div className="flex items-center gap-3 bg-card border border-border/60 rounded-full px-4 py-2 shadow-sm">
               <div className="w-9 h-9 rounded-full bg-secondary/15 flex items-center justify-center text-xs font-bold text-secondary">
                 {authorName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
@@ -306,12 +377,47 @@ const BlogPost = () => {
                 {post.reading_time} min read
               </div>
             )}
-            {wordCount > 0 && (
+            {post.view_count > 0 && (
               <div className="flex items-center gap-2 bg-card border border-border/60 rounded-full px-4 py-2.5 text-sm text-muted-foreground shadow-sm">
                 <Eye className="w-4 h-4 text-secondary/70" />
-                {wordCount.toLocaleString()} words
+                {post.view_count.toLocaleString()} views
               </div>
             )}
+
+            {/* Action buttons */}
+            <div className="flex items-center gap-1 ml-auto">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full h-10 w-10"
+                onClick={toggleBookmark}
+                title={isBookmarked ? "Remove bookmark" : "Bookmark this article"}
+              >
+                {isBookmarked ? (
+                  <BookmarkCheck className="w-5 h-5 text-secondary" />
+                ) : (
+                  <Bookmark className="w-5 h-5" />
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full h-10 w-10"
+                onClick={handleLike}
+                title="Like this article"
+              >
+                <Heart className={`w-5 h-5 ${hasLiked ? "fill-red-500 text-red-500" : ""}`} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full h-10 w-10 hidden md:flex"
+                onClick={() => window.print()}
+                title="Print article"
+              >
+                <Printer className="w-5 h-5" />
+              </Button>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -320,10 +426,8 @@ const BlogPost = () => {
       <section className="bg-muted/30 pt-6 pb-2">
         <div className="container max-w-6xl">
           <div className="grid grid-cols-12 gap-8">
-            {/* Spacer for share bar alignment */}
             <div className="col-span-1 hidden lg:block" />
 
-            {/* Image Card */}
             <motion.div
               className="col-span-12 lg:col-span-8 xl:col-span-7"
               initial={{ opacity: 0, y: 20 }}
@@ -338,15 +442,16 @@ const BlogPost = () => {
                   loading="eager"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                
-                {/* Overlay badges */}
-                <div className="absolute top-4 right-4">
-                  <Badge className="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs font-semibold shadow-lg gap-1.5">
-                    <Sparkles className="w-3 h-3" />
-                    Premium
-                  </Badge>
+
+                <div className="absolute top-4 right-4 flex gap-2">
+                  {post.is_featured && (
+                    <Badge className="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs font-semibold shadow-lg gap-1.5">
+                      <Sparkles className="w-3 h-3" />
+                      Featured
+                    </Badge>
+                  )}
                 </div>
-                
+
                 <div className="absolute bottom-4 left-4 flex flex-wrap gap-2">
                   <Badge className="bg-white/15 backdrop-blur-md text-white border border-white/20 rounded-full px-3 py-1.5 text-xs gap-1.5">
                     <TrendingUp className="w-3 h-3" />
@@ -368,13 +473,44 @@ const BlogPost = () => {
               </div>
             </motion.div>
 
-            {/* Table of Contents Preview (desktop) */}
             <div className="hidden xl:block col-span-3">
               <TableOfContents content={post.content || ""} />
             </div>
           </div>
         </div>
       </section>
+
+      {/* Sticky Reading Info Bar */}
+      <AnimatePresence>
+        {readProgress > 5 && readProgress < 95 && (
+          <motion.div
+            className="hidden md:block sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border shadow-sm"
+            initial={{ opacity: 0, y: -40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="container max-w-6xl py-2 flex items-center justify-between">
+              <div className="flex items-center gap-3 min-w-0">
+                <h2 className="text-sm font-semibold truncate max-w-md">{post.title}</h2>
+                <Badge variant="outline" className="text-xs shrink-0">
+                  <Clock className="w-3 h-3 mr-1" />
+                  {readingTimeRemaining} min left
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">{Math.round(readProgress)}%</span>
+                <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-secondary rounded-full transition-all duration-300" style={{ width: `${readProgress}%` }} />
+                </div>
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={toggleBookmark}>
+                  {isBookmarked ? <BookmarkCheck className="w-4 h-4 text-secondary" /> : <Bookmark className="w-4 h-4" />}
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content */}
       <article className="min-h-screen bg-muted/30 py-10 pb-16">
@@ -392,6 +528,17 @@ const BlogPost = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.35 }}
             >
+              {/* Mobile TOC */}
+              <details className="lg:hidden mb-6 bg-card rounded-xl border border-border p-4">
+                <summary className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-foreground">
+                  <BookOpen className="w-4 h-4 text-secondary" />
+                  Table of Contents
+                </summary>
+                <div className="mt-3 pt-3 border-t border-border">
+                  <TableOfContents content={post.content || ""} />
+                </div>
+              </details>
+
               <div
                 className="blog-content prose prose-lg max-w-none 
                   prose-headings:font-display prose-headings:font-bold prose-headings:text-foreground
@@ -443,9 +590,69 @@ const BlogPost = () => {
                 dangerouslySetInnerHTML={{ __html: cardContent }}
               />
 
+              {/* Engagement Strip */}
+              <motion.div
+                className="mt-8 flex items-center justify-between bg-card rounded-2xl border border-border/40 p-5"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+              >
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant={hasLiked ? "default" : "outline"}
+                    size="sm"
+                    className={`rounded-full gap-2 ${hasLiked ? "bg-red-500 hover:bg-red-600 text-white border-red-500" : ""}`}
+                    onClick={handleLike}
+                  >
+                    <Heart className={`w-4 h-4 ${hasLiked ? "fill-white" : ""}`} />
+                    {hasLiked ? "Liked" : "Like"} {likeCount > 0 && `(${likeCount})`}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full gap-2"
+                    onClick={toggleBookmark}
+                  >
+                    {isBookmarked ? <BookmarkCheck className="w-4 h-4 text-secondary" /> : <Bookmark className="w-4 h-4" />}
+                    {isBookmarked ? "Saved" : "Save"}
+                  </Button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground hidden sm:inline">Share:</span>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 rounded-full"
+                    onClick={() => {
+                      const msg = encodeURIComponent(`Check out this article: ${post.title}\n${currentUrl}`);
+                      window.open(`https://wa.me/?text=${msg}`, "_blank");
+                    }}
+                    title="Share on WhatsApp"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8 rounded-full"
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({ title: post.title, url: currentUrl });
+                      } else {
+                        navigator.clipboard.writeText(currentUrl);
+                        toast.success("Link copied!");
+                      }
+                    }}
+                    title="Share"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              </motion.div>
+
               {/* Tags */}
               {post.tags && post.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-12 pt-8 border-t border-border">
+                <div className="flex flex-wrap gap-2 mt-8 pt-6 border-t border-border">
                   <span className="text-sm font-medium text-muted-foreground mr-2">Tags:</span>
                   {post.tags.map((tag) => (
                     <Link key={tag} to={`/blog/tag/${tag}`}>
@@ -457,9 +664,40 @@ const BlogPost = () => {
                 </div>
               )}
 
-              {/* CTA Card - "Have questions about this article?" */}
+              {/* Author Bio Card */}
               <motion.div
-                className="mt-10 bg-card rounded-2xl border border-border/50 p-8"
+                className="mt-8 bg-card rounded-2xl border border-border/50 p-6 flex flex-col sm:flex-row gap-5"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+              >
+                <div className="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center text-lg font-bold text-secondary shrink-0">
+                  {authorName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Written by</p>
+                  <h3 className="font-bold text-lg text-foreground">{authorName}</h3>
+                  <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                    Dubai travel expert with years of experience helping visitors discover the best experiences the city has to offer. From luxury yacht cruises to desert safaris, we cover it all.
+                  </p>
+                  <div className="flex gap-2 mt-3">
+                    <Link to="/blog">
+                      <Button variant="outline" size="sm" className="rounded-full text-xs gap-1.5">
+                        <BookOpen className="w-3.5 h-3.5" /> All Articles
+                      </Button>
+                    </Link>
+                    <Link to="/contact">
+                      <Button variant="outline" size="sm" className="rounded-full text-xs gap-1.5">
+                        <Mail className="w-3.5 h-3.5" /> Contact
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* CTA Card */}
+              <motion.div
+                className="mt-8 bg-card rounded-2xl border border-border/50 p-8"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -509,6 +747,38 @@ const BlogPost = () => {
                   </Button>
                 </div>
               </motion.div>
+
+              {/* Prev / Next Navigation */}
+              {(prevPost || nextPost) && (
+                <div className="mt-10 pt-8 border-t border-border grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {prevPost ? (
+                    <Link to={`/blog/${prevPost.slug}`} className="group">
+                      <Card className="p-4 rounded-xl border-border/40 hover:border-secondary/30 hover:shadow-md transition-all h-full">
+                        <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
+                          <ChevronLeft className="w-3 h-3" /> Previous Article
+                        </p>
+                        <h4 className="text-sm font-semibold group-hover:text-secondary transition-colors line-clamp-2">
+                          {prevPost.title}
+                        </h4>
+                      </Card>
+                    </Link>
+                  ) : (
+                    <div />
+                  )}
+                  {nextPost && (
+                    <Link to={`/blog/${nextPost.slug}`} className="group">
+                      <Card className="p-4 rounded-xl border-border/40 hover:border-secondary/30 hover:shadow-md transition-all text-right h-full">
+                        <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1 justify-end">
+                          Next Article <ChevronRight className="w-3 h-3" />
+                        </p>
+                        <h4 className="text-sm font-semibold group-hover:text-secondary transition-colors line-clamp-2">
+                          {nextPost.title}
+                        </h4>
+                      </Card>
+                    </Link>
+                  )}
+                </div>
+              )}
 
               {/* Related Posts */}
               {relatedPosts.length > 0 && (
@@ -583,13 +853,34 @@ const BlogPost = () => {
         </div>
       </article>
 
+      {/* Back to Top Button */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.div
+            className="fixed bottom-20 lg:bottom-8 right-4 z-50"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+          >
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-10 w-10 rounded-full shadow-lg bg-card hover:bg-secondary hover:text-secondary-foreground border-border"
+              onClick={scrollToTop}
+            >
+              <ArrowUp className="w-4 h-4" />
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Mobile Share Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-card/95 backdrop-blur-md border-t border-border p-3 pb-safe">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs text-muted-foreground truncate">{post.title}</p>
             <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-              <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {post.reading_time} min</span>
+              <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {readingTimeRemaining} min left</span>
               <span>•</span>
               <span>{Math.round(readProgress)}% read</span>
             </div>
@@ -604,9 +895,11 @@ const BlogPost = () => {
                   navigator.share({ title: post.title, url: currentUrl });
                 } else {
                   navigator.clipboard.writeText(currentUrl);
+                  toast.success("Link copied!");
                 }
               }}
             >
+              <Share2 className="w-3.5 h-3.5 mr-1" />
               Share
             </Button>
             <Button
