@@ -194,12 +194,12 @@ const BlogPostForm = ({ post, mode }: BlogPostFormProps) => {
           <div className="flex items-center gap-2">
             <Badge
               variant={formData.is_published ? "default" : "secondary"}
-              className={`text-xs ${formData.is_published ? "bg-green-100 text-green-700" : ""}`}
+              className="text-xs"
             >
               {formData.is_published ? "Published" : "Draft"}
             </Badge>
             {formData.is_featured && (
-              <Badge className="bg-amber-100 text-amber-700 text-xs">Featured</Badge>
+              <Badge variant="outline" className="text-xs border-secondary text-secondary">Featured</Badge>
             )}
           </div>
         </div>
