@@ -191,6 +191,7 @@ const App = () => (
             <Route path="/blog/:slug" element={<BlogPost />} />
             {/* AI Trip Planner */}
             <Route path="/plan-trip" element={<TripPlanner />} />
+            <Route path="/trip-planner" element={<Navigate to="/plan-trip" replace />} />
             <Route path="/trip/:tripId" element={<TripItinerary />} />
             {/* Combo Packages */}
             <Route path="/combo-packages" element={<ComboPackages />} />
