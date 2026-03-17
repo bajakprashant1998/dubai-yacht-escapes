@@ -579,7 +579,7 @@ const ComboPackageDetail = () => {
               </section>
 
               {/* ── FAQ TAB ── */}
-              <section ref={(el) => { sectionRefs.current.faq = el; }} id="section-faq">
+              <section ref={(el) => { sectionRefs.current.faq = el; }} id="section-faq" className="scroll-mt-40">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                   <MessageCircle className="w-5 h-5 text-secondary" /> Frequently Asked Questions
                 </h2>
