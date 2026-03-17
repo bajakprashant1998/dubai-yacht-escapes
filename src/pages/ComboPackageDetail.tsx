@@ -369,7 +369,7 @@ const ComboPackageDetail = () => {
             <div className="lg:col-span-2 space-y-16">
 
               {/* ── OVERVIEW TAB ── */}
-              <section ref={(el) => { sectionRefs.current.overview = el; }} id="section-overview">
+              <section ref={(el) => { sectionRefs.current.overview = el; }} id="section-overview" className="scroll-mt-40">
                 {/* Quick Info Grid */}
                 <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
