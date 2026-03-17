@@ -502,7 +502,7 @@ const ComboPackageDetail = () => {
               </section>
 
               {/* ── REVIEWS TAB ── */}
-              <section ref={(el) => { sectionRefs.current.reviews = el; }} id="section-reviews">
+              <section ref={(el) => { sectionRefs.current.reviews = el; }} id="section-reviews" className="scroll-mt-40">
                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                   <Star className="w-5 h-5 text-secondary" /> Guest Reviews
                 </h2>
