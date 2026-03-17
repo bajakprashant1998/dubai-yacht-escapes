@@ -466,7 +466,7 @@ const ComboPackageDetail = () => {
               </section>
 
               {/* ── ITINERARY TAB ── */}
-              <section ref={(el) => { sectionRefs.current.itinerary = el; }} id="section-itinerary">
+              <section ref={(el) => { sectionRefs.current.itinerary = el; }} id="section-itinerary" className="scroll-mt-40">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-secondary" /> Day-by-Day Itinerary
