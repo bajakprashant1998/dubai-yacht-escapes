@@ -308,7 +308,7 @@ const ComboPackageDetail = () => {
         )}
       >
         <div className="container">
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-2 -mx-1">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-3 -mx-1">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
