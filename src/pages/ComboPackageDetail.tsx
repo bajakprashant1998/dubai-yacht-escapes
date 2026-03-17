@@ -98,7 +98,7 @@ const ComboPackageDetail = () => {
     setActiveTab(id);
     const el = sectionRefs.current[id];
     if (el) {
-      const offset = 140;
+      const offset = 160;
       window.scrollTo({ top: el.offsetTop - offset, behavior: "smooth" });
     }
   };
