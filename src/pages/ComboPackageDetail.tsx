@@ -366,7 +366,7 @@ const ComboPackageDetail = () => {
 
           <div className="grid lg:grid-cols-3 gap-8">
             {/* ═══ Main Content ═══ */}
-            <div className="lg:col-span-2 space-y-12">
+            <div className="lg:col-span-2 space-y-16">
 
               {/* ── OVERVIEW TAB ── */}
               <section ref={(el) => { sectionRefs.current.overview = el; }} id="section-overview">
