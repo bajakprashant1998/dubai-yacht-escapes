@@ -341,7 +341,7 @@ const ComboPackageDetail = () => {
       </div>
 
       {/* ───── Quick Info Strip ───── */}
-      <div className="bg-muted/30 pb-16 lg:pb-24">
+      <div className="bg-muted/30 pt-6 pb-16 lg:pb-24">
         <div className="container">
           <motion.div
             className="grid grid-cols-2 md:grid-cols-4 gap-3 -mt-8 relative z-10 mb-10"
