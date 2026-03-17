@@ -98,7 +98,7 @@ const ComboPackageDetail = () => {
     setActiveTab(id);
     const el = sectionRefs.current[id];
     if (el) {
-      const offset = 140;
+      const offset = 160;
       window.scrollTo({ top: el.offsetTop - offset, behavior: "smooth" });
     }
   };
@@ -308,7 +308,7 @@ const ComboPackageDetail = () => {
         )}
       >
         <div className="container">
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide py-2 -mx-1">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-3 -mx-1">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -341,7 +341,7 @@ const ComboPackageDetail = () => {
       </div>
 
       {/* ───── Quick Info Strip ───── */}
-      <div className="bg-muted/30 pb-16 lg:pb-24">
+      <div className="bg-muted/30 pt-6 pb-16 lg:pb-24">
         <div className="container">
           <motion.div
             className="grid grid-cols-2 md:grid-cols-4 gap-3 -mt-8 relative z-10 mb-10"
@@ -366,10 +366,10 @@ const ComboPackageDetail = () => {
 
           <div className="grid lg:grid-cols-3 gap-8">
             {/* ═══ Main Content ═══ */}
-            <div className="lg:col-span-2 space-y-12">
+            <div className="lg:col-span-2 space-y-16">
 
               {/* ── OVERVIEW TAB ── */}
-              <section ref={(el) => { sectionRefs.current.overview = el; }} id="section-overview">
+              <section ref={(el) => { sectionRefs.current.overview = el; }} id="section-overview" className="scroll-mt-40">
                 {/* Quick Info Grid */}
                 <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -466,7 +466,7 @@ const ComboPackageDetail = () => {
               </section>
 
               {/* ── ITINERARY TAB ── */}
-              <section ref={(el) => { sectionRefs.current.itinerary = el; }} id="section-itinerary">
+              <section ref={(el) => { sectionRefs.current.itinerary = el; }} id="section-itinerary" className="scroll-mt-40">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-secondary" /> Day-by-Day Itinerary
@@ -494,7 +494,7 @@ const ComboPackageDetail = () => {
               </section>
 
               {/* ── PRICING TAB ── */}
-              <section ref={(el) => { sectionRefs.current.pricing = el; }} id="section-pricing">
+              <section ref={(el) => { sectionRefs.current.pricing = el; }} id="section-pricing" className="scroll-mt-40">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                   <Ticket className="w-5 h-5 text-secondary" /> Pricing & Inclusions
                 </h2>
@@ -502,7 +502,7 @@ const ComboPackageDetail = () => {
               </section>
 
               {/* ── REVIEWS TAB ── */}
-              <section ref={(el) => { sectionRefs.current.reviews = el; }} id="section-reviews">
+              <section ref={(el) => { sectionRefs.current.reviews = el; }} id="section-reviews" className="scroll-mt-40">
                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                   <Star className="w-5 h-5 text-secondary" /> Guest Reviews
                 </h2>
@@ -579,7 +579,7 @@ const ComboPackageDetail = () => {
               </section>
 
               {/* ── FAQ TAB ── */}
-              <section ref={(el) => { sectionRefs.current.faq = el; }} id="section-faq">
+              <section ref={(el) => { sectionRefs.current.faq = el; }} id="section-faq" className="scroll-mt-40">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                   <MessageCircle className="w-5 h-5 text-secondary" /> Frequently Asked Questions
                 </h2>
