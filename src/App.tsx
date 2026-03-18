@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { I18nProvider } from "@/lib/i18n";
+import { CurrencyProvider } from "@/hooks/useCurrency";
 
 import ScrollToTop from "./components/ScrollToTop";
 
