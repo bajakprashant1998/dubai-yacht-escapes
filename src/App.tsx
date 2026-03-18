@@ -453,6 +453,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
     </I18nProvider>
+    </CurrencyProvider>
   </QueryClientProvider>
 );
 
