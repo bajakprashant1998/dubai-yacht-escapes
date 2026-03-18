@@ -25,6 +25,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const comboTypeConfig: Record<string, { icon: React.ElementType; color: string; label: string; gradient: string }> = {
   essentials: { icon: Sparkles, color: "bg-secondary", label: "Essentials", gradient: "from-secondary/20 to-secondary/5" },
@@ -58,6 +59,7 @@ const ComboPackageDetail = () => {
   const { whatsapp, phone } = useContactConfig();
   const { data: testimonials } = useTestimonials();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const [activeTab, setActiveTab] = useState("overview");
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -125,14 +127,14 @@ const ComboPackageDetail = () => {
     return (
       <Layout>
         <div className="min-h-screen">
-          <Skeleton className="h-[55vh] w-full" />
-          <div className="container py-8">
-            <Skeleton className="h-12 w-full rounded-xl mb-8" />
-            <div className="grid lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-6">
-                {[1,2,3,4].map(i => <Skeleton key={i} className="h-40 rounded-xl" />)}
+          <Skeleton className="h-[40vh] md:h-[55vh] w-full" />
+          <div className="container px-4 md:px-6 py-6 md:py-8">
+            <Skeleton className="h-12 w-full rounded-xl mb-6 md:mb-8" />
+            <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
+              <div className="lg:col-span-2 space-y-4 md:space-y-6">
+                {[1,2,3,4].map(i => <Skeleton key={i} className="h-32 md:h-40 rounded-xl" />)}
               </div>
-              <Skeleton className="h-[500px] rounded-xl" />
+              <Skeleton className="h-[400px] md:h-[500px] rounded-xl hidden lg:block" />
             </div>
           </div>
         </div>
@@ -143,11 +145,11 @@ const ComboPackageDetail = () => {
   if (!combo) {
     return (
       <Layout>
-        <div className="min-h-screen pt-32 pb-16 flex items-center justify-center">
+        <div className="min-h-screen pt-24 md:pt-32 pb-16 flex items-center justify-center px-4">
           <div className="text-center">
-            <Sparkles className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold mb-2">Package Not Found</h1>
-            <p className="text-muted-foreground mb-6">The combo package you're looking for doesn't exist.</p>
+            <Sparkles className="w-12 h-12 md:w-16 md:h-16 text-muted-foreground/30 mx-auto mb-4" />
+            <h1 className="text-xl md:text-2xl font-bold mb-2">Package Not Found</h1>
+            <p className="text-sm md:text-base text-muted-foreground mb-6">The combo package you're looking for doesn't exist.</p>
             <Link to="/combo-packages">
               <Button className="bg-secondary text-secondary-foreground rounded-xl">Browse All Packages</Button>
             </Link>
@@ -207,17 +209,17 @@ const ComboPackageDetail = () => {
       />
 
       {/* ───── Cinematic Hero ───── */}
-      <div className="relative h-[58vh] min-h-[450px] overflow-hidden" id="combo-hero-sentinel">
+      <div className="relative h-[45vh] sm:h-[50vh] md:h-[55vh] lg:h-[58vh] min-h-[340px] md:min-h-[450px] overflow-hidden" id="combo-hero-sentinel">
         <img src={combo.image_url || "/placeholder.svg"} alt={combo.name} className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/60 to-primary/10" />
         <div className="absolute inset-0 bg-gradient-to-r from-primary/40 to-transparent" />
 
         {/* Share / Wishlist floating buttons */}
-        <div className="absolute top-24 right-4 md:right-8 flex flex-col gap-2 z-10">
+        <div className="absolute top-20 sm:top-24 right-3 sm:right-4 md:right-8 flex flex-col gap-2 z-10">
           <Button
             size="icon"
             variant="ghost"
-            className="bg-white/15 backdrop-blur-md hover:bg-white/25 text-white rounded-full h-10 w-10"
+            className="bg-white/15 backdrop-blur-md hover:bg-white/25 text-white rounded-full h-9 w-9 sm:h-10 sm:w-10"
             onClick={handleShare}
           >
             <Share2 className="w-4 h-4" />
@@ -226,7 +228,7 @@ const ComboPackageDetail = () => {
             size="icon"
             variant="ghost"
             className={cn(
-              "backdrop-blur-md rounded-full h-10 w-10 transition-colors",
+              "backdrop-blur-md rounded-full h-9 w-9 sm:h-10 sm:w-10 transition-colors",
               isWishlisted ? "bg-red-500/80 hover:bg-red-500 text-white" : "bg-white/15 hover:bg-white/25 text-white"
             )}
             onClick={() => {
@@ -238,58 +240,58 @@ const ComboPackageDetail = () => {
           </Button>
         </div>
 
-        <div className="container relative h-full flex flex-col justify-end pb-10">
+        <div className="container relative h-full flex flex-col justify-end pb-6 sm:pb-8 md:pb-10 px-4 md:px-6">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-white/50 mb-4">
-            <Link to="/" className="hover:text-white transition-colors">Home</Link>
-            <ChevronRight className="w-3 h-3" />
-            <Link to="/combo-packages" className="hover:text-white transition-colors">Combo Packages</Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-white/80 line-clamp-1">{combo.name}</span>
+          <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-white/50 mb-3 sm:mb-4 overflow-x-auto scrollbar-hide">
+            <Link to="/" className="hover:text-white transition-colors whitespace-nowrap">Home</Link>
+            <ChevronRight className="w-3 h-3 flex-shrink-0" />
+            <Link to="/combo-packages" className="hover:text-white transition-colors whitespace-nowrap">Combo Packages</Link>
+            <ChevronRight className="w-3 h-3 flex-shrink-0" />
+            <span className="text-white/80 line-clamp-1 whitespace-nowrap">{combo.name}</span>
           </nav>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             {/* Badges */}
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-white text-xs font-semibold backdrop-blur-sm ${typeConfig.color}`}>
-                <TypeIcon className="w-3.5 h-3.5" />
-                {typeConfig.label} Package
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+              <div className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-white text-[10px] sm:text-xs font-semibold backdrop-blur-sm ${typeConfig.color}`}>
+                <TypeIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                {typeConfig.label}
               </div>
-              <Badge className="bg-white/15 text-white border-0 backdrop-blur-sm text-xs">
+              <Badge className="bg-white/15 text-white border-0 backdrop-blur-sm text-[10px] sm:text-xs">
                 <Clock className="w-3 h-3 mr-1" />
-                {combo.duration_days} Days / {combo.duration_nights} Nights
+                {combo.duration_days}D / {combo.duration_nights}N
               </Badge>
-              <Badge className="bg-white/15 text-white border-0 backdrop-blur-sm text-xs">
+              <Badge className="bg-white/15 text-white border-0 backdrop-blur-sm text-[10px] sm:text-xs hidden sm:inline-flex">
                 <MapPin className="w-3 h-3 mr-1" />
                 Dubai, UAE
               </Badge>
               {reviews.length > 0 && (
-                <Badge className="bg-amber-500/20 text-amber-300 border-0 backdrop-blur-sm text-xs cursor-pointer" onClick={() => scrollToSection("reviews")}>
+                <Badge className="bg-amber-500/20 text-amber-300 border-0 backdrop-blur-sm text-[10px] sm:text-xs cursor-pointer" onClick={() => scrollToSection("reviews")}>
                   <Star className="w-3 h-3 mr-1 fill-current" />
-                  {avgRating} ({reviews.length} reviews)
+                  {avgRating} ({reviews.length})
                 </Badge>
               )}
               {combo.discount_percent > 0 && (
-                <Badge className="bg-destructive text-destructive-foreground text-xs font-bold animate-pulse">
+                <Badge className="bg-destructive text-destructive-foreground text-[10px] sm:text-xs font-bold animate-pulse">
                   Save {combo.discount_percent}%
                 </Badge>
               )}
             </div>
 
-            <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 leading-tight">{combo.name}</h1>
-            <p className="text-white/60 text-lg max-w-2xl mb-5">{combo.description}</p>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 leading-tight">{combo.name}</h1>
+            <p className="text-white/60 text-sm sm:text-base md:text-lg max-w-2xl mb-4 sm:mb-5 line-clamp-2 sm:line-clamp-none">{combo.description}</p>
 
             {/* Hero Price + CTA */}
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-baseline gap-3">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+              <div className="flex items-baseline gap-2 sm:gap-3">
                 {combo.discount_percent > 0 && (
-                  <span className="text-white/40 line-through text-lg">{formatPrice(combo.base_price_aed)}</span>
+                  <span className="text-white/40 line-through text-sm sm:text-lg">{formatPrice(combo.base_price_aed)}</span>
                 )}
-                <span className="text-3xl font-extrabold text-secondary">{formatPrice(combo.final_price_aed)}</span>
-                <span className="text-white/50">/person</span>
+                <span className="text-2xl sm:text-3xl font-extrabold text-secondary">{formatPrice(combo.final_price_aed)}</span>
+                <span className="text-white/50 text-xs sm:text-base">/person</span>
               </div>
               <Button
-                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-xl h-11 px-6 font-bold hidden md:inline-flex"
+                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-xl h-10 sm:h-11 px-5 sm:px-6 font-bold hidden md:inline-flex"
                 onClick={() => scrollToSection("pricing")}
               >
                 View Pricing <ArrowRight className="w-4 h-4 ml-1" />
@@ -303,12 +305,12 @@ const ComboPackageDetail = () => {
       <div
         ref={tabBarRef}
         className={cn(
-          "sticky top-[64px] z-30 bg-card/95 backdrop-blur-lg border-b border-border/50 transition-shadow",
+          "sticky top-[56px] sm:top-[64px] z-30 bg-card/95 backdrop-blur-lg border-b border-border/50 transition-shadow",
           stickyVisible && "shadow-md"
         )}
       >
-        <div className="container">
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-3 -mx-1">
+        <div className="container px-3 sm:px-4 md:px-6">
+          <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-hide py-2.5 sm:py-3 -mx-1">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -317,13 +319,13 @@ const ComboPackageDetail = () => {
                   key={tab.id}
                   onClick={() => scrollToSection(tab.id)}
                   className={cn(
-                    "flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all",
+                    "flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all flex-shrink-0",
                     isActive
                       ? "bg-secondary text-secondary-foreground shadow-sm"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
-                  <Icon className="w-3.5 h-3.5" />
+                  <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   {tab.label}
                   {tab.id === "reviews" && reviews.length > 0 && (
                     <span className={cn(
@@ -341,51 +343,51 @@ const ComboPackageDetail = () => {
       </div>
 
       {/* ───── Quick Info Strip ───── */}
-      <div className="bg-muted/30 pt-6 pb-16 lg:pb-24">
-        <div className="container">
+      <div className="bg-muted/30 pt-4 sm:pt-6 pb-12 sm:pb-16 lg:pb-24">
+        <div className="container px-4 md:px-6">
           <motion.div
-            className="grid grid-cols-2 md:grid-cols-4 gap-3 -mt-8 relative z-10 mb-10"
+            className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 -mt-6 sm:-mt-8 relative z-10 mb-8 sm:mb-10"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
             {inclusions.map((item, i) => (
               <Card key={i} className="bg-card/95 backdrop-blur-md border-border/50 shadow-lg hover:shadow-xl transition-shadow">
-                <CardContent className="flex items-center gap-3 p-4">
-                  <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                    <item.icon className="w-5 h-5 text-secondary" />
+                <CardContent className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                    <item.icon className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" />
                   </div>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Included</p>
-                    <p className="font-semibold text-sm">{item.label}</p>
+                  <div className="min-w-0">
+                    <p className="text-[10px] sm:text-[11px] text-muted-foreground uppercase tracking-wider">Included</p>
+                    <p className="font-semibold text-xs sm:text-sm truncate">{item.label}</p>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </motion.div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
             {/* ═══ Main Content ═══ */}
-            <div className="lg:col-span-2 space-y-16">
+            <div className="lg:col-span-2 space-y-10 sm:space-y-12 md:space-y-16">
 
               {/* ── OVERVIEW TAB ── */}
               <section ref={(el) => { sectionRefs.current.overview = el; }} id="section-overview" className="scroll-mt-40">
                 {/* Quick Info Grid */}
                 <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-6 sm:mb-8">
                     {[
                       { icon: Clock, label: "Duration", value: `${combo.duration_days}D / ${combo.duration_nights}N` },
                       { icon: Hotel, label: "Hotel", value: combo.includes_hotel ? `${combo.hotel_star_rating || 4}-Star` : "Not Included" },
                       { icon: Car, label: "Transport", value: combo.includes_transport ? (combo.transport_type || "Private") : "Not Included" },
                       { icon: Ticket, label: "Activities", value: `${combo.items?.length || 0} Experiences` },
                     ].map((info, i) => (
-                      <div key={i} className="flex items-center gap-3 p-4 bg-muted/50 rounded-xl border border-border/50">
-                        <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
-                          <info.icon className="w-5 h-5 text-secondary" />
+                      <div key={i} className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-muted/50 rounded-lg sm:rounded-xl border border-border/50">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
+                          <info.icon className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" />
                         </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground">{info.label}</p>
-                          <p className="text-sm font-semibold text-foreground">{info.value}</p>
+                        <div className="min-w-0">
+                          <p className="text-[10px] sm:text-xs text-muted-foreground">{info.label}</p>
+                          <p className="text-xs sm:text-sm font-semibold text-foreground truncate">{info.value}</p>
                         </div>
                       </div>
                     ))}
@@ -394,9 +396,9 @@ const ComboPackageDetail = () => {
 
                 {/* Gallery */}
                 {combo.gallery && combo.gallery.length > 0 && (
-                  <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-8">
-                    <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                      <Camera className="w-5 h-5 text-secondary" /> Gallery
+                  <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-6 sm:mb-8">
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2">
+                      <Camera className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" /> Gallery
                     </h2>
                     <ComboGallery images={combo.gallery} name={combo.name} />
                   </motion.div>
@@ -405,22 +407,22 @@ const ComboPackageDetail = () => {
                 {/* Highlights */}
                 {combo.highlights && combo.highlights.length > 0 && (
                   <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
-                    <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-secondary" /> Package Highlights
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" /> Package Highlights
                     </h2>
-                    <div className="grid md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                       {combo.highlights.map((highlight, idx) => (
                         <motion.div
                           key={idx}
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.35 + idx * 0.05 }}
-                          className="flex items-start gap-3 bg-card p-4 rounded-xl border border-border/50 hover:border-secondary/30 hover:shadow-sm transition-all"
+                          className="flex items-start gap-2 sm:gap-3 bg-card p-3 sm:p-4 rounded-lg sm:rounded-xl border border-border/50 hover:border-secondary/30 hover:shadow-sm transition-all"
                         >
-                          <div className="w-6 h-6 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <CheckCircle className="w-3.5 h-3.5 text-secondary" />
+                          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-secondary" />
                           </div>
-                          <span className="text-sm text-muted-foreground leading-relaxed">{highlight}</span>
+                          <span className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{highlight}</span>
                         </motion.div>
                       ))}
                     </div>
@@ -429,10 +431,10 @@ const ComboPackageDetail = () => {
 
                 {/* Long Description */}
                 {combo.long_description && combo.long_description !== combo.description && (
-                  <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-8">
-                    <h2 className="text-xl font-bold mb-4">About This Package</h2>
+                  <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-6 sm:mt-8">
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">About This Package</h2>
                     <Card className="border-border/50">
-                      <CardContent className="p-6 text-muted-foreground leading-relaxed whitespace-pre-line">
+                      <CardContent className="p-4 sm:p-6 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
                         {combo.long_description}
                       </CardContent>
                     </Card>
@@ -440,24 +442,24 @@ const ComboPackageDetail = () => {
                 )}
 
                 {/* Why Book This Combo */}
-                <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }} className="mt-8">
-                  <h2 className="text-xl font-bold mb-4">Why Book This Combo?</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }} className="mt-6 sm:mt-8">
+                  <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Why Book This Combo?</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
                     {[
                       { icon: TrendingUp, title: `Save ${combo.discount_percent}%`, desc: "vs booking individually" },
-                      { icon: Shield, title: "Best Price Guarantee", desc: "We'll match any lower price" },
-                      { icon: CheckCircle, title: "Instant Confirmation", desc: "Confirmed in under 60s" },
-                      { icon: Clock, title: "Free Cancellation", desc: "Cancel up to 24h before" },
-                      { icon: Award, title: "Curated by Experts", desc: "Hand-picked experiences" },
+                      { icon: Shield, title: "Best Price", desc: "We'll match any lower price" },
+                      { icon: CheckCircle, title: "Instant Confirm", desc: "Confirmed in under 60s" },
+                      { icon: Clock, title: "Free Cancel", desc: "Cancel up to 24h before" },
+                      { icon: Award, title: "Expert Curated", desc: "Hand-picked experiences" },
                       { icon: Sparkles, title: "AI Customizable", desc: "Tailor it to your needs" },
                     ].map((item, i) => (
                       <Card key={i} className="border-border/50 hover:border-secondary/30 hover:shadow-sm transition-all group">
-                        <CardContent className="p-4 text-center">
-                          <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center mx-auto mb-2 group-hover:bg-secondary/20 transition-colors">
-                            <item.icon className="w-5 h-5 text-secondary" />
+                        <CardContent className="p-3 sm:p-4 text-center">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-secondary/10 flex items-center justify-center mx-auto mb-1.5 sm:mb-2 group-hover:bg-secondary/20 transition-colors">
+                            <item.icon className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" />
                           </div>
-                          <p className="font-semibold text-sm mb-0.5">{item.title}</p>
-                          <p className="text-xs text-muted-foreground">{item.desc}</p>
+                          <p className="font-semibold text-xs sm:text-sm mb-0.5">{item.title}</p>
+                          <p className="text-[10px] sm:text-xs text-muted-foreground leading-tight">{item.desc}</p>
                         </CardContent>
                       </Card>
                     ))}
@@ -467,25 +469,25 @@ const ComboPackageDetail = () => {
 
               {/* ── ITINERARY TAB ── */}
               <section ref={(el) => { sectionRefs.current.itinerary = el; }} id="section-itinerary" className="scroll-mt-40">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-secondary" /> Day-by-Day Itinerary
+                <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
+                  <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
+                    <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" /> Day-by-Day Itinerary
                   </h2>
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-[10px] sm:text-xs whitespace-nowrap flex-shrink-0">
                     {combo.duration_days} Days · {combo.items?.length || 0} Activities
                   </Badge>
                 </div>
                 <ComboItinerary items={combo.items || []} totalDays={combo.duration_days} />
                 
                 {/* Customize CTA */}
-                <Card className={cn("mt-6 border-0 bg-gradient-to-r", typeConfig.gradient)}>
-                  <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-4">
+                <Card className={cn("mt-4 sm:mt-6 border-0 bg-gradient-to-r", typeConfig.gradient)}>
+                  <CardContent className="p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                     <div className="flex-1">
-                      <h3 className="font-bold text-lg mb-1">Want to customize this itinerary?</h3>
-                      <p className="text-sm text-muted-foreground">Swap activities, extend days, or upgrade hotels with our AI Trip Planner.</p>
+                      <h3 className="font-bold text-base sm:text-lg mb-1">Want to customize this itinerary?</h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground">Swap activities, extend days, or upgrade hotels with our AI Trip Planner.</p>
                     </div>
-                    <Link to={`/plan-trip?combo=${combo.slug}`}>
-                      <Button className="bg-secondary text-secondary-foreground rounded-xl font-semibold gap-2 whitespace-nowrap">
+                    <Link to={`/plan-trip?combo=${combo.slug}`} className="w-full sm:w-auto">
+                      <Button className="bg-secondary text-secondary-foreground rounded-xl font-semibold gap-2 whitespace-nowrap w-full sm:w-auto">
                         <Sparkles className="w-4 h-4" /> Customize Now
                       </Button>
                     </Link>
@@ -495,39 +497,39 @@ const ComboPackageDetail = () => {
 
               {/* ── PRICING TAB ── */}
               <section ref={(el) => { sectionRefs.current.pricing = el; }} id="section-pricing" className="scroll-mt-40">
-                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                  <Ticket className="w-5 h-5 text-secondary" /> Pricing & Inclusions
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2">
+                  <Ticket className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" /> Pricing & Inclusions
                 </h2>
                 <ComboPricing combo={combo} />
               </section>
 
               {/* ── REVIEWS TAB ── */}
               <section ref={(el) => { sectionRefs.current.reviews = el; }} id="section-reviews" className="scroll-mt-40">
-                <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                  <Star className="w-5 h-5 text-secondary" /> Guest Reviews
+                <h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
+                  <Star className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" /> Guest Reviews
                 </h2>
 
                 {/* Rating Summary */}
-                <Card className="border-border/50 mb-6">
-                  <CardContent className="p-6">
-                    <div className="grid md:grid-cols-[auto_1fr] gap-8">
+                <Card className="border-border/50 mb-4 sm:mb-6">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-4 sm:gap-8">
                       {/* Big Score */}
-                      <div className="text-center md:pr-8 md:border-r border-border/50">
-                        <p className="text-5xl font-extrabold text-foreground">{avgRating}</p>
-                        <div className="flex items-center justify-center gap-0.5 my-2">
+                      <div className="text-center sm:pr-8 sm:border-r border-border/50 pb-4 sm:pb-0 border-b sm:border-b-0">
+                        <p className="text-4xl sm:text-5xl font-extrabold text-foreground">{avgRating}</p>
+                        <div className="flex items-center justify-center gap-0.5 my-1.5 sm:my-2">
                           {[1,2,3,4,5].map(s => (
-                            <Star key={s} className={cn("w-4 h-4", s <= Math.round(avgRating) ? "text-amber-500 fill-amber-500" : "text-muted-foreground/30")} />
+                            <Star key={s} className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4", s <= Math.round(avgRating) ? "text-amber-500 fill-amber-500" : "text-muted-foreground/30")} />
                           ))}
                         </div>
-                        <p className="text-sm text-muted-foreground">{reviews.length} reviews</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">{reviews.length} reviews</p>
                       </div>
                       {/* Distribution */}
-                      <div className="space-y-2">
+                      <div className="space-y-1.5 sm:space-y-2">
                         {ratingDistribution.map((r) => (
-                          <div key={r.stars} className="flex items-center gap-3">
-                            <span className="text-sm w-12 text-muted-foreground">{r.stars} star</span>
-                            <Progress value={r.pct} className="h-2 flex-1" />
-                            <span className="text-xs text-muted-foreground w-10 text-right">{r.pct}%</span>
+                          <div key={r.stars} className="flex items-center gap-2 sm:gap-3">
+                            <span className="text-xs sm:text-sm w-10 sm:w-12 text-muted-foreground">{r.stars} star</span>
+                            <Progress value={r.pct} className="h-1.5 sm:h-2 flex-1" />
+                            <span className="text-[10px] sm:text-xs text-muted-foreground w-8 sm:w-10 text-right">{r.pct}%</span>
                           </div>
                         ))}
                       </div>
@@ -537,7 +539,7 @@ const ComboPackageDetail = () => {
 
                 {/* Review Cards */}
                 {reviews.length > 0 ? (
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {reviews.map((review, idx) => (
                       <motion.div
                         key={review.id}
@@ -546,23 +548,23 @@ const ComboPackageDetail = () => {
                         transition={{ delay: idx * 0.05 }}
                       >
                         <Card className="border-border/50 h-full hover:shadow-sm transition-shadow">
-                          <CardContent className="p-5">
-                            <div className="flex items-center gap-3 mb-3">
-                              <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-bold text-sm">
+                          <CardContent className="p-4 sm:p-5">
+                            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-bold text-xs sm:text-sm flex-shrink-0">
                                 {review.name.charAt(0).toUpperCase()}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-sm truncate">{review.name}</p>
-                                <p className="text-xs text-muted-foreground">{review.date}</p>
+                                <p className="font-semibold text-xs sm:text-sm truncate">{review.name}</p>
+                                <p className="text-[10px] sm:text-xs text-muted-foreground">{review.date}</p>
                               </div>
-                              <div className="flex items-center gap-0.5">
+                              <div className="flex items-center gap-0.5 flex-shrink-0">
                                 {[1,2,3,4,5].map(s => (
-                                  <Star key={s} className={cn("w-3 h-3", s <= review.rating ? "text-amber-500 fill-amber-500" : "text-muted-foreground/20")} />
+                                  <Star key={s} className={cn("w-2.5 h-2.5 sm:w-3 sm:h-3", s <= review.rating ? "text-amber-500 fill-amber-500" : "text-muted-foreground/20")} />
                                 ))}
                               </div>
                             </div>
-                            {review.title && <p className="font-medium text-sm mb-1">{review.title}</p>}
-                            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{review.content}</p>
+                            {review.title && <p className="font-medium text-xs sm:text-sm mb-1">{review.title}</p>}
+                            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3">{review.content}</p>
                           </CardContent>
                         </Card>
                       </motion.div>
@@ -570,9 +572,9 @@ const ComboPackageDetail = () => {
                   </div>
                 ) : (
                   <Card className="border-border/50">
-                    <CardContent className="p-8 text-center">
-                      <Quote className="w-10 h-10 text-muted-foreground/20 mx-auto mb-3" />
-                      <p className="text-muted-foreground">No reviews yet. Be the first to experience this package!</p>
+                    <CardContent className="p-6 sm:p-8 text-center">
+                      <Quote className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground/20 mx-auto mb-3" />
+                      <p className="text-sm text-muted-foreground">No reviews yet. Be the first to experience this package!</p>
                     </CardContent>
                   </Card>
                 )}
@@ -580,16 +582,16 @@ const ComboPackageDetail = () => {
 
               {/* ── FAQ TAB ── */}
               <section ref={(el) => { sectionRefs.current.faq = el; }} id="section-faq" className="scroll-mt-40">
-                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                  <MessageCircle className="w-5 h-5 text-secondary" /> Frequently Asked Questions
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" /> Frequently Asked Questions
                 </h2>
-                <Accordion type="single" collapsible className="bg-card rounded-xl border border-border/50">
+                <Accordion type="single" collapsible className="bg-card rounded-lg sm:rounded-xl border border-border/50">
                   {faqs.map((faq, index) => (
                     <AccordionItem key={index} value={`faq-${index}`} className="border-b border-border/50 last:border-0">
-                      <AccordionTrigger className="px-6 text-left hover:no-underline text-sm font-medium">
+                      <AccordionTrigger className="px-4 sm:px-6 text-left hover:no-underline text-xs sm:text-sm font-medium">
                         {faq.question}
                       </AccordionTrigger>
-                      <AccordionContent className="px-6 pb-4 text-muted-foreground text-sm leading-relaxed">
+                      <AccordionContent className="px-4 sm:px-6 pb-3 sm:pb-4 text-muted-foreground text-xs sm:text-sm leading-relaxed">
                         {faq.answer}
                       </AccordionContent>
                     </AccordionItem>
@@ -598,8 +600,8 @@ const ComboPackageDetail = () => {
               </section>
             </div>
 
-            {/* ═══ Sidebar ═══ */}
-            <div className="space-y-6">
+            {/* ═══ Sidebar — hidden on mobile, shown on lg ═══ */}
+            <div className="hidden lg:block space-y-6">
               <ComboBookingCard combo={combo} />
 
               {/* Need Help Card */}
@@ -635,14 +637,14 @@ const ComboPackageDetail = () => {
 
           {/* ───── Related Packages ───── */}
           {filteredRelatedCombos && filteredRelatedCombos.length > 0 && (
-            <motion.section className="mt-16" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Similar Packages</h2>
-                <Link to="/combo-packages" className="text-secondary font-medium flex items-center gap-1 hover:underline text-sm">
+            <motion.section className="mt-10 sm:mt-16" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold">Similar Packages</h2>
+                <Link to="/combo-packages" className="text-secondary font-medium flex items-center gap-1 hover:underline text-xs sm:text-sm">
                   View All <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {filteredRelatedCombos.map((relatedCombo, i) => (
                   <motion.div key={relatedCombo.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 + i * 0.1 }}>
                     <ComboCard combo={relatedCombo} />
@@ -655,26 +657,26 @@ const ComboPackageDetail = () => {
       </div>
 
       {/* ───── Mobile Sticky CTA ───── */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-card/95 backdrop-blur-lg border-t border-border/50 px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
+      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-card/95 backdrop-blur-lg border-t border-border/50 px-3 sm:px-4 py-2.5 sm:py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] pb-safe">
         <div className="flex items-center justify-between gap-3 max-w-lg mx-auto">
-          <div>
+          <div className="min-w-0">
             <div className="flex items-baseline gap-1.5">
               {combo.discount_percent > 0 && (
-                <span className="text-xs text-muted-foreground line-through">{formatPrice(combo.base_price_aed)}</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground line-through">{formatPrice(combo.base_price_aed)}</span>
               )}
-              <span className="text-xl font-extrabold text-secondary">{formatPrice(combo.final_price_aed)}</span>
+              <span className="text-lg sm:text-xl font-extrabold text-secondary">{formatPrice(combo.final_price_aed)}</span>
             </div>
-            <p className="text-[11px] text-muted-foreground">/person · {combo.duration_days} Days</p>
+            <p className="text-[10px] sm:text-[11px] text-muted-foreground">/person · {combo.duration_days} Days</p>
           </div>
           <Button
             onClick={() => document.querySelector<HTMLButtonElement>('[data-combo-book]')?.click()}
-            className="bg-secondary text-secondary-foreground font-bold rounded-xl h-11 px-6"
+            className="bg-secondary text-secondary-foreground font-bold rounded-xl h-10 sm:h-11 px-4 sm:px-6 text-sm flex-shrink-0"
           >
             Book Now <ArrowRight className="w-4 h-4 ml-1" />
           </Button>
         </div>
       </div>
-      <div className="h-20 lg:hidden" />
+      <div className="h-16 sm:h-20 lg:hidden" />
     </Layout>
   );
 };
