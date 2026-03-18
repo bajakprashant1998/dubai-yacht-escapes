@@ -31,7 +31,7 @@ const ComboPricing = ({ combo }: ComboPricingProps) => {
           <p className="text-sm text-muted-foreground mb-1">Package Price</p>
           {combo.discount_percent > 0 && (
             <p className="text-lg text-muted-foreground line-through">
-              AED {combo.base_price_aed.toLocaleString()}
+              {formatPrice(combo.base_price_aed)}
             </p>
           )}
           <p className="text-4xl font-bold text-foreground">
