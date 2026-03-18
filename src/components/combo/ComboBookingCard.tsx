@@ -51,7 +51,7 @@ const ComboBookingCard = ({ combo }: ComboBookingCardProps) => {
             )}
             <div className="flex items-baseline justify-center gap-1">
               <span className="text-4xl font-extrabold text-foreground">
-                AED {combo.final_price_aed.toLocaleString()}
+                {formatPrice(combo.final_price_aed)}
               </span>
             </div>
             <p className="text-sm text-muted-foreground mt-1">per person</p>
