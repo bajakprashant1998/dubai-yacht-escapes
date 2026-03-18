@@ -660,9 +660,9 @@ const ComboPackageDetail = () => {
           <div>
             <div className="flex items-baseline gap-1.5">
               {combo.discount_percent > 0 && (
-                <span className="text-xs text-muted-foreground line-through">AED {combo.base_price_aed.toLocaleString()}</span>
+                <span className="text-xs text-muted-foreground line-through">{formatPrice(combo.base_price_aed)}</span>
               )}
-              <span className="text-xl font-extrabold text-secondary">AED {combo.final_price_aed.toLocaleString()}</span>
+              <span className="text-xl font-extrabold text-secondary">{formatPrice(combo.final_price_aed)}</span>
             </div>
             <p className="text-[11px] text-muted-foreground">/person · {combo.duration_days} Days</p>
           </div>

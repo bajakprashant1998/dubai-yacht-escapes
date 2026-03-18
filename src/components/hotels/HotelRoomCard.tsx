@@ -81,9 +81,9 @@ const HotelRoomCard = ({ room, onBook }: HotelRoomCardProps) => {
           <div className="flex items-end justify-between mt-4 pt-4 border-t border-border/50">
             <div>
               <div className="flex items-baseline gap-1.5">
-                <span className="text-xs text-muted-foreground line-through">AED {fakeOriginalPrice.toLocaleString()}</span>
+                <span className="text-xs text-muted-foreground line-through">{formatPrice(fakeOriginalPrice)}</span>
                 <span className="text-2xl font-bold text-secondary">
-                  AED {room.price_per_night.toLocaleString()}
+                  {formatPrice(room.price_per_night)}
                 </span>
               </div>
               <span className="text-xs text-muted-foreground">per night</span>

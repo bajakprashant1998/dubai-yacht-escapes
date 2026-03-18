@@ -85,14 +85,14 @@ const ComboBookingCard = ({ combo }: ComboBookingCardProps) => {
                   <Users className="w-3 h-3 text-muted-foreground" />
                   <span className="text-[10px] text-muted-foreground">2 Travelers</span>
                 </div>
-                <p className="text-sm font-bold">AED {(combo.final_price_aed * 2).toLocaleString()}</p>
+                <p className="text-sm font-bold">{formatPrice(combo.final_price_aed * 2)}</p>
               </div>
               <div className="text-center p-3 rounded-xl bg-muted/50">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <Users className="w-3 h-3 text-muted-foreground" />
                   <span className="text-[10px] text-muted-foreground">4 Travelers</span>
                 </div>
-                <p className="text-sm font-bold">AED {(combo.final_price_aed * 4).toLocaleString()}</p>
+                <p className="text-sm font-bold">{formatPrice(combo.final_price_aed * 4)}</p>
               </div>
             </div>
           </div>

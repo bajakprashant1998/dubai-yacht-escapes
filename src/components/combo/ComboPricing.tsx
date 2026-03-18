@@ -50,13 +50,13 @@ const ComboPricing = ({ combo }: ComboPricingProps) => {
           <div className="text-center p-4 rounded-lg bg-muted">
             <p className="text-sm text-muted-foreground mb-1">2 Travelers</p>
             <p className="text-xl font-bold text-foreground">
-              AED {(combo.final_price_aed * 2).toLocaleString()}
+              {formatPrice(combo.final_price_aed * 2)}
             </p>
           </div>
           <div className="text-center p-4 rounded-lg bg-muted">
             <p className="text-sm text-muted-foreground mb-1">4 Travelers</p>
             <p className="text-xl font-bold text-foreground">
-              AED {(combo.final_price_aed * 4).toLocaleString()}
+              {formatPrice(combo.final_price_aed * 4)}
             </p>
           </div>
         </div>
