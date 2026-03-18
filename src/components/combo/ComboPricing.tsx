@@ -8,6 +8,7 @@ interface ComboPricingProps {
 }
 
 const ComboPricing = ({ combo }: ComboPricingProps) => {
+  const { formatPrice } = useCurrency();
   const inclusions = [
     { included: combo.includes_hotel, label: `${combo.hotel_star_rating || 4}-Star Hotel Accommodation` },
     { included: combo.includes_transport, label: `Private ${combo.transport_type || "Sedan"} Transport` },
