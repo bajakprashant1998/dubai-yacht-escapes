@@ -35,7 +35,7 @@ const ComboPricing = ({ combo }: ComboPricingProps) => {
             </p>
           )}
           <p className="text-4xl font-bold text-foreground">
-            AED {combo.final_price_aed.toLocaleString()}
+            {formatPrice(combo.final_price_aed)}
           </p>
           <p className="text-sm text-muted-foreground">per person</p>
           {savings > 0 && (
