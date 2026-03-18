@@ -46,7 +46,7 @@ const ComboBookingCard = ({ combo }: ComboBookingCardProps) => {
             <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Starting from</p>
             {combo.discount_percent > 0 && (
               <p className="text-base text-muted-foreground line-through">
-                AED {combo.base_price_aed.toLocaleString()}
+                {formatPrice(combo.base_price_aed)}
               </p>
             )}
             <div className="flex items-baseline justify-center gap-1">
