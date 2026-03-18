@@ -144,6 +144,7 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <CurrencyProvider>
     <I18nProvider>
     <TooltipProvider>
       <Toaster />
