@@ -1,5 +1,6 @@
 import { Check, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useCurrency } from "@/hooks/useCurrency";
 import type { ComboPackage } from "@/hooks/useComboPackages";
 
 interface ComboPricingProps {
