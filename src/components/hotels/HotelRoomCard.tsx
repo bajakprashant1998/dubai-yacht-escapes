@@ -11,6 +11,7 @@ interface HotelRoomCardProps {
 }
 
 const HotelRoomCard = ({ room, onBook }: HotelRoomCardProps) => {
+  const { formatPrice } = useCurrency();
   const fakeOriginalPrice = Math.round(room.price_per_night * 1.18);
 
   return (
