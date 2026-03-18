@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useContactConfig } from "@/hooks/useContactConfig";
+import { useCurrency } from "@/hooks/useCurrency";
 import CheckoutModal from "@/components/checkout/CheckoutModal";
 import type { ComboPackage } from "@/hooks/useComboPackages";
 
