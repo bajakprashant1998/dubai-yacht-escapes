@@ -16,6 +16,7 @@ interface FloatingBookWidgetProps {
 const FloatingBookWidget = ({ price, originalPrice, tourTitle, onBookClick, pricingType = "per_person" }: FloatingBookWidgetProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const { whatsappLinkWithGreeting } = useContactConfig();
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     const handleScroll = () => {
