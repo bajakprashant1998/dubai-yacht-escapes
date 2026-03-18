@@ -3,6 +3,7 @@ import { MessageCircle, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useContactConfig } from "@/hooks/useContactConfig";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface FloatingBookWidgetProps {
   price: number;
