@@ -2,6 +2,7 @@ import { Users, Bed, Maximize, Check, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useCurrency } from "@/hooks/useCurrency";
 import { HotelRoom } from "@/hooks/useHotelRooms";
 
 interface HotelRoomCardProps {
