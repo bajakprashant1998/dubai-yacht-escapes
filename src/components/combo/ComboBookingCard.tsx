@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useContactConfig } from "@/hooks/useContactConfig";
+import { useCurrency } from "@/hooks/useCurrency";
 import CheckoutModal from "@/components/checkout/CheckoutModal";
 import type { ComboPackage } from "@/hooks/useComboPackages";
 
@@ -14,6 +15,7 @@ interface ComboBookingCardProps {
 
 const ComboBookingCard = ({ combo }: ComboBookingCardProps) => {
   const { phone, whatsappLink } = useContactConfig();
+  const { formatPrice } = useCurrency();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   const savings = combo.base_price_aed - combo.final_price_aed;
@@ -44,18 +46,18 @@ const ComboBookingCard = ({ combo }: ComboBookingCardProps) => {
             <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Starting from</p>
             {combo.discount_percent > 0 && (
               <p className="text-base text-muted-foreground line-through">
-                AED {combo.base_price_aed.toLocaleString()}
+                {formatPrice(combo.base_price_aed)}
               </p>
             )}
             <div className="flex items-baseline justify-center gap-1">
               <span className="text-4xl font-extrabold text-foreground">
-                AED {combo.final_price_aed.toLocaleString()}
+                {formatPrice(combo.final_price_aed)}
               </span>
             </div>
             <p className="text-sm text-muted-foreground mt-1">per person</p>
             {savings > 0 && (
               <Badge className="mt-3 bg-green-500/10 text-green-600 border-green-500/20 text-xs font-semibold">
-                You save AED {savings.toLocaleString()} ({combo.discount_percent}%)
+                You save {formatPrice(savings)} ({combo.discount_percent}%)
               </Badge>
             )}
           </div>
@@ -83,14 +85,14 @@ const ComboBookingCard = ({ combo }: ComboBookingCardProps) => {
                   <Users className="w-3 h-3 text-muted-foreground" />
                   <span className="text-[10px] text-muted-foreground">2 Travelers</span>
                 </div>
-                <p className="text-sm font-bold">AED {(combo.final_price_aed * 2).toLocaleString()}</p>
+                <p className="text-sm font-bold">{formatPrice(combo.final_price_aed * 2)}</p>
               </div>
               <div className="text-center p-3 rounded-xl bg-muted/50">
                 <div className="flex items-center justify-center gap-1 mb-1">
                   <Users className="w-3 h-3 text-muted-foreground" />
                   <span className="text-[10px] text-muted-foreground">4 Travelers</span>
                 </div>
-                <p className="text-sm font-bold">AED {(combo.final_price_aed * 4).toLocaleString()}</p>
+                <p className="text-sm font-bold">{formatPrice(combo.final_price_aed * 4)}</p>
               </div>
             </div>
           </div>

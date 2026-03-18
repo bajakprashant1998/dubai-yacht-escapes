@@ -3,6 +3,7 @@ import { MessageCircle, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useContactConfig } from "@/hooks/useContactConfig";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface FloatingBookWidgetProps {
   price: number;
@@ -15,6 +16,7 @@ interface FloatingBookWidgetProps {
 const FloatingBookWidget = ({ price, originalPrice, tourTitle, onBookClick, pricingType = "per_person" }: FloatingBookWidgetProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const { whatsappLinkWithGreeting } = useContactConfig();
+  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,9 +45,9 @@ const FloatingBookWidget = ({ price, originalPrice, tourTitle, onBookClick, pric
           <div>
             <p className="text-xs text-muted-foreground line-clamp-1">{tourTitle}</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-xl font-bold text-foreground">AED {price}</span>
+              <span className="text-xl font-bold text-foreground">{formatPrice(price)}</span>
               {originalPrice > price && (
-                <span className="text-sm text-muted-foreground line-through">AED {originalPrice}</span>
+                <span className="text-sm text-muted-foreground line-through">{formatPrice(originalPrice)}</span>
               )}
             </div>
           </div>

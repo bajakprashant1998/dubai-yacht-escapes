@@ -1,5 +1,6 @@
 import { Check, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useCurrency } from "@/hooks/useCurrency";
 import type { ComboPackage } from "@/hooks/useComboPackages";
 
 interface ComboPricingProps {
@@ -7,6 +8,7 @@ interface ComboPricingProps {
 }
 
 const ComboPricing = ({ combo }: ComboPricingProps) => {
+  const { formatPrice } = useCurrency();
   const inclusions = [
     { included: combo.includes_hotel, label: `${combo.hotel_star_rating || 4}-Star Hotel Accommodation` },
     { included: combo.includes_transport, label: `Private ${combo.transport_type || "Sedan"} Transport` },
@@ -29,16 +31,16 @@ const ComboPricing = ({ combo }: ComboPricingProps) => {
           <p className="text-sm text-muted-foreground mb-1">Package Price</p>
           {combo.discount_percent > 0 && (
             <p className="text-lg text-muted-foreground line-through">
-              AED {combo.base_price_aed.toLocaleString()}
+              {formatPrice(combo.base_price_aed)}
             </p>
           )}
           <p className="text-4xl font-bold text-foreground">
-            AED {combo.final_price_aed.toLocaleString()}
+            {formatPrice(combo.final_price_aed)}
           </p>
           <p className="text-sm text-muted-foreground">per person</p>
           {savings > 0 && (
             <div className="inline-flex items-center gap-2 mt-3 px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm font-medium">
-              You save AED {savings.toLocaleString()} ({combo.discount_percent}%)
+              You save {formatPrice(savings)} ({combo.discount_percent}%)
             </div>
           )}
         </div>
@@ -48,13 +50,13 @@ const ComboPricing = ({ combo }: ComboPricingProps) => {
           <div className="text-center p-4 rounded-lg bg-muted">
             <p className="text-sm text-muted-foreground mb-1">2 Travelers</p>
             <p className="text-xl font-bold text-foreground">
-              AED {(combo.final_price_aed * 2).toLocaleString()}
+              {formatPrice(combo.final_price_aed * 2)}
             </p>
           </div>
           <div className="text-center p-4 rounded-lg bg-muted">
             <p className="text-sm text-muted-foreground mb-1">4 Travelers</p>
             <p className="text-xl font-bold text-foreground">
-              AED {(combo.final_price_aed * 4).toLocaleString()}
+              {formatPrice(combo.final_price_aed * 4)}
             </p>
           </div>
         </div>
