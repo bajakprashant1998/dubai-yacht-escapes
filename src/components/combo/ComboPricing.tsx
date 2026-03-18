@@ -40,7 +40,7 @@ const ComboPricing = ({ combo }: ComboPricingProps) => {
           <p className="text-sm text-muted-foreground">per person</p>
           {savings > 0 && (
             <div className="inline-flex items-center gap-2 mt-3 px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm font-medium">
-              You save AED {savings.toLocaleString()} ({combo.discount_percent}%)
+              You save {formatPrice(savings)} ({combo.discount_percent}%)
             </div>
           )}
         </div>
