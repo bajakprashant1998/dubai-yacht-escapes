@@ -15,6 +15,7 @@ interface ComboBookingCardProps {
 
 const ComboBookingCard = ({ combo }: ComboBookingCardProps) => {
   const { phone, whatsappLink } = useContactConfig();
+  const { formatPrice } = useCurrency();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   const savings = combo.base_price_aed - combo.final_price_aed;
