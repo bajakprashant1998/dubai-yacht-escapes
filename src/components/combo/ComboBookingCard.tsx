@@ -57,7 +57,7 @@ const ComboBookingCard = ({ combo }: ComboBookingCardProps) => {
             <p className="text-sm text-muted-foreground mt-1">per person</p>
             {savings > 0 && (
               <Badge className="mt-3 bg-green-500/10 text-green-600 border-green-500/20 text-xs font-semibold">
-                You save AED {savings.toLocaleString()} ({combo.discount_percent}%)
+                You save {formatPrice(savings)} ({combo.discount_percent}%)
               </Badge>
             )}
           </div>
