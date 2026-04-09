@@ -342,48 +342,81 @@ const ServiceDetail = () => {
                     )}
                   </TabsList>
 
-                  <TabsContent value="overview" className="pt-8 space-y-8">
+                  <TabsContent value="overview" className="pt-8 space-y-10">
+                    {/* About This Experience - Premium Card */}
                     {service.description && (
-                      <div>
-                        <h3 className="text-xl font-bold mb-3 flex items-center gap-2">
-                          <Sparkles className="w-5 h-5 text-secondary" />
-                          About This Experience
-                        </h3>
-                        <p className="text-muted-foreground leading-relaxed text-[15px]">
-                          {service.description}
-                        </p>
-                      </div>
+                      <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="relative rounded-2xl border border-border/60 bg-gradient-to-br from-card via-card to-secondary/5 p-6 lg:p-8 overflow-hidden"
+                      >
+                        {/* Decorative accent */}
+                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-secondary via-secondary/60 to-transparent rounded-l-2xl" />
+                        <div className="absolute -top-12 -right-12 w-32 h-32 bg-secondary/5 rounded-full blur-2xl" />
+
+                        <div className="relative">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-secondary/20 to-secondary/5 flex items-center justify-center shadow-sm">
+                              <Sparkles className="w-5 h-5 text-secondary" />
+                            </div>
+                            <h3 className="text-xl lg:text-2xl font-display font-bold tracking-tight">
+                              About This Experience
+                            </h3>
+                          </div>
+                          <p className="text-muted-foreground leading-relaxed text-[15px] lg:text-base pl-[52px]">
+                            {service.description}
+                          </p>
+                        </div>
+                      </motion.div>
                     )}
+
+                    {/* Long Description */}
                     {service.longDescription && (
-                      <div
-                        className="prose prose-sm max-w-none text-muted-foreground [&_h2]:text-foreground [&_h3]:text-foreground [&_strong]:text-foreground [&_ul]:list-disc [&_ol]:list-decimal [&_li]:ml-4"
+                      <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                        className="rounded-2xl border border-border/40 bg-card p-6 lg:p-8 prose prose-sm max-w-none text-muted-foreground [&_h2]:text-foreground [&_h3]:text-foreground [&_strong]:text-foreground [&_ul]:list-disc [&_ol]:list-decimal [&_li]:ml-4"
                         dangerouslySetInnerHTML={{ __html: service.longDescription }}
                       />
                     )}
+
+                    {/* Highlights - Premium Grid */}
                     {service.highlights && service.highlights.length > 0 && (
-                      <div>
-                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                          <Star className="w-5 h-5 text-secondary" />
-                          Highlights
-                        </h3>
+                      <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.15 }}
+                      >
+                        <div className="flex items-center gap-3 mb-5">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-secondary/20 to-secondary/5 flex items-center justify-center shadow-sm">
+                            <Star className="w-5 h-5 text-secondary fill-secondary" />
+                          </div>
+                          <div>
+                            <h3 className="text-xl lg:text-2xl font-display font-bold tracking-tight">Highlights</h3>
+                            <p className="text-sm text-muted-foreground">{service.highlights.length} amazing experiences await</p>
+                          </div>
+                        </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {service.highlights.map((highlight, idx) => (
                             <motion.div
                               key={idx}
-                              initial={{ opacity: 0, x: -10 }}
-                              whileInView={{ opacity: 1, x: 0 }}
+                              initial={{ opacity: 0, y: 12 }}
+                              whileInView={{ opacity: 1, y: 0 }}
                               viewport={{ once: true }}
-                              transition={{ delay: idx * 0.05 }}
-                              className="flex items-start gap-3 p-3 rounded-xl bg-secondary/5 border border-secondary/10"
+                              transition={{ delay: idx * 0.06, duration: 0.35 }}
+                              whileHover={{ scale: 1.02, y: -2 }}
+                              className="group flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-secondary/[0.04] to-secondary/[0.08] border border-secondary/10 hover:border-secondary/25 hover:shadow-md hover:shadow-secondary/5 transition-all duration-300 cursor-default"
                             >
-                              <div className="w-6 h-6 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <CheckCircle className="w-3.5 h-3.5 text-secondary" />
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-secondary to-secondary/70 flex items-center justify-center flex-shrink-0 shadow-sm shadow-secondary/20 group-hover:shadow-md group-hover:shadow-secondary/30 transition-shadow">
+                                <CheckCircle className="w-4 h-4 text-secondary-foreground" />
                               </div>
-                              <span className="text-sm">{highlight}</span>
+                              <span className="text-sm font-medium text-foreground/90 group-hover:text-foreground transition-colors">{highlight}</span>
                             </motion.div>
                           ))}
                         </div>
-                      </div>
+                      </motion.div>
                     )}
                   </TabsContent>
 
