@@ -387,42 +387,72 @@ const ServiceDetail = () => {
                     )}
                   </TabsContent>
 
-                  <TabsContent value="included" className="pt-8 space-y-8">
+                  <TabsContent value="included" className="pt-8 space-y-10">
                     {service.included && service.included.length > 0 && (
-                      <div>
-                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                          <CheckCircle className="w-5 h-5 text-green-500" />
-                          What's Included
-                        </h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/20">
+                            <CheckCircle className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold text-foreground">What's Included</h3>
+                            <p className="text-xs text-muted-foreground">{service.included.length} items included in your package</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {service.included.map((item, idx) => (
-                            <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-green-500/5 border border-green-500/10">
-                              <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                                <CheckCircle className="w-3 h-3 text-green-600" />
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.3, delay: idx * 0.05 }}
+                              className="group flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-green-500/5 to-emerald-500/5 border border-green-500/15 hover:border-green-500/30 hover:shadow-md hover:shadow-green-500/5 transition-all duration-300"
+                            >
+                              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                                <CheckCircle className="w-4 h-4 text-green-600" />
                               </div>
-                              <span className="text-sm">{item}</span>
-                            </div>
+                              <span className="text-sm font-medium text-foreground">{item}</span>
+                            </motion.div>
                           ))}
                         </div>
-                      </div>
+                      </motion.div>
                     )}
                     {service.excluded && service.excluded.length > 0 && (
-                      <div>
-                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                          <XCircle className="w-5 h-5 text-destructive" />
-                          What's Not Included
-                        </h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                      >
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center shadow-lg shadow-red-500/20">
+                            <XCircle className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold text-foreground">What's Not Included</h3>
+                            <p className="text-xs text-muted-foreground">Available as optional add-ons</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {service.excluded.map((item, idx) => (
-                            <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-destructive/5 border border-destructive/10">
-                              <div className="w-5 h-5 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
-                                <XCircle className="w-3 h-3 text-destructive" />
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.3, delay: idx * 0.05 }}
+                              className="group flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-red-500/5 to-rose-500/5 border border-red-500/15 hover:border-red-500/30 hover:shadow-md hover:shadow-red-500/5 transition-all duration-300"
+                            >
+                              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-red-500/20 to-rose-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                                <XCircle className="w-4 h-4 text-red-500" />
                               </div>
-                              <span className="text-sm">{item}</span>
-                            </div>
+                              <span className="text-sm font-medium text-foreground/80">{item}</span>
+                            </motion.div>
                           ))}
                         </div>
-                      </div>
+                      </motion.div>
                     )}
                   </TabsContent>
 
